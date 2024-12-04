@@ -20,6 +20,7 @@ class AppColors {
   static final textSuccess = Color(0xff288267);
   static final backgroundDoing = Color(0xffEAF2FF);
   static final textDoing = Color(0xff006FFD);
+  static final iconFlight = Color(0xffE86339);
 
   static const List<Color> gradientColors = [
     primary,

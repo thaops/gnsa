@@ -15,6 +15,7 @@ class CustomTextField extends StatefulWidget {
   final double? borderWidth;
   final Color? backgroundColor;
   final double? borderRadius;
+  final Color? borderColor;
   CustomTextField({
     required this.controller,
     required this.hintText,
@@ -29,6 +30,7 @@ class CustomTextField extends StatefulWidget {
     this.borderWidth,
     this.backgroundColor,
     this.borderRadius = 12,
+    this.borderColor,
   });
 
   @override
@@ -89,7 +91,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                 borderRadius: BorderRadius.circular(
                     widget.borderRadius ?? 12), // Đặt độ bo tròn
                 borderSide: BorderSide(
-                    color: Colors.grey.shade400,
+                    color: widget.borderColor ?? Colors.grey.shade400,
                     width:
                         widget.borderWidth ?? 1), // Màu border khi không focus
               ),

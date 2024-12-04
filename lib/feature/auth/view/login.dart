@@ -19,33 +19,35 @@ class Login extends StatelessWidget {
         child: SizedBox(
           width: Get.width,
           height: Get.height,
-          child: Column(
-            children: [
-              // Expanded(
-              //   flex: 1,
-              //   child: Container(
-              //     width: Get.width,
-              //     color: AppColors.primary,
-              //     child: Image.asset(
-              //       Img.background,
-              //       fit: BoxFit.cover,
-              //     ),
-              //   ),
-              // ),
-              Expanded(
-                flex: 1,
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w),
+          child: Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(Img.background),
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  width: Get.width * 0.8,
+                  padding: EdgeInsets.all(24.w),
+                  decoration: BoxDecoration(
+                    color: AppColors.white.withOpacity(0.9),
+                    borderRadius: BorderRadius.circular(24.r),
+                  ),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      50.verticalSpace,
-                      const TextWidget(
-                        text: 'Hệ thống GNSA!',
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      for (var text in ['Hệ Thống', 'Giao Nhận Xuất Ăn'])
+                        TextWidget(
+                          text: text,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
+                        ),
                       24.verticalSpace,
                       CustomTextField(
                         controller: controller.nameController,
@@ -66,11 +68,12 @@ class Login extends StatelessWidget {
                           controller.login();
                         },
                       ),
+                      30.verticalSpace,
                     ],
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
