@@ -7,6 +7,7 @@ import 'package:gnsa/feature/presentation/flight_list/controller/flight_list_con
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:gnsa/feature/presentation/flight_list/widget/costom_flight_list.dart';
+import 'package:gnsa/common/utils/responsive_helper.dart';
 
 class FlightList extends StatefulWidget {
   const FlightList({super.key});
@@ -19,6 +20,8 @@ class _FlightListState extends State<FlightList> {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<FlightListController>();
+    bool isTablet = ResponsiveHelper.isTablet(context);
+    bool isWeb = ResponsiveHelper.isWeb(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -32,7 +35,12 @@ class _FlightListState extends State<FlightList> {
       ),
       body: Container(
         color: AppColors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+        padding: EdgeInsets.symmetric(
+            horizontal: isWeb
+                ? Get.width * 0.3
+                : isTablet
+                    ? Get.width * 0.1
+                    : 26),
         child: Column(
           children: [
             CustomTextField(
@@ -46,7 +54,7 @@ class _FlightListState extends State<FlightList> {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: 2,
+                itemCount: 10,
                 itemBuilder: (context, index) => Padding(
                   padding: EdgeInsets.symmetric(vertical: 16.h),
                   child: CustomFightList(

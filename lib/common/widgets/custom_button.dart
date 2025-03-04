@@ -13,6 +13,7 @@ class CustomButton extends StatelessWidget {
   final double? height;
   final double? horizontalPadding;
   final double? verticalPadding;
+  final int? fontSize;
   const CustomButton({
     Key? key,
     required this.text,
@@ -24,6 +25,7 @@ class CustomButton extends StatelessWidget {
     this.height,
     this.horizontalPadding,
     this.verticalPadding,
+    this.fontSize,
   }) : super(key: key);
 
   @override
@@ -47,7 +49,7 @@ class CustomButton extends StatelessWidget {
         ),
         child: TextWidget(
           text: text,
-          fontSize: 16,
+          fontSize: fontSize?.toDouble() ?? 16,
           fontWeight: FontWeight.w500,
           color: textColor ?? Colors.white,
         ),

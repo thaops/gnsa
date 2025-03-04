@@ -6,34 +6,65 @@ import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gnsa/feature/presentation/flight_detail/controller/flight_Detail_controller.dart';
 
-class CustomExpansionTile extends StatelessWidget {
-  const CustomExpansionTile({super.key});
+class CustomExpansionTile extends StatefulWidget {
+  final Color? backgroundColor;
+  const CustomExpansionTile({super.key, this.backgroundColor});
 
+  @override
+  State<CustomExpansionTile> createState() => _CustomExpansionTileState();
+}
+
+class _CustomExpansionTileState extends State<CustomExpansionTile> {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(FlightDetailController());
-
-    return Container(
+    return   Container(
       width: Get.width * 0.9,
-      padding: const EdgeInsets.all(8),
+      padding:  EdgeInsets.all(8.r),
       decoration: BoxDecoration(
-        color: AppColors.backgroundTab,
+        color: widget.backgroundColor ?? AppColors.backgroundTab,
         borderRadius: BorderRadius.circular(18),
       ),
-      child: GestureDetector(
-        child: ExpansionTile(
-          backgroundColor: AppColors.primary.withOpacity(0.1),
+      child:  ExpansionTile(
           collapsedShape: const RoundedRectangleBorder(
             side: BorderSide.none,
           ),
           shape: const RoundedRectangleBorder(
             side: BorderSide.none,
           ),
-          trailing: const TextWidget(
-            text: '15',
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: AppColors.black,
+          trailing: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              const TextWidget(
+                text: '15',
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+              SizedBox(height: 10.h),
+              Container(
+                height: 16.h,
+                width: 80.w,
+                padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+                decoration: BoxDecoration(
+                  color: AppColors.textSuccess,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.check, color: AppColors.white, size: 12.sp),
+                    SizedBox(width: 3.w),
+                    const TextWidget(
+                      text: 'Đã Xác nhận',
+                      fontSize: 8,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.white,
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
           title: const TextWidget(
             text: 'Suất ăn - Hạng PE & Y',
@@ -156,33 +187,7 @@ class CustomExpansionTile extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class ListItems extends StatelessWidget {
-  const ListItems({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: ListView(
-        padding: const EdgeInsets.all(8),
-        children: [
-          GestureDetector(
-            onTap: () {
-              print('tap');
-            },
-            child: Container(
-              height: 50,
-              color: Colors.amber[100],
-              child: const Center(child: Text('Entry A')),
-            ),
-          ),
-        ],
-      ),
+      
     );
   }
 }

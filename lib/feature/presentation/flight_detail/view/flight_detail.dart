@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gnsa/common/utils/responsive_helper.dart';
 import 'package:gnsa/common/widgets/custom_button.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
@@ -8,6 +9,7 @@ import 'package:gnsa/feature/presentation/flight_detail/controller/flight_Detail
 import 'package:gnsa/feature/presentation/flight_detail/widget/custom_ExpansionTile.dart';
 import 'package:gnsa/feature/presentation/flight_detail/widget/custom_detail_flight.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gnsa/router/app_router.dart';
 
 class FlightDetail extends StatelessWidget {
   const FlightDetail({super.key});
@@ -15,8 +17,10 @@ class FlightDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<FlightDetailController>();
+    bool isTablet = ResponsiveHelper.isTablet(context);
+    bool isWeb = ResponsiveHelper.isWeb(context);
 
-    return Scaffold(
+    return  Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.white,
         leading: IconButton(
@@ -33,14 +37,16 @@ class FlightDetail extends StatelessWidget {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              controller.onTapPrinter();
+            },
             icon: const Icon(Icons.file_present_outlined,
                 color: AppColors.primary),
           ),
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        padding:  EdgeInsets.symmetric(horizontal: isWeb ? Get.width * 0.3 : isTablet ? Get.width * 0.1 : 16, vertical: 16),
         child: Column(
           children: [
             CustomDetailFlight(
@@ -77,18 +83,27 @@ class FlightDetail extends StatelessWidget {
                     child: Material(
                       borderRadius: BorderRadius.circular(18),
                       color: AppColors.backgroundTab,
-                      child: CustomExpansionTile(),
+                      child: GestureDetector(
+                        onTap: () {
+                          controller.isExpanded.value = !controller.isExpanded.value;
+                          controller.update();
+                          print("isExpanded ${controller.isExpanded.value}");
+                        },
+                        child: CustomExpansionTile(
+                          backgroundColor:
+                              controller.isExpanded.value ? AppColors.primary.withOpacity(0.5) : AppColors.backgroundTab,
+                        ),
+                      ),
                     ),
                     actions: <CupertinoContextMenuAction>[
                       CupertinoContextMenuAction(
-                        
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Icon(Icons.edit, color: AppColors.primary),
                             10.horizontalSpace,
-                           const TextWidget(
+                            const TextWidget(
                               text: 'Ký xác nhận',
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
@@ -97,8 +112,7 @@ class FlightDetail extends StatelessWidget {
                           ],
                         ),
                         onPressed: () {
-                          print('Ký xác nhận');
-                          Navigator.pop(context);
+                          Get.toNamed(AppRouter.flightSignature);
                         },
                       ),
                     ],
@@ -117,6 +131,7 @@ class FlightDetail extends StatelessWidget {
           ],
         ),
       ),
+      
     );
   }
 }

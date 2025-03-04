@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gnsa/common/img/img.dart';
+import 'package:gnsa/common/utils/responsive_helper.dart';
 import 'package:gnsa/common/widgets/custom_button.dart';
 import 'package:gnsa/common/widgets/custom_text_field.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:gnsa/feature/auth/controller/login_controller.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class Login extends StatelessWidget {
   const Login({super.key});
@@ -14,6 +16,9 @@ class Login extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<LoginController>();
+    bool isTablet = ResponsiveHelper.isTablet(context);
+    bool isWeb = ResponsiveHelper.isWeb(context);
+
     return Scaffold(
       body: SingleChildScrollView(
         child: SizedBox(
@@ -31,7 +36,7 @@ class Login extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
-                  width: Get.width * 0.8,
+                  width: isWeb ? Get.width * 0.3 : isTablet ? Get.width * 0.5 : Get.width * 0.8,
                   padding: EdgeInsets.all(24.w),
                   decoration: BoxDecoration(
                     color: AppColors.white.withOpacity(0.9),

@@ -17,10 +17,11 @@ class AppColors {
   static final backgroundAddImage = Color(0xffE0F7FB);
   static final backgroundError = Color(0xffF4F5FA);
   static final backgroundSuccess = Color(0xffE7F4E8);
-  static final textSuccess = Color(0xff288267);
+  static final textSuccess = Color.fromARGB(255, 137, 236, 206);
   static final backgroundDoing = Color(0xffEAF2FF);
   static final textDoing = Color(0xff006FFD);
   static final iconFlight = Color(0xffE86339);
+  static final borderSignature = Color(0xffD4D6DD);
 
   static const List<Color> gradientColors = [
     primary,
