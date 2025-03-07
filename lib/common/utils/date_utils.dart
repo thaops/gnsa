@@ -1,33 +1,62 @@
-import 'package:intl/intl.dart'; // Đảm bảo bạn đã import thư viện intl
+import 'package:intl/intl.dart';
 
 class DateUtilsCustom {
-  // Hàm để định dạng DateTime thành chuỗi ngày tháng
+  // Hàm định dạng ngày (dd/MM/yyyy)
   static String formatDate(DateTime? date) {
     if (date != null) {
       try {
-        // Định dạng ngày tháng năm
-        return DateFormat('dd/MM/yyyy').format(date); // Định dạng ngày
+        return DateFormat('dd/MM/yyyy').format(date);
       } catch (e) {
-        print("Error formatting date: $e"); // In ra lỗi nếu có
-        return date.toString(); // Nếu không thể định dạng, giữ nguyên chuỗi
+        print("Error formatting date: $e");
+        return date.toString();
       }
     } else {
-      return 'N/A'; // Hoặc một thông báo mặc định khác
+      return 'N/A';
     }
   }
 
-  // Hàm để chuyển đổi chuỗi ISO 8601 thành DateTime và định dạng
+  // Hàm chuyển đổi chuỗi ISO 8601 thành DateTime rồi định dạng ngày
   static String formatStringDate(String? date) {
     if (date != null && date.isNotEmpty) {
       try {
-        DateTime dateTime = DateTime.parse(date); // Phân tích chuỗi ISO 8601 thành DateTime
-        return formatDate(dateTime); // Sử dụng hàm formatDate để định dạng
+        DateTime dateTime = DateTime.parse(date);
+        return formatDate(dateTime);
       } catch (e) {
-        print("Error parsing date: $e"); // In ra lỗi nếu có
-        return date; // Nếu không thể phân tích, giữ nguyên chuỗi
+        print("Error parsing date: $e");
+        return date;
       }
     } else {
-      return 'N/A'; // Hoặc một thông báo mặc định khác
+      return 'N/A';
+    }
+  }
+
+  // Hàm định dạng giờ (ví dụ: HH:mm)
+  static String formatTime(DateTime? time) {
+    if (time != null) {
+      try {
+        return DateFormat('HH:mm').format(time);
+        // Nếu muốn dùng định dạng 12 giờ, thay 'HH:mm' bằng 'hh:mm a'
+      } catch (e) {
+        print("Error formatting time: $e");
+        return time.toString();
+      }
+    } else {
+      return 'N/A';
+    }
+  }
+
+  // Hàm chuyển chuỗi ISO 8601 thành DateTime rồi định dạng giờ
+  static String formatStringTime(String? time) {
+    if (time != null && time.isNotEmpty) {
+      try {
+        DateTime dateTime = DateTime.parse(time);
+        return formatTime(dateTime);
+      } catch (e) {
+        print("Error parsing time: $e");
+        return time;
+      }
+    } else {
+      return 'N/A';
     }
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gnsa/common/utils/screen_size.dart';
+import 'package:gnsa/common/widgets/app_bar_widget.dart';
 import 'package:gnsa/common/widgets/custom_button.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:signature/signature.dart';
@@ -19,23 +20,17 @@ class _FlightSignState extends State<FlightSign> {
   Widget build(BuildContext context) {
     final title = Get.arguments as String;
     return Scaffold(
-      appBar: AppBar(
-        leading: const SizedBox(),
-        backgroundColor: AppColors.white,
-        title:
-            TextWidget(text: title, fontSize: 16, fontWeight: FontWeight.bold),
-        centerTitle: true,
-        actions: [
-          IconButton(
-              onPressed: () {
-                Get.back();
-              },
-              icon: const Icon(Icons.close, color: AppColors.primary)),
-        ],
+      appBar: AppBarWidget(
+        title: title,
+        isBack: false,
+        iconRightfirst: Icons.close,
+        functionfirst: () {
+          Get.back();
+        },
       ),
       body: SingleChildScrollView(
         child: SizedBox(
-          height: Get.height * 0.9,
+          height: Get.height * 0.85,
           width: Get.width,
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),

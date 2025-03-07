@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gnsa/common/widgets/app_bar_widget.dart' show AppBarWidget;
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:gnsa/feature/presentation/flight_signature/widget/custom_signature.dart';
@@ -12,20 +13,9 @@ class FlightSignature extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            Get.back();
-          },
-          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.primary),
-        ),
-        backgroundColor: AppColors.white,
-        title: const TextWidget(
-          text: 'Xác nhận',
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
-        centerTitle: true,
+      appBar:const AppBarWidget(
+        title: 'Xác nhận',
+        
       ),
       body: SingleChildScrollView(
         child: Container(

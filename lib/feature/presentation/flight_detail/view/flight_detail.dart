@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gnsa/common/utils/responsive_helper.dart';
+import 'package:gnsa/common/widgets/app_bar_widget.dart';
 import 'package:gnsa/common/widgets/custom_button.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
@@ -20,33 +21,23 @@ class FlightDetail extends StatelessWidget {
     bool isTablet = ResponsiveHelper.isTablet(context);
     bool isWeb = ResponsiveHelper.isWeb(context);
 
-    return  Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColors.white,
-        leading: IconButton(
-          onPressed: () {
-            Get.back();
-          },
-          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.primary),
-        ),
-        title: const TextWidget(
-          text: 'Cung ứng vật tư',
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () {
-              controller.onTapPrinter();
-            },
-            icon: const Icon(Icons.file_present_outlined,
-                color: AppColors.primary),
-          ),
-        ],
+    return Scaffold(
+      appBar: AppBarWidget(
+        title: 'Cung ứng vật tư',
+        iconRightfirst: Icons.file_present_outlined,
+        colorfirst: AppColors.primary,
+        functionfirst: () {
+          controller.onTapPrinter();
+        },
       ),
       body: Padding(
-        padding:  EdgeInsets.symmetric(horizontal: isWeb ? Get.width * 0.3 : isTablet ? Get.width * 0.1 : 16, vertical: 16),
+        padding: EdgeInsets.symmetric(
+            horizontal: isWeb
+                ? Get.width * 0.3
+                : isTablet
+                    ? Get.width * 0.1
+                    : 16,
+            vertical: 16),
         child: Column(
           children: [
             CustomDetailFlight(
@@ -75,33 +66,17 @@ class FlightDetail extends StatelessWidget {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: 2,
-                padding: EdgeInsets.symmetric(vertical: 16.h),
+                itemCount: 1,
                 itemBuilder: (context, index) => Padding(
                   padding: const EdgeInsets.only(bottom: 16),
                   child: CupertinoContextMenu(
-                    child: Material(
-                      borderRadius: BorderRadius.circular(18),
-                      color: AppColors.backgroundTab,
-                      child: GestureDetector(
-                        onTap: () {
-                          controller.isExpanded.value = !controller.isExpanded.value;
-                          controller.update();
-                          print("isExpanded ${controller.isExpanded.value}");
-                        },
-                        child: CustomExpansionTile(
-                          backgroundColor:
-                              controller.isExpanded.value ? AppColors.primary.withOpacity(0.5) : AppColors.backgroundTab,
-                        ),
-                      ),
-                    ),
                     actions: <CupertinoContextMenuAction>[
                       CupertinoContextMenuAction(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Icon(Icons.edit, color: AppColors.primary),
+                            const Icon(Icons.edit, color: AppColors.primary),
                             10.horizontalSpace,
                             const TextWidget(
                               text: 'Ký xác nhận',
@@ -116,22 +91,42 @@ class FlightDetail extends StatelessWidget {
                         },
                       ),
                     ],
+                    child: Material(
+                      borderRadius: BorderRadius.circular(18),
+                      color: AppColors.backgroundTab,
+                      child: InkWell(
+                        onTap: () {
+                          controller.isExpanded.value =
+                              !controller.isExpanded.value;
+                          controller.update();
+                        },
+                        child: CustomExpansionTile(
+                          backgroundColor: controller.isExpanded.value
+                              ? AppColors.primary.withOpacity(0.5)
+                              : AppColors.backgroundTab,
+                          title: 'Suất ăn - Hạng PE & Y',
+                          subtitle: 'Mã code: 1234',
+                          leadingIcon: Icons.airplane_ticket,
+                          trailingCount: '15',
+                          confirmationText: 'Đã Xác nhận',
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
-            Card(
-              elevation: 3,
-              child: CustomButton(
-                onPressed: () {},
-                color: AppColors.primary,
-                text: 'Ký xác nhận',
-              ),
+            CustomButton(
+              horizontalPadding: 16,
+              onPressed: () {},
+              color: AppColors.primary,
+              text: 'Ký xác nhận',
             ),
+
+            const SizedBox(height: 16),
           ],
         ),
       ),
-      
     );
   }
 }

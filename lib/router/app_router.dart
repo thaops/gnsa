@@ -25,7 +25,7 @@ class AppRouter {
     //flight list
     GetPage(
         name: flightList,
-        page: () => const FlightList(),
+        page: () =>  FlightList(),
         binding: FlightListBinding()),
     //flight detail
     GetPage(

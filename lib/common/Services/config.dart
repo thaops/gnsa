@@ -1,3 +1,3 @@
 class Config {
-  static const baseUrl = "http://127.0.0.1:3000/api";
+  static const baseUrl = "https://vacs-api-dev.azurewebsites.net/api";
 }

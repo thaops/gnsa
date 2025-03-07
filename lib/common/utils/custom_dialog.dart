@@ -23,7 +23,7 @@ class CustomDialog {
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: AppColors.black), // Đổi màu tiêu đề thành đen
-              SizedBox(height: 10), // Khoảng cách giữa tiêu đề và nội dung
+              10.verticalSpace, // Khoảng cách giữa tiêu đề và nội dung
               TextWidget(
                   text: content,
                   fontSize: 14,
@@ -44,7 +44,7 @@ class CustomDialog {
                       isOutlined: true,
                     ),
                   ),
-                  SizedBox(width: 10), // Khoảng cách giữa hai nút
+                  10.horizontalSpace,
                   Expanded(
                     child: CustomButton(
                       text: 'Có',

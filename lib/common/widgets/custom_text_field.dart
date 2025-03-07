@@ -7,7 +7,7 @@ class CustomTextField extends StatefulWidget {
   final Function()? onTap;
   final bool obscureText; // Trạng thái ẩn/hiện mật khẩu
   final IconData? suffixIcon; // Icon hiển thị bên phải
-  final Function(String)? onSubmit;
+  final Function(String)? onSubmit ;
   final FocusNode? focusNode;
   final double? width;
   final bool isMobile;
@@ -16,6 +16,7 @@ class CustomTextField extends StatefulWidget {
   final Color? backgroundColor;
   final double? borderRadius;
   final Color? borderColor;
+  final Function(String)? onChanged;
   CustomTextField({
     required this.controller,
     required this.hintText,
@@ -31,6 +32,7 @@ class CustomTextField extends StatefulWidget {
     this.backgroundColor,
     this.borderRadius = 12,
     this.borderColor,
+    this.onChanged,
   });
 
   @override
@@ -75,6 +77,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             textAlignVertical: TextAlignVertical.center,
             onTap: widget.onTap,
             obscureText: _obscureText,
+            onChanged: widget.onChanged,
             onSubmitted: widget.onSubmit,
             decoration: InputDecoration(
               contentPadding: EdgeInsets.symmetric(
@@ -84,7 +87,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
               errorBorder: InputBorder.none,
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(widget.borderRadius ?? 12),
-                borderSide: BorderSide(
+                borderSide:const BorderSide(
                     color: AppColors.primary), // Màu border khi focus
               ),
               enabledBorder: OutlineInputBorder(

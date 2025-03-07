@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:gnsa/common/img/img.dart';
+import 'package:gnsa/common/utils/date_utils.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
+import 'package:gnsa/feature/presentation/flight_list/model/flights_model.dart';
 
 class CustomFightList extends StatelessWidget {
-  const CustomFightList({super.key, required this.onTap});
+  const CustomFightList({super.key, required this.onTap, required this.data});
   final VoidCallback onTap;
+  final FlightData data;
 
   @override
   Widget build(BuildContext context) {
@@ -25,55 +28,26 @@ class CustomFightList extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      TextWidget(
-                        text: "Hà Nội",
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      TextWidget(
-                        text: "12:42",
-                        fontSize: 12,
-                        fontWeight: FontWeight.w300,
-                      ),
-                    ],
+                  Expanded(
+                    child: FlightInfoColumn(
+                      flightNo: data.depart!,
+                      flightDate: data.actualTimeDepart!,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                    ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const TextWidget(
-                        text: "VN7563",
-                        fontSize: 14,
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 2),
-                        child: Image.asset(Img.iconFlight),
-                      ),
-                      const TextWidget(
-                        text: "15 Aug",
-                        fontSize: 12,
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ],
+                  Expanded(
+                    child: FlightInfoColumn(
+                        flightNo: data.flightNo!,
+                        flightDate: data.actualTimeArrival!,
+                        isDepart: true,
+                        crossAxisAlignment: CrossAxisAlignment.center),
                   ),
-                  const Column(
-                    children: [
-                      TextWidget(
-                        text: "Hà Nội",
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      TextWidget(
-                        text: "12:42",
-                        fontSize: 12,
-                        fontWeight: FontWeight.w300,
-                      ),
-                    ],
+                  Expanded(
+                    child: FlightInfoColumn(
+                      flightNo: data.arrival!,
+                      flightDate: data.actualTimeArrival!,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                    ),
                   ),
                 ],
               ),
@@ -82,5 +56,52 @@ class CustomFightList extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class FlightInfoColumn extends StatelessWidget {
+  final String flightNo;
+  final DateTime flightDate;
+  final bool? isDepart;
+  final CrossAxisAlignment crossAxisAlignment;
+  const FlightInfoColumn({
+    super.key,
+    required this.flightNo,
+    required this.flightDate,
+    this.isDepart,
+    required this.crossAxisAlignment,
+  });
+  @override
+  Widget build(BuildContext context) {
+    return   Column(
+          crossAxisAlignment: crossAxisAlignment,
+          mainAxisAlignment: MainAxisAlignment.center,
+           children: [
+            TextWidget(
+              text: flightNo,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              textAlign: TextAlign.center,
+            ),
+            if (isDepart == true)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Image.asset(Img.iconFlight),
+              ),
+            if (isDepart != true) const SizedBox(height: 4),
+            TextWidget(
+              text: isDepart == true
+                  ? DateUtilsCustom.formatStringDate(flightDate.toIso8601String())
+                  : DateUtilsCustom.formatStringTime(
+                      flightDate.toIso8601String()),
+              fontSize: 12,
+              textAlign: TextAlign.center,
+              fontWeight: FontWeight.w300,
+              
+            ),
+          ],
+        
+      );
+    
   }
 }
