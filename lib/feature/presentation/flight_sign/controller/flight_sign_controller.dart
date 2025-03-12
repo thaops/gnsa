@@ -1,13 +1,11 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:signature/signature.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:gnsa/common/utils/custom_flushbar.dart';
 
-class FlightSignController extends GetxController {
-
-    File? imageFile; // Biến để lưu trữ file ảnh đã lưu
+class FlightSignController extends ChangeNotifier {
+  File? imageFile; 
 
   final SignatureController signatureController = SignatureController(
     penStrokeWidth: 5,
@@ -15,28 +13,19 @@ class FlightSignController extends GetxController {
     exportBackgroundColor: Colors.white,
   );
 
-  // Hàm để lưu chữ ký vào file ảnh PNG
-  Future<void> saveSignature() async {
+  Future<void> saveSignature(BuildContext context) async {
     try {
-      // Xuất chữ ký dưới dạng bytes (PNG)
-      var signature = await signatureController.toPngBytes();
+      final signature = await signatureController.toPngBytes();
       if (signature != null) {
-        // Lấy đường dẫn thư mục tạm của thiết bị
         final directory = await getApplicationDocumentsDirectory();
         String filePath = '${directory.path}/signature.png';
-
-        // Tạo file ảnh
-        File imageFile = File(filePath);
-
-        // Lưu chữ ký vào file
-        await imageFile.writeAsBytes(signature);
-        imageFile = imageFile;
-
-        // Hiển thị thông báo lưu thành công
-        Get.snackbar('Thông báo', 'Chữ ký đã được lưu tại: $filePath');
+        File file = File(filePath);
+        await file.writeAsBytes(signature);
+        imageFile = file;
+        await CustomFlushbar.showSuccess(context, message: 'Lưu chữ ký thành công');
       }
     } catch (e) {
-      Get.snackbar('Thông báo', 'Lỗi khi lưu chữ ký: $e');
+      await CustomFlushbar.showError(context, message: 'Lỗi khi lưu chữ ký: $e');
     }
   }
 

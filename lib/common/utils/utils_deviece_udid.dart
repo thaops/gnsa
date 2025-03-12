@@ -9,7 +9,7 @@ class UtilsDeviceUdid {
       return iosInfo.identifierForVendor ?? 'Unknown UID';
     } else if (GetPlatform.isAndroid) {
       AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      return androidInfo.id ?? 'Unknown UID'; // Sử dụng id của Android
+      return androidInfo.id ; // Sử dụng id của Android
     }
     return 'Unknown UID';
   }

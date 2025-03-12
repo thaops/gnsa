@@ -1,10 +1,7 @@
+// custom_expansion_tile.dart
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:gnsa/common/widgets/custom_text_field.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gnsa/feature/presentation/flight_detail/controller/flight_Detail_controller.dart';
 import 'package:gnsa/feature/presentation/flight_detail/widget/child_expansion.dart';
 
 class CustomExpansionTile extends StatefulWidget {
@@ -14,6 +11,8 @@ class CustomExpansionTile extends StatefulWidget {
   final IconData leadingIcon;
   final String trailingCount;
   final String confirmationText;
+  final bool isExpanded;
+  final VoidCallback? onTap;
   final int outerListCount;
   final int innerListCount;
 
@@ -25,6 +24,8 @@ class CustomExpansionTile extends StatefulWidget {
     required this.leadingIcon,
     required this.trailingCount,
     required this.confirmationText,
+    required this.isExpanded,
+    this.onTap,
     this.outerListCount = 1,
     this.innerListCount = 1,
   }) : super(key: key);
@@ -34,13 +35,11 @@ class CustomExpansionTile extends StatefulWidget {
 }
 
 class _CustomExpansionTileState extends State<CustomExpansionTile> {
-  final FlightDetailController controller = Get.put(FlightDetailController());
-
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: Get.width * 0.9,
-      padding: EdgeInsets.all(8.r),
+      width: MediaQuery.of(context).size.width * 0.9,
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: widget.backgroundColor ?? AppColors.backgroundTab,
         borderRadius: BorderRadius.circular(18),
@@ -68,11 +67,11 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> {
               fontSize: 14,
               fontWeight: FontWeight.w500,
             ),
-            SizedBox(height: 10.h),
+            const SizedBox(height: 10),
             Container(
-              height: 16.h,
-              width: 80.w,
-              padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+              height: 16,
+              width: 80,
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
               decoration: BoxDecoration(
                 color: AppColors.textSuccess,
                 borderRadius: BorderRadius.circular(10),
@@ -80,8 +79,8 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.check, color: AppColors.white, size: 12.sp),
-                  SizedBox(width: 3.w),
+                 const Icon(Icons.check, color: AppColors.white, size: 12),
+                  const SizedBox(width: 3),
                   TextWidget(
                     text: widget.confirmationText,
                     fontSize: 8,
@@ -93,7 +92,6 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> {
             ),
           ],
         ),
-       
         children: [
           ListView.builder(
             shrinkWrap: true,
@@ -101,25 +99,22 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> {
             itemCount: widget.outerListCount,
             itemBuilder: (context, outerIndex) => ExpansionTile(
               backgroundColor: AppColors.backgroundTab,
-                iconColor: AppColors.primary,
-                collapsedIconColor: AppColors.primary,
-                title: const TextWidget(
-                  text: 'HÀNG KHO NGOẠI QUAN',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-                children: [
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: widget.innerListCount,
-                    itemBuilder: (context, innerIndex) => ChildExpansion(
-                      controller: controller,
-                    ),
-                  ),
-                ],
+              iconColor: AppColors.primary,    
+              title: const TextWidget(
+                text: 'HÀNG KHO NGOẠI QUAN',
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
               ),
+              children: [
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: widget.innerListCount,
+                  itemBuilder: (context, innerIndex) => const ChildExpansion(),
+                ),
+              ],
             ),
+          ),
         ],
       ),
     );

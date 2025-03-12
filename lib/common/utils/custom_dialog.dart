@@ -7,13 +7,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CustomDialog {
   Future<bool?> showConfirmationDialog(String title, String content,
-      {dynamic? data}) {
+      {dynamic data}) {
     return Get.dialog<bool>(
       Dialog(
         child: Container(
           width: MediaQuery.of(Get.context!).size.width *
               0.9, 
-          padding: EdgeInsets.all(20), // Padding cho nội dung
+          padding:const EdgeInsets.all(20), // Padding cho nội dung
           child: Column(
             mainAxisSize: MainAxisSize.min, // Để chiều cao tự động điều chỉnh
             children: [

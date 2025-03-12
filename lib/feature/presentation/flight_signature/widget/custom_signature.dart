@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:gnsa/common/utils/screen_size.dart';
 import 'package:gnsa/common/widgets/custom_button.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
@@ -21,9 +19,10 @@ class CustomSignature extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
     return SizedBox(
-      width: Get.width,
-      height: Get.height * 0.42,
+      width: screenSize.width,
+      height: screenSize.height * 0.42,
       child: SizedBox(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -31,8 +30,8 @@ class CustomSignature extends StatelessWidget {
             TextWidget(text: title, fontSize: 16, fontWeight: FontWeight.bold),
             SizedBox(height: 16.h),
             Container(
-                width: Get.width,
-                height: Get.height * 0.35,
+                width: screenSize.width,
+                height: screenSize.height * 0.35,
                 padding: EdgeInsets.symmetric(
                   horizontal: imageUrl == null ? 40.w : 0,
                 ),
@@ -67,7 +66,7 @@ class CustomSignature extends StatelessWidget {
                               maxLines: 2),
                           SizedBox(height: 20.h),
                           CustomButton(
-                              width: Get.width * 0.35,
+                              width: screenSize.width * 0.35,
                               fontSize: 14,
                               color: AppColors.primary,
                               text: 'Ký xác nhận',
@@ -78,7 +77,7 @@ class CustomSignature extends StatelessWidget {
                         children: [
                           Center(
                               child: Image.network(imageUrl!,
-                                  fit: BoxFit.cover, width: Get.width)),
+                                  fit: BoxFit.cover, width: screenSize.width)),
                           Positioned(
                             top: 10,
                             right: 10,

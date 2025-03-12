@@ -1,37 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:gnsa/common/utils/screen_size.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gnsa/common/widgets/app_bar_widget.dart';
 import 'package:gnsa/common/widgets/custom_button.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
+import 'package:gnsa/feature/presentation/flight_sign/binding/flight_sign_binding.dart';
 import 'package:signature/signature.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
-import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gnsa/feature/presentation/flight_sign/controller/flight_sign_controller.dart';
-class FlightSign extends StatefulWidget {
+
+class FlightSign extends ConsumerStatefulWidget {
+  final String title;
+  const FlightSign({Key? key, required this.title}) : super(key: key);
+
   @override
   _FlightSignState createState() => _FlightSignState();
 }
 
-class _FlightSignState extends State<FlightSign> {
-  final FlightSignController controller = Get.put(FlightSignController());
+class _FlightSignState extends ConsumerState<FlightSign> {
+
 
   @override
   Widget build(BuildContext context) {
-    final title = Get.arguments as String;
+    final controller = ref.watch(flightSignControllerProvider);
+    final screenSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBarWidget(
-        title: title,
+        title: widget.title,
         isBack: false,
-        iconRightfirst: Icons.close,
-        functionfirst: () {
-          Get.back();
+        iconRightFirst: Icons.close,
+        onPressedFirst: () {
+          Navigator.pop(context);
         },
       ),
       body: SingleChildScrollView(
         child: SizedBox(
-          height: Get.height * 0.85,
-          width: Get.width,
+          height: screenSize.height * 0.85,
+          width: screenSize.width,
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
             child: Column(
@@ -39,11 +43,11 @@ class _FlightSignState extends State<FlightSign> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
-                  height: Get.height * 0.7,
-                  width: Get.width,
+                  height: screenSize.height * 0.7,
+                  width: screenSize.width,
                   decoration: BoxDecoration(
-                    border:
-                        Border.all(color: AppColors.borderSignature, width: 1),
+                    border: Border.all(
+                        color: AppColors.borderSignature, width: 1),
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Column(
@@ -51,8 +55,8 @@ class _FlightSignState extends State<FlightSign> {
                       Expanded(
                         flex: 8,
                         child: SizedBox(
-                          height: Get.height * 0.7,
-                          width: Get.width,
+                          height: screenSize.height * 0.7,
+                          width: screenSize.width,
                           child: Signature(
                             controller: controller.signatureController,
                             backgroundColor: AppColors.white,
@@ -60,27 +64,30 @@ class _FlightSignState extends State<FlightSign> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20.w),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20.w),
                         child: const Divider(),
                       ),
                       Expanded(
-                          flex: 1,
-                          child: GestureDetector(
-                            onTap: () {
-                              controller.signatureController.clear();
-                            },
-                            child: SizedBox(
-                              height: Get.height,
-                              width: Get.width,
-                              child: const Center(
-                                child: TextWidget(
-                                    text: 'Ký lại',
-                                    fontSize: 16,
-                                    textAlign: TextAlign.center,
-                                    fontWeight: FontWeight.w300),
+                        flex: 1,
+                        child: GestureDetector(
+                          onTap: () {
+                            controller.signatureController.clear();
+                          },
+                          child: SizedBox(
+                            height: screenSize.height,
+                            width: screenSize.width,
+                            child: const Center(
+                              child: TextWidget(
+                                text: 'Ký lại',
+                                fontSize: 16,
+                                textAlign: TextAlign.center,
+                                fontWeight: FontWeight.w300,
                               ),
                             ),
-                          )),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -89,7 +96,7 @@ class _FlightSignState extends State<FlightSign> {
                   height: 60.h,
                   color: AppColors.primary,
                   onPressed: () async {
-                    await controller.saveSignature();
+                    await controller.saveSignature(context);
                   },
                   text: 'Lưu',
                 ),

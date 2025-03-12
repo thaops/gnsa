@@ -1,21 +1,33 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:gnsa/feature/presentation/flight_printer/view/flight_printer.dart';
-import 'package:gnsa/router/app_router.dart';
+// flight_detail_controller.dart
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get_connect/http/src/status/http_status.dart';
+import 'package:gnsa/common/Services/api_endpoints.dart';
+import 'package:gnsa/common/repositoty/dio_api.dart';
+import '../model/flight_detail_model.dart';
 
-class FlightDetailController extends GetxController {
-  final isEdit = false.obs;
-  final isExpanded = false.obs;
-  final noteController = TextEditingController().obs;
+class FlightDetailNotifier extends StateNotifier<AsyncValue<FlightDetailModel>> {
+  FlightDetailNotifier() : super(const AsyncValue.loading());
 
-  final title = ['Tên chuyến bay :', 'Thời gian bay :', 'Thời gian bay :'];
-  final value = ['SGN - DAD - SGN', '12:00 - 14:00', '12:00 - 14:00'];
 
-  void onTapSign() {
-    Get.toNamed(AppRouter.flightSignature);
-  }
-
-  void onTapPrinter() {
-    Get.dialog(const FlightPrinter());
+  Future<FlightDetailModel> fetchFlightDetail(String id) async {
+    try {
+      state = const AsyncValue.loading(); 
+      final dioApi = DioApi();
+      final response = await dioApi.get(ApiEndpoints.flightDetail(id));
+      if (response.statusCode == HttpStatus.ok) {
+        state = AsyncValue.data(FlightDetailModel.fromJson(response.data['Data'])); 
+        return FlightDetailModel.fromJson(response.data['Data']);
+      } else {
+        throw Exception('Failed to load flight detail');
+      }
+    } catch (error, stackTrace) {
+      state = AsyncValue.error(error, stackTrace); 
+    }
+    return FlightDetailModel();
   }
 }
+
+final flightDetailControllerProvider =
+    StateNotifierProvider<FlightDetailNotifier, AsyncValue<FlightDetailModel>>(
+  (ref) => FlightDetailNotifier(),
+);

@@ -5,7 +5,8 @@ import 'package:gnsa/core/configs/theme/app_colors.dart';
 
 class ConstomCheckbox extends StatelessWidget {
   final bool isChecked;
-  const ConstomCheckbox({super.key, required this.isChecked});
+  final VoidCallback onTap;
+  const ConstomCheckbox({super.key, required this.isChecked, required this.onTap});
 
   @override
   Widget build(BuildContext context) {

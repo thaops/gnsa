@@ -1,6 +1,8 @@
 // lib/common/constants/http_status_codes.dart
 class HttpStatusCodes {
+  // ignore: constant_identifier_names
   static const int STATUS_CODE_OK = 200;
+  // ignore: constant_identifier_names
   static const int STATUS_CODE_CREATED = 201;
   static const int STATUS_CODE_NO_CONTENT = 204;
   static const int STATUS_CODE_BAD_REQUEST = 400;

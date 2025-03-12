@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gnsa/feature/presentation/flight_detail/model/flight_detail_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/widget/text_star.dart';
 
 class CustomDetailFlight extends StatelessWidget {
-  final List<String> title;
-  final List<String> value;
   final String flightDetail;
-  const CustomDetailFlight(
-      {super.key,
-      required this.title,
-      required this.value,
-      required this.flightDetail});
+  final FlightDetailModel flightDetailModel;
+  const CustomDetailFlight({
+    super.key,
+    required this.flightDetail,
+    required this.flightDetailModel,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,8 +31,9 @@ class CustomDetailFlight extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
           SizedBox(height: 8.h),
-          ...List.generate(title.length,
-              (index) => TextStar(title: title[index], value: value[index])),
+          TextStar(title: "Chuyến bay :", value: flightDetailModel.flightNo.toString()),
+          TextStar(title: "Số hiệu :", value: flightDetailModel.routing.toString()),
+          TextStar(title: "Giờ bay", value: flightDetailModel.actualTimeArrival.toString()),
         ],
       ),
     );

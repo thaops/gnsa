@@ -5,8 +5,8 @@ import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:gnsa/feature/presentation/flight_list/model/flights_model.dart';
 
-class CustomFightList extends StatelessWidget {
-  const CustomFightList({super.key, required this.onTap, required this.data});
+class CustomFlightList extends StatelessWidget {
+  const CustomFlightList({super.key, required this.onTap, required this.data});
   final VoidCallback onTap;
   final FlightData data;
 

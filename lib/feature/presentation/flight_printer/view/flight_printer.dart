@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart' show ConsumerWidget, WidgetRef;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 import 'package:gnsa/common/utils/screen_size.dart';
 import 'package:gnsa/common/widgets/custom_button.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
-import 'package:gnsa/feature/presentation/flight_printer/controller/flight_printer_controller.dart';
 import 'package:gnsa/feature/presentation/flight_printer/widget/constom_checkbox.dart';
+import 'package:go_router/go_router.dart';
 
-class FlightPrinter extends StatelessWidget {
+import '../binding/flight_printer_binding.dart';
+
+class FlightPrinter extends ConsumerWidget {
   const FlightPrinter({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.put(FlightPrinterController());
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.read(flightPrinterControllerProvider.notifier); // Lấy controller để gọi hàm
+    final listChecked = ref.watch(flightPrinterControllerProvider); // Lấy danh sách trạng thái từ provider
+
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
@@ -42,7 +46,7 @@ class FlightPrinter extends StatelessWidget {
                     child: Center(
                       child: IconButton(
                         onPressed: () {
-                          Get.back();
+                          GoRouter.of(context).pop();
                         },
                         icon: const Icon(
                           Icons.close,
@@ -58,17 +62,19 @@ class FlightPrinter extends StatelessWidget {
             SizedBox(height: 16.h),
             ListView.builder(
               shrinkWrap: true,
-              itemCount: 5,
+              itemCount: listChecked.length, 
               itemBuilder: (context, index) {
-                return Obx(
-                  () => GestureDetector(
-                    onTap: () {
-                      controller.isChecked.value = !controller.isChecked.value;
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 8.h),
-                      child: ConstomCheckbox(
-                          isChecked: controller.isChecked.value),
+                return GestureDetector(
+                  onTap: () {
+                    controller.toggleChecked(index); 
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8.h),
+                    child: ConstomCheckbox(
+                      onTap: () {
+                        controller.toggleChecked(index);
+                      },
+                      isChecked: listChecked[index], // Sử dụng trạng thái từ Riverpod
                     ),
                   ),
                 );
@@ -80,7 +86,9 @@ class FlightPrinter extends StatelessWidget {
               color: AppColors.primary,
               text: "In phiếu",
               fontSize: 14,
-              onPressed: () {},
+              onPressed: () {
+                    controller.addItem();
+              },
             )
           ],
         ),

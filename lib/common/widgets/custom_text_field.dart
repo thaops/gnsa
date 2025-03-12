@@ -17,6 +17,7 @@ class CustomTextField extends StatefulWidget {
   final double? borderRadius;
   final Color? borderColor;
   final Function(String)? onChanged;
+  final Duration? debounce;
   CustomTextField({
     required this.controller,
     required this.hintText,
@@ -33,6 +34,7 @@ class CustomTextField extends StatefulWidget {
     this.borderRadius = 12,
     this.borderColor,
     this.onChanged,
+    this.debounce,
   });
 
   @override
@@ -79,6 +81,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             obscureText: _obscureText,
             onChanged: widget.onChanged,
             onSubmitted: widget.onSubmit,
+           
             decoration: InputDecoration(
               contentPadding: EdgeInsets.symmetric(
                   horizontal: widget.isMobile ? 12 : 24,

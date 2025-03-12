@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:gnsa/common/img/img.dart';
 
@@ -12,41 +11,43 @@ class LoadingOverlay extends StatelessWidget {
     Key? key,
     required this.isLoading,
     required this.child,
-    this.istwoloading
+    this.istwoloading,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Stack(
       children: [
-        child, 
+        child,
         if (isLoading)
           Positioned.fill(
             child: Container(
-              color: Colors.black.withOpacity(0.01), 
-              child: Align(
-                alignment: Alignment.center,
+              color: Colors.black.withOpacity(0.01),
+              child: Center(
                 child: Container(
-                  height: Get.height * 0.15,
-                  width: Get.width * 0.3,
+                  height: screenHeight * 0.15,
+                  width: screenWidth * 0.3,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                    color: Colors.white.withOpacity(0.8), // Nền sáng hơn cho loading
+                    color: Colors.white.withOpacity(0.8),
                   ),
                   child: Center(
                     child: Lottie.network(
                       Img.loading,
-                      width: Get.width * 0.4,
+                      width: screenWidth * 0.4,
                     ),
                   ),
                 ),
               ),
             ),
           ),
-          if(istwoloading == true)    
+        if (istwoloading == true)
           Positioned.fill(
             child: Container(
-              color: Colors.black.withOpacity(0.01), 
+              color: Colors.black.withOpacity(0.01),
             ),
           ),
       ],
