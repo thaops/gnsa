@@ -31,9 +31,9 @@ class CustomDetailFlight extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
           SizedBox(height: 8.h),
-          TextStar(title: "Chuyến bay :", value: flightDetailModel.flightNo.toString()),
-          TextStar(title: "Số hiệu :", value: flightDetailModel.routing.toString()),
-          TextStar(title: "Giờ bay", value: flightDetailModel.actualTimeArrival.toString()),
+          TextStar(title: "Chuyến bay :", value: flightDetailModel.flight?.flightNo.toString() ?? ''),
+          TextStar(title: "Số hiệu :", value: flightDetailModel.flight?.routing.toString() ?? ''),
+          TextStar(title: "Giờ bay", value: flightDetailModel.flight?.actualTimeArrival.toString() ?? ''),
         ],
       ),
     );

@@ -16,6 +16,7 @@ void main() async {
   final deviceUdid = await DeviceUdid.createDeviceUdid();
   await deviceUdid.saveUdid(await utilsDeviceUdid.getDeviceUid());
   final accessToken = await services.getAccessToken();
+  print(accessToken);
   runApp(
     ProviderScope(
       child: MyApp(accessToken: accessToken),

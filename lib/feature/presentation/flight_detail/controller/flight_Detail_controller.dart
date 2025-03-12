@@ -13,10 +13,11 @@ class FlightDetailNotifier extends StateNotifier<AsyncValue<FlightDetailModel>> 
     try {
       state = const AsyncValue.loading(); 
       final dioApi = DioApi();
-      final response = await dioApi.get(ApiEndpoints.flightDetail(id));
+      final response = await dioApi.get(ApiEndpoints.supplyFormAllDetail(id: id));
       if (response.statusCode == HttpStatus.ok) {
-        state = AsyncValue.data(FlightDetailModel.fromJson(response.data['Data'])); 
-        return FlightDetailModel.fromJson(response.data['Data']);
+        final data = response.data['Data'];
+        state = AsyncValue.data(FlightDetailModel.fromJson(data)); 
+        return FlightDetailModel.fromJson(data);
       } else {
         throw Exception('Failed to load flight detail');
       }

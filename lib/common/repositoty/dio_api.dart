@@ -1,6 +1,7 @@
 // import 'package:app_version_update/core/values/consts/consts.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gnsa/common/Services/config.dart';
 import 'package:gnsa/common/Services/services.dart';
 import 'package:gnsa/common/constants/http_status_codes.dart';
@@ -136,3 +137,5 @@ class DioApi {
     }
   }
 }
+
+final dioApiProvider = Provider((ref) => DioApi());

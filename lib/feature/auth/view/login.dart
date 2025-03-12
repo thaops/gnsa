@@ -11,24 +11,21 @@ import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:gnsa/feature/auth/provider/login_provider.dart.dart';
 
 class Login extends ConsumerWidget {
-  const Login({Key? key}) : super(key: key);
-
+  const Login({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.watch(loginControllerProvider);
-    bool isTablet = ResponsiveHelper.isTablet(context);
-    bool isWeb = ResponsiveHelper.isWeb(context);
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final isTablet = ResponsiveHelper.isTablet(context);
+    final isWeb = ResponsiveHelper.isWeb(context);
+    final size = MediaQuery.of(context).size;
 
     return Scaffold(
       body: LoadingOverlay(
         isLoading: controller.isLoading,
         child: SingleChildScrollView(
-          child: SizedBox(
-            width: screenWidth,
-            height: screenHeight,
-            child: Container(
+          child: SizedBox.fromSize(
+            size: size,
+            child: DecoratedBox(
               decoration: const BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage(Img.background),
@@ -37,11 +34,7 @@ class Login extends ConsumerWidget {
               ),
               child: Center(
                 child: Container(
-                  width: isWeb
-                      ? screenWidth * 0.3
-                      : isTablet
-                          ? screenWidth * 0.5
-                          : screenWidth * 0.8,
+                  width: size.width * (isWeb ? 0.3 : isTablet ? 0.5 : 0.8),
                   padding: EdgeInsets.all(24.w),
                   decoration: BoxDecoration(
                     color: AppColors.white.withOpacity(0.9),
@@ -50,34 +43,33 @@ class Login extends ConsumerWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      for (var text in ['Hệ Thống', 'Giao Nhận Xuất Ăn'])
-                        TextWidget(
+                      ...['Hệ Thống', 'Giao Nhận Xuất Ăn'].map(
+                        (text) => TextWidget(
                           text: text,
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: AppColors.primary,
                         ),
-                      24.verticalSpace,
+                      ),
+                      SizedBox(height: 24.h),
                       CustomTextField(
                         controller: controller.nameController,
                         hintText: 'Tên đăng nhập',
                       ),
-                      20.verticalSpace,
+                      SizedBox(height: 20.h),
                       CustomTextField(
                         controller: controller.passwordController,
                         hintText: 'Mật khẩu',
                         obscureText: true,
                         suffixIcon: Icons.visibility,
                       ),
-                      30.verticalSpace,
+                      SizedBox(height: 30.h),
                       CustomButton(
                         text: 'Đăng nhập',
                         color: AppColors.primary,
-                        onPressed: () {
-                          controller.login(context);
-                        },
+                        onPressed: () => controller.login(context),
                       ),
-                      30.verticalSpace,
+                      SizedBox(height: 30.h),
                     ],
                   ),
                 ),

@@ -10,7 +10,7 @@ class CustomExpansionTile extends StatefulWidget {
   final String subtitle;
   final IconData leadingIcon;
   final String trailingCount;
-  final String confirmationText;
+  final bool isConfirmed;
   final bool isExpanded;
   final VoidCallback? onTap;
   final int outerListCount;
@@ -23,7 +23,7 @@ class CustomExpansionTile extends StatefulWidget {
     required this.subtitle,
     required this.leadingIcon,
     required this.trailingCount,
-    required this.confirmationText,
+    required this.isConfirmed,
     required this.isExpanded,
     this.onTap,
     this.outerListCount = 1,
@@ -67,29 +67,7 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> {
               fontSize: 14,
               fontWeight: FontWeight.w500,
             ),
-            const SizedBox(height: 10),
-            Container(
-              height: 16,
-              width: 80,
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-              decoration: BoxDecoration(
-                color: AppColors.textSuccess,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                 const Icon(Icons.check, color: AppColors.white, size: 12),
-                  const SizedBox(width: 3),
-                  TextWidget(
-                    text: widget.confirmationText,
-                    fontSize: 8,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.white,
-                  ),
-                ],
-              ),
-            ),
+            widget.isConfirmed ? _ComfimerWidget() : const SizedBox(),
           ],
         ),
         children: [
@@ -117,6 +95,36 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _ComfimerWidget() {
+    return Column(
+      children: [
+        const SizedBox(height: 10),
+        Container(
+                height: 16,
+                width: 80,
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.textSuccess,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child:const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.check, color: AppColors.white, size: 12),
+                     SizedBox(width: 3),
+                    TextWidget(
+                      text: "Đã Xác nhận",
+                      fontSize: 8,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.white,
+                    ),
+                  ],
+                ),
+              ),
+      ],
     );
   }
 }
