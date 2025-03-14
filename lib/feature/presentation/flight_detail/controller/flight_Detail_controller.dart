@@ -1,4 +1,3 @@
-// flight_detail_controller.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get_connect/http/src/status/http_status.dart';
 import 'package:gnsa/common/Services/api_endpoints.dart';
@@ -8,23 +7,57 @@ import '../model/flight_detail_model.dart';
 class FlightDetailNotifier extends StateNotifier<AsyncValue<FlightDetailModel>> {
   FlightDetailNotifier() : super(const AsyncValue.loading());
 
-
   Future<FlightDetailModel> fetchFlightDetail(String id) async {
     try {
-      state = const AsyncValue.loading(); 
+      state = const AsyncValue.loading();
       final dioApi = DioApi();
       final response = await dioApi.get(ApiEndpoints.supplyFormAllDetail(id: id));
       if (response.statusCode == HttpStatus.ok) {
         final data = response.data['Data'];
-        state = AsyncValue.data(FlightDetailModel.fromJson(data)); 
-        return FlightDetailModel.fromJson(data);
+
+        final transformedData = transformSupplies(data);
+
+        final flightDetail = FlightDetailModel.fromJson(transformedData);
+        state = AsyncValue.data(flightDetail);
+        print("Transformed data: $transformedData");
+        return flightDetail;
       } else {
         throw Exception('Failed to load flight detail');
       }
     } catch (error, stackTrace) {
-      state = AsyncValue.error(error, stackTrace); 
+      state = AsyncValue.error(error, stackTrace);
+      print("Error: $error");
     }
     return FlightDetailModel();
+  }
+
+  Map<String, dynamic> transformSupplies(Map<String, dynamic> data) {
+    List<dynamic> supplyForms = data['supplyForms'] ?? [];
+
+    for (var form in supplyForms) {
+      List<dynamic> supplies = form['Supplies'] ?? [];
+      Map<String, List<dynamic>> groupedSupplies = {};
+
+      for (var supply in supplies) {
+        String supplyName = supply['SupplyName'] ?? 'Unknown';
+        if (!groupedSupplies.containsKey(supplyName)) {
+          groupedSupplies[supplyName] = [];
+        }
+        groupedSupplies[supplyName]!.add(supply);
+      }
+
+      List<Map<String, dynamic>> newSupplies = [];
+      groupedSupplies.forEach((supplyName, items) {
+        newSupplies.add({
+          'Supplys': supplyName,
+          'Items': items,
+        });
+      });
+
+      form['Supplies'] = newSupplies;
+    }
+
+    return data;
   }
 }
 

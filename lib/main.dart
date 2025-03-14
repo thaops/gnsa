@@ -10,7 +10,6 @@ import 'package:gnsa/router/app_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   final services = await Services.create();
   final utilsDeviceUdid = UtilsDeviceUdid();
   final deviceUdid = await DeviceUdid.createDeviceUdid();

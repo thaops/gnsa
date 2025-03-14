@@ -22,41 +22,43 @@ class LoginController extends ChangeNotifier {
   }
 
   Future<void> login(BuildContext context) async {
-    if (nameController.text.isEmpty || passwordController.text.isEmpty) {
-      await CustomFlushbar.showWarning(context, message: 'Vui lòng nhập đầy đủ thông tin');
-      return;
-    }
+
+    // if (nameController.text.isEmpty || passwordController.text.isEmpty) {
+    //   await CustomFlushbar.showWarning(context, message: 'Vui lòng nhập đầy đủ thông tin');
+    //   return;
+    // }
     try {
       _setLoading(true);
       final response = await dioApi.post(
         ApiEndpoints.login,
         data: {
-          'UserName': nameController.text,
-          'Password': passwordController.text,
+          'UserName': "admin",
+          'Password': "123",
         },
       );
+      print(response.data);
       if (response.data['StatusCode'] != HttpStatusCodes.STATUS_CODE_OK) {
         _setLoading(false);
         await CustomFlushbar.showError(context, message: 'Tài khoản và mật khẩu không chính xác');
         return;
       }
-      _setLoading(false);
-      await CustomFlushbar.showSuccess(context, message: 'Đăng nhập thành công');
+       CustomFlushbar.showSuccess(context, message: 'Đăng nhập thành công');
       final token = response.data["Data"]['AccessToken'];
       final services = await Services.create();
       await services.saveAccessToken(token);
       GoRouter.of(context).go(AppRouter.flightList);
     } catch (e) {
+      print(e);
       await CustomFlushbar.showError(context, message: 'Tài khoản và mật khẩu không chính xác');
     } finally {
       _setLoading(false);
     }
   }
 
-  @override
-  void dispose() {
-    nameController.dispose();
-    passwordController.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   nameController.dispose();
+  //   passwordController.dispose();
+  //   super.dispose();
+  // }
 }

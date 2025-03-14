@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gnsa/common/utils/date_utils.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -31,9 +32,9 @@ class CustomDetailFlight extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
           SizedBox(height: 8.h),
-          TextStar(title: "Chuyến bay :", value: flightDetailModel.flight?.flightNo.toString() ?? ''),
-          TextStar(title: "Số hiệu :", value: flightDetailModel.flight?.routing.toString() ?? ''),
-          TextStar(title: "Giờ bay", value: flightDetailModel.flight?.actualTimeArrival.toString() ?? ''),
+          TextStar(title: "Chuyến bay :", value: flightDetailModel.flight?.routing.toString() ?? ''),
+          TextStar(title: "Số hiệu :", value: flightDetailModel.flight?.flightNo.toString() ?? ''),
+          TextStar(title: "Giờ bay :", value:DateUtilsCustom.formatStringDate( flightDetailModel.flight?.actualTimeArrival.toString() ?? '')),
         ],
       ),
     );

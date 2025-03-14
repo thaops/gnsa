@@ -32,9 +32,8 @@ class _FlightSignState extends ConsumerState<FlightSign> {
           Navigator.pop(context);
         },
       ),
-      body: SingleChildScrollView(
-        child: SizedBox(
-          height: screenSize.height * 0.85,
+      body:  SizedBox(
+          height: screenSize.height * 0.80,
           width: screenSize.width,
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
@@ -43,7 +42,7 @@ class _FlightSignState extends ConsumerState<FlightSign> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
-                  height: screenSize.height * 0.7,
+                  height: screenSize.height * 0.6,
                   width: screenSize.width,
                   decoration: BoxDecoration(
                     border: Border.all(
@@ -104,7 +103,7 @@ class _FlightSignState extends ConsumerState<FlightSign> {
             ),
           ),
         ),
-      ),
+      
     );
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gnsa/common/method_channel/printer_plugin.dart' show UrovoPrinter;
+import 'package:gnsa/common/utils/custom_flushbar.dart';
 import 'package:gnsa/common/utils/responsive_helper.dart';
 import 'package:gnsa/common/widgets/app_bar_widget.dart';
 import 'package:gnsa/common/widgets/custom_button.dart';
@@ -8,6 +10,7 @@ import 'package:gnsa/common/widgets/loading_overlay.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:gnsa/feature/presentation/flight_detail/controller/filght_bool_state.dart';
+import 'package:gnsa/feature/presentation/flight_detail/model/flight_detail_model.dart' show FlightDetailModel;
 import 'package:gnsa/feature/presentation/flight_detail/provider/flight_detail_provider.dart';
 import 'package:gnsa/feature/presentation/flight_detail/widget/custom_detail_flight.dart';
 import 'package:gnsa/feature/presentation/flight_detail/widget/custom_ExpansionTile.dart';
@@ -50,7 +53,28 @@ class _FlightDetailState extends ConsumerState<FlightDetail> {
   void _navigateToSignature(BuildContext context) =>
       context.push(AppRouter.flightSignature);
   void _showPrinterDialog(BuildContext context) =>
-      showDialog(context: context, builder: (_) => const FlightPrinter());
+      showDialog(context: context, builder: (_) => FlightPrinter(
+        flightDetailModel: ref.watch(flightDetailControllerProvider).value!,
+      ));
+
+// Future<void> _printJson(FlightDetailModel? flightDetail) async {
+//   if (flightDetail == null) {
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       const SnackBar(content: Text('No flight data to print')),
+//     );
+//     return;
+//   }
+//   try {
+//     final result = await UrovoPrinter().printGnsa(flightDetail);
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(content: Text('Print result: ${result ?? "Success"}')),
+//     );
+//   } catch (e) {
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(content: Text('Print failed: $e')),
+//     );
+//   }
+// }
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +115,7 @@ class _FlightDetailState extends ConsumerState<FlightDetail> {
                     CustomDetailFlight(
                         flightDetail: 'Chi tiết chuyến bay:',
                         flightDetailModel: data),
-                    const TitleRowAll(title: 'DANH SÁCH', subtitle: 'Xem hết'),
+                     TitleRowAll(title: 'DANH SÁCH', subtitle: 'Xem hết' , onClickseenAll: () {print("seenall");}),
                     Expanded(
                       child: ListView.builder(
                         itemCount: data.supplyForms?.length ?? 0,
@@ -127,11 +151,11 @@ class _FlightDetailState extends ConsumerState<FlightDetail> {
                                   subtitle:
                                       'Mã code: ${data.supplyForms?[index].supplyFormCode}',
                                   leadingIcon: Icons.airplane_ticket,
-                                  trailingCount:
-                                      '${data.supplyForms?[index].totalSupply}',
+                                  trailingCount: '${data.supplyForms?[index].totalSupply}',
                                   isConfirmed: data.supplyForms?[index].status == 'NotSign',
                                   isExpanded: isExpanded,
                                   onTap: flightBoolNotifier.toggleExpansion,
+                                  supplyForm: data.supplyForms?[index],
                                 ),
                               ),
                             ),
@@ -158,10 +182,11 @@ class _FlightDetailState extends ConsumerState<FlightDetail> {
 }
 
 class TitleRowAll extends StatelessWidget {
-  const TitleRowAll({required this.title, required this.subtitle, super.key});
+  const TitleRowAll({required this.title, required this.subtitle, super.key , required this.onClickseenAll});
 
   final String title;
   final String subtitle;
+  final Function() onClickseenAll;
 
   @override
   Widget build(BuildContext context) => Padding(
@@ -170,11 +195,14 @@ class TitleRowAll extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             TextWidget(text: title, fontSize: 14, fontWeight: FontWeight.w500),
-            TextWidget(
-                text: subtitle,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: AppColors.primary),
+            InkWell(
+              onTap: () => onClickseenAll(),
+              child: TextWidget(
+                  text: subtitle,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.primary),
+            ),
           ],
         ),
       );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gnsa/common/img/img.dart';
 import 'package:gnsa/common/utils/date_utils.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
@@ -18,12 +19,14 @@ class CustomFlightList extends StatelessWidget {
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          height: 100,
+          height: 100.h,
           decoration: BoxDecoration(
             color: AppColors.backgroundTab,
             borderRadius: BorderRadius.circular(10),
           ),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

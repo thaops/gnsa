@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gnsa/feature/auth/view/login.dart';
+import 'package:gnsa/feature/presentation/flight_detail/model/flight_detail_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/view/flight_detail.dart';
 import 'package:gnsa/feature/presentation/flight_list/view/flight_list.dart';
 import 'package:gnsa/feature/presentation/flight_signature/view/flight_signature.dart';
@@ -25,11 +26,11 @@ class AppRouter {
         ),
         GoRoute(
           path: flightList,
-          builder: (context, state) =>const  FlightList(),
+          builder: (context, state) => const FlightList(),
         ),
         GoRoute(
           path: flightDetail,
-          builder: (context, state) { 
+          builder: (context, state) {
             final id = state.extra as String;
             return FlightDetail(
               id: id,
@@ -42,11 +43,16 @@ class AppRouter {
         ),
         GoRoute(
           path: flightSign,
-          builder: (context, state) => const FlightSign(title: '',),
+          builder: (context, state) => const FlightSign(
+            title: '',
+          ),
         ),
         GoRoute(
           path: flightPrinter,
-          builder: (context, state) => const FlightPrinter(),
+          builder: (context, state) {
+            final flightDetailModel = state.extra as FlightDetailModel;
+            return FlightPrinter(flightDetailModel: flightDetailModel);
+          },
         ),
       ],
     );

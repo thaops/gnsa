@@ -7,7 +7,8 @@
         {
             "name": "gnsa",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "args": ["--no-enable-impeller"]
         },
         {
             "name": "gnsa (profile mode)",

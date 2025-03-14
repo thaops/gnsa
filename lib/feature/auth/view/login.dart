@@ -15,9 +15,10 @@ class Login extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.watch(loginControllerProvider);
-    final isTablet = ResponsiveHelper.isTablet(context);
-    final isWeb = ResponsiveHelper.isWeb(context);
+
     final size = MediaQuery.of(context).size;
+
+    final width = size.width *  (ResponsiveHelper.isWeb(context) ? 0.3 : ResponsiveHelper.isTablet(context)? 0.5 : 0.8);
 
     return Scaffold(
       body: LoadingOverlay(
@@ -34,7 +35,7 @@ class Login extends ConsumerWidget {
               ),
               child: Center(
                 child: Container(
-                  width: size.width * (isWeb ? 0.3 : isTablet ? 0.5 : 0.8),
+                  width: width,
                   padding: EdgeInsets.all(24.w),
                   decoration: BoxDecoration(
                     color: AppColors.white.withOpacity(0.9),
@@ -55,6 +56,7 @@ class Login extends ConsumerWidget {
                       CustomTextField(
                         controller: controller.nameController,
                         hintText: 'Tên đăng nhập',
+                        
                       ),
                       SizedBox(height: 20.h),
                       CustomTextField(

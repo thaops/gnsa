@@ -1,22 +1,29 @@
-import 'package:get_storage/get_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DeviceUdid {
-  final GetStorage _storage;
+  final SharedPreferences _prefs;
 
-  DeviceUdid(this._storage);
+  DeviceUdid(this._prefs);
 
+  // Phương thức khởi tạo bất đồng bộ
   static Future<DeviceUdid> createDeviceUdid() async {
-    return DeviceUdid(GetStorage());
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return DeviceUdid(prefs);
   }
 
+  // Lưu UDID
   Future<void> saveUdid(String udid) async {
-    await _storage.write('udid', udid); // Lưu udid
+    await _prefs.setString('udid', udid); // Lưu udid
   }
+
+  // Lấy UDID
   Future<String> getUdid() async {
-    String? token = _storage.read('udid'); // Lấy udid
-    return token ?? ''; // Trả về udid hoặc chuỗi rỗng
+    String? udid = _prefs.getString('udid'); // Lấy udid
+    return udid ?? ''; // Trả về udid hoặc chuỗi rỗng
   }
+
+  // Xóa UDID
   Future<void> deleteUdid() async {
-    await _storage.remove('udid'); // Xóa udid
+    await _prefs.remove('udid'); // Xóa udid
   }
 }

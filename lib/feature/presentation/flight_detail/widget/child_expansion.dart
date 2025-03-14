@@ -1,20 +1,22 @@
-// child_expansion.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gnsa/common/widgets/custom_text_field.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
-import 'package:gnsa/feature/presentation/flight_detail/controller/filght_bool_state.dart' show isEditProvider;
+import 'package:gnsa/feature/presentation/flight_detail/model/flight_detail_model.dart';
 
-class ChildExpansion extends ConsumerWidget {
-  const ChildExpansion({Key? key}) : super(key: key);
+class ChildExpansion extends HookWidget {
+  final SupplyItem? supplyItem;
+
+  const ChildExpansion({Key? key, this.supplyItem}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-   final isEdit = ref.watch(isEditProvider);
-   final flightBoolNotifier = ref.read(isEditProvider.notifier);
+  Widget build(BuildContext context) {
+    final isEdit = useState(false);
 
-   final noteController = TextEditingController();
+    final noteController = useTextEditingController(
+      text: supplyItem?.note ?? '',
+    );
 
     return Container(
       color: AppColors.white,
@@ -28,41 +30,48 @@ class ChildExpansion extends ConsumerWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const TextWidget(
-                    text: 'Nước tinh khiết Aquafina 1,5L',
+                  TextWidget(
+                    text: supplyItem?.categoryName ?? '',
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
                   const SizedBox(height: 6),
                   TextWidget(
-                    text: 'Cung ứng: 10',
+                    text: supplyItem?.confirmedQuantity.toString() ?? '',
                     fontSize: 14,
                     color: AppColors.iconFlight,
                     fontWeight: FontWeight.w300,
                   ),
                 ],
               ),
-              isEdit
+              isEdit.value
                   ? Row(
                       children: [
                         IconButton(
                           onPressed: () {
-                            flightBoolNotifier.toggleEdit();
+                            // Xử lý hành động xóa (chưa triển khai)
                           },
-                          icon:  Icon(Icons.delete, color: AppColors.iconFlight),
+                          icon: Icon(Icons.delete, color: AppColors.iconFlight),
                         ),
-                         Icon(Icons.check, color: AppColors.iconFlight),
+                        IconButton(
+                          onPressed: () {
+                            print(noteController.value.text);
+                            isEdit.value = false;
+                          },
+                          icon: Icon(Icons.check, color: AppColors.iconFlight),
+                        ),
                       ],
                     )
                   : IconButton(
                       onPressed: () {
-                        flightBoolNotifier.toggleEdit();
+                        // Bật edit mode
+                        isEdit.value = true;
                       },
-                      icon:  Icon(Icons.edit_note_sharp, color: AppColors.iconFlight),
+                      icon: Icon(Icons.edit_note_sharp, color: AppColors.iconFlight),
                     ),
             ],
           ),
-          isEdit
+          isEdit.value
               ? Container(
                   margin: const EdgeInsets.only(top: 8),
                   width: MediaQuery.of(context).size.width,

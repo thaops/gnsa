@@ -1,0 +1,1 @@
+C:\Flutter-dev\NP-Technology\gnsa\build\app\intermediates\cxx\Debug\5z39585p\obj\arm64-v8a

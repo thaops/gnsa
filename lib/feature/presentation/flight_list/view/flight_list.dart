@@ -109,7 +109,6 @@ class FlightList extends HookConsumerWidget {
                       child: CustomFlightList(
                         data: flightData,
                         onTap: () {
-                          print(flightData.id);
                           GoRouter.of(context).push(AppRouter.flightDetail, extra: flightData.id);
                         },
                       ),

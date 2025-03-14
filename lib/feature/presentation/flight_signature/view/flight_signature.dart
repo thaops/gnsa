@@ -16,34 +16,36 @@ class FlightSignature extends ConsumerWidget {
       appBar: const AppBarWidget(
         title: 'Xác nhận',
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          height: screenSize.height,
+      body: Container(
           width: screenSize.width,
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CustomSignature(
-                title: 'TIẾP VIÊN XÁC NHẬN',
-                onPressed: () {
-                  context.push(AppRouter.flightSign, extra: "TIẾP VIÊN XÁC NHẬN");
-                },
-                onEditPressed: () {
-                  context.push(AppRouter.flightSign, extra: "TIẾP VIÊN XÁC NHẬN");
-                },
-                imageUrl: 'https://chukydep.vn/Upload/post/chu-ky-ten-chi.jpg',
+              Expanded(
+                child: CustomSignature(
+                  title: 'TIẾP VIÊN XÁC NHẬN',
+                  onPressed: () {
+                    context.push(AppRouter.flightSign, extra: "TIẾP VIÊN XÁC NHẬN");
+                  },
+                  onEditPressed: () {
+                    context.push(AppRouter.flightSign, extra: "TIẾP VIÊN XÁC NHẬN");
+                  },
+                  imageUrl: 'https://chukydep.vn/Upload/post/chu-ky-ten-chi.jpg',
+                ),
               ),
-              CustomSignature(
-                title: 'NHÂN VIÊN XÁC NHẬN',
-                onPressed: () {
-                  context.push(AppRouter.flightSign, extra: "NHÂN VIÊN XÁC NHẬN");
-                },
+              SizedBox(height: 4.h),
+              Expanded(
+                child: CustomSignature(
+                  title: 'NHÂN VIÊN XÁC NHẬN',
+                  onPressed: () {
+                    context.push(AppRouter.flightSign, extra: "NHÂN VIÊN XÁC NHẬN");
+                  },
+                ),
               ),
             ],
           ),
         ),
-      ),
     );
   }
 }

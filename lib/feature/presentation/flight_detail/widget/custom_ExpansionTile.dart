@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
+import 'package:gnsa/feature/presentation/flight_detail/model/flight_detail_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/widget/child_expansion.dart';
 
 class CustomExpansionTile extends StatefulWidget {
@@ -13,8 +14,7 @@ class CustomExpansionTile extends StatefulWidget {
   final bool isConfirmed;
   final bool isExpanded;
   final VoidCallback? onTap;
-  final int outerListCount;
-  final int innerListCount;
+  final SupplyForm? supplyForm;
 
   const CustomExpansionTile({
     Key? key,
@@ -26,8 +26,7 @@ class CustomExpansionTile extends StatefulWidget {
     required this.isConfirmed,
     required this.isExpanded,
     this.onTap,
-    this.outerListCount = 1,
-    this.innerListCount = 1,
+    this.supplyForm,
   }) : super(key: key);
 
   @override
@@ -74,12 +73,12 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> {
           ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: widget.outerListCount,
+            itemCount: widget.supplyForm?.supplies?.length ?? 0,
             itemBuilder: (context, outerIndex) => ExpansionTile(
               backgroundColor: AppColors.backgroundTab,
               iconColor: AppColors.primary,    
-              title: const TextWidget(
-                text: 'HÀNG KHO NGOẠI QUAN',
+              title:  TextWidget(
+                text:widget.supplyForm?.supplies?[outerIndex].supplys.toString() ?? '',
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
@@ -87,8 +86,10 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> {
                 ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: widget.innerListCount,
-                  itemBuilder: (context, innerIndex) => const ChildExpansion(),
+                  itemCount: widget.supplyForm?.supplies?[outerIndex].items?.length ?? 0,
+                  itemBuilder: (context, innerIndex) =>  ChildExpansion(
+                    supplyItem: widget.supplyForm?.supplies?[outerIndex].items?[innerIndex],
+                  ),
                 ),
               ],
             ),
