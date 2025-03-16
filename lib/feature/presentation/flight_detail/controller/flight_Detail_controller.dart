@@ -19,7 +19,6 @@ class FlightDetailNotifier extends StateNotifier<AsyncValue<FlightDetailModel>> 
 
         final flightDetail = FlightDetailModel.fromJson(transformedData);
         state = AsyncValue.data(flightDetail);
-        print("Transformed data: $transformedData");
         return flightDetail;
       } else {
         throw Exception('Failed to load flight detail');

@@ -1,11 +1,15 @@
 // custom_expansion_tile.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
+import 'package:gnsa/feature/presentation/flight_detail/controller/filght_bool_state.dart';
 import 'package:gnsa/feature/presentation/flight_detail/model/flight_detail_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/widget/child_expansion.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class CustomExpansionTile extends StatefulWidget {
+class CustomExpansionTile extends HookConsumerWidget {
   final Color? backgroundColor;
   final String title;
   final String subtitle;
@@ -13,8 +17,8 @@ class CustomExpansionTile extends StatefulWidget {
   final String trailingCount;
   final bool isConfirmed;
   final bool isExpanded;
-  final VoidCallback? onTap;
   final SupplyForm? supplyForm;
+  final VoidCallback? onTap;
 
   const CustomExpansionTile({
     Key? key,
@@ -25,76 +29,87 @@ class CustomExpansionTile extends StatefulWidget {
     required this.trailingCount,
     required this.isConfirmed,
     required this.isExpanded,
-    this.onTap,
     this.supplyForm,
+    this.onTap,
   }) : super(key: key);
 
   @override
-  State<CustomExpansionTile> createState() => _CustomExpansionTileState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isExpandedHook = useState<bool>(isExpanded);
 
-class _CustomExpansionTileState extends State<CustomExpansionTile> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width * 0.9,
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: widget.backgroundColor ?? AppColors.backgroundTab,
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: ExpansionTile(
-        collapsedShape: const RoundedRectangleBorder(side: BorderSide.none),
-        shape: const RoundedRectangleBorder(side: BorderSide.none),
-        leading: Icon(widget.leadingIcon, color: AppColors.iconFlight),
-        title: TextWidget(
-          text: widget.title,
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
+    final isAllExpanded = ref.watch(isChildExpandedProvider);
+    useEffect(() {
+      isExpandedHook.value = isAllExpanded;
+      return null;
+    }, [isAllExpanded]);
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        key: ValueKey(isAllExpanded),
+        width: MediaQuery.of(context).size.width * 0.9,
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: backgroundColor ?? AppColors.backgroundTab,
+          borderRadius: BorderRadius.circular(18),
         ),
-        subtitle: TextWidget(
-          text: widget.subtitle,
-          fontSize: 14,
-          fontWeight: FontWeight.w300,
-        ),
-        trailing: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            TextWidget(
-              text: widget.trailingCount,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-            widget.isConfirmed ? _ComfimerWidget() : const SizedBox(),
-          ],
-        ),
-        children: [
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: widget.supplyForm?.supplies?.length ?? 0,
-            itemBuilder: (context, outerIndex) => ExpansionTile(
-              backgroundColor: AppColors.backgroundTab,
-              iconColor: AppColors.primary,    
-              title:  TextWidget(
-                text:widget.supplyForm?.supplies?[outerIndex].supplys.toString() ?? '',
+        child: ExpansionTile(
+          initiallyExpanded: isExpandedHook.value,
+          collapsedShape: const RoundedRectangleBorder(side: BorderSide.none),
+          shape: const RoundedRectangleBorder(side: BorderSide.none),
+          leading: Icon(leadingIcon, color: AppColors.iconFlight),
+          title: TextWidget(
+            text: title,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+          subtitle: TextWidget(
+            text: subtitle,
+            fontSize: 14,
+            fontWeight: FontWeight.w300,
+          ),
+          trailing: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              TextWidget(
+                text: trailingCount,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
-              children: [
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: widget.supplyForm?.supplies?[outerIndex].items?.length ?? 0,
-                  itemBuilder: (context, innerIndex) =>  ChildExpansion(
-                    supplyItem: widget.supplyForm?.supplies?[outerIndex].items?[innerIndex],
-                  ),
-                ),
-              ],
-            ),
+              isConfirmed ? _ComfimerWidget() : const SizedBox(),
+            ],
           ),
-        ],
+          children: [
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: supplyForm?.supplies?.length ?? 0,
+              itemBuilder: (context, outerIndex) => ExpansionTile(
+                initiallyExpanded: isExpandedHook.value,
+                backgroundColor: AppColors.backgroundTab,
+                iconColor: AppColors.primary,
+                title: TextWidget(
+                  text: supplyForm?.supplies?[outerIndex].supplys.toString() ??
+                      '',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+                children: [
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount:
+                        supplyForm?.supplies?[outerIndex].items?.length ?? 0,
+                    itemBuilder: (context, innerIndex) => ChildExpansion(
+                      supplyItem:
+                          supplyForm?.supplies?[outerIndex].items?[innerIndex],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -104,27 +119,27 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> {
       children: [
         const SizedBox(height: 10),
         Container(
-                height: 16,
-                width: 80,
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                decoration: BoxDecoration(
-                  color: AppColors.textSuccess,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child:const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.check, color: AppColors.white, size: 12),
-                     SizedBox(width: 3),
-                    TextWidget(
-                      text: "Đã Xác nhận",
-                      fontSize: 8,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.white,
-                    ),
-                  ],
-                ),
+          height: 16,
+          width: 80,
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+          decoration: BoxDecoration(
+            color: AppColors.textSuccess,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.check, color: AppColors.white, size: 12),
+              SizedBox(width: 3),
+              TextWidget(
+                text: "Đã Xác nhận",
+                fontSize: 8,
+                fontWeight: FontWeight.w500,
+                color: AppColors.white,
               ),
+            ],
+          ),
+        ),
       ],
     );
   }

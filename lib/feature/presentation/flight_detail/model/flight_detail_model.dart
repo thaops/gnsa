@@ -147,6 +147,7 @@ class SupplyGroup {
 
 class SupplyItem {
   String? supplyFormId;
+  String? supplyId;
   String? categoryName;
   String? supplyName;
   int? suppliedQuantity;
@@ -155,6 +156,7 @@ class SupplyItem {
 
   SupplyItem({
     this.supplyFormId,
+    this.supplyId,
     this.categoryName,
     this.supplyName,
     this.suppliedQuantity,
@@ -165,6 +167,7 @@ class SupplyItem {
   factory SupplyItem.fromJson(Map<String, dynamic> json) {
     return SupplyItem(
       supplyFormId: json['SupplyFormId'] as String?,
+      supplyId: json['SupplyId'] as String?,
       categoryName: json['CategoryName'] as String?,
       supplyName: json['SupplyName'] as String?,
       suppliedQuantity: json['SuppliedQuantity'] as int?,
@@ -176,6 +179,7 @@ class SupplyItem {
   Map<String, dynamic> toJson() {
     return {
       'SupplyFormId': supplyFormId,
+      'SupplyId': supplyId,
       'CategoryName': categoryName,
       'SupplyName': supplyName,
       'SuppliedQuantity': suppliedQuantity,

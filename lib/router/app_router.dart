@@ -39,14 +39,20 @@ class AppRouter {
         ),
         GoRoute(
           path: flightSignature,
-          builder: (context, state) => const FlightSignature(),
+          builder: (context, state) {
+            final supplyformId = state.extra as List<String>;
+            return FlightSignature(supplyfromId: supplyformId);
+          },
         ),
         GoRoute(
-          path: flightSign,
-          builder: (context, state) => const FlightSign(
-            title: '',
-          ),
-        ),
+            path: flightSign,
+            builder: (context, state) {
+              final extra = state.extra as Map<String, dynamic>?;
+              return FlightSign(
+                title: extra?['title'] as String? ?? '',
+                supplyFormIds: extra?['supplyFormIds'] as List<String>? ?? [],
+              );
+            }),
         GoRoute(
           path: flightPrinter,
           builder: (context, state) {

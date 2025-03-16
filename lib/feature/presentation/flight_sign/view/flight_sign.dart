@@ -1,109 +1,109 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gnsa/common/widgets/app_bar_widget.dart';
 import 'package:gnsa/common/widgets/custom_button.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
-import 'package:gnsa/feature/presentation/flight_sign/binding/flight_sign_binding.dart';
-import 'package:signature/signature.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gnsa/feature/presentation/flight_sign/controller/flight_sign_controller.dart';
+import 'package:signature/signature.dart';
 
-class FlightSign extends ConsumerStatefulWidget {
+class FlightSign extends HookConsumerWidget {
   final String title;
-  const FlightSign({Key? key, required this.title}) : super(key: key);
+  final List<String> supplyFormIds;
+
+  const FlightSign({
+    super.key,
+    required this.title,
+    required this.supplyFormIds,
+  });
 
   @override
-  _FlightSignState createState() => _FlightSignState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Lấy controller và trạng thái từ provider
+    final controller = ref.watch(flightSignProvider.notifier);
+    final state = ref.watch(flightSignProvider);
 
-class _FlightSignState extends ConsumerState<FlightSign> {
-
-
-  @override
-  Widget build(BuildContext context) {
-    final controller = ref.watch(flightSignControllerProvider);
-    final screenSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBarWidget(
-        title: widget.title,
+        title: title,
         isBack: false,
         iconRightFirst: Icons.close,
-        onPressedFirst: () {
-          Navigator.pop(context);
-        },
+        onPressedFirst: () => Navigator.pop(context),
       ),
-      body:  SizedBox(
-          height: screenSize.height * 0.80,
-          width: screenSize.width,
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  height: screenSize.height * 0.6,
-                  width: screenSize.width,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                        color: AppColors.borderSignature, width: 1),
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        flex: 8,
-                        child: SizedBox(
-                          height: screenSize.height * 0.7,
-                          width: screenSize.width,
-                          child: Signature(
-                            controller: controller.signatureController,
-                            backgroundColor: AppColors.white,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 20.w),
-                        child: const Divider(),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: GestureDetector(
-                          onTap: () {
-                            controller.signatureController.clear();
-                          },
-                          child: SizedBox(
-                            height: screenSize.height,
-                            width: screenSize.width,
-                            child: const Center(
-                              child: TextWidget(
-                                text: 'Ký lại',
-                                fontSize: 16,
-                                textAlign: TextAlign.center,
-                                fontWeight: FontWeight.w300,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Spacer(),
-                CustomButton(
-                  height: 60.h,
-                  color: AppColors.primary,
-                  onPressed: () async {
-                    await controller.saveSignature(context);
-                  },
-                  text: 'Lưu',
-                ),
-              ],
-            ),
+      body: SizedBox.expand(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
+          child: Column(
+            children: [
+              _buildSignatureArea(controller),
+              const Spacer(),
+              _buildSaveButton(context, controller, state),
+            ],
           ),
         ),
-      
+      ),
+    );
+  }
+
+  Widget _buildSignatureArea(FlightSignNotifier controller) {
+    return Container(
+      height: 0.6.sh, // Dùng ScreenUtil để responsive
+      decoration: BoxDecoration(
+        border: Border.all(color: AppColors.borderSignature, width: 1),
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Column(
+        children: [
+          Expanded(
+            flex: 8,
+            child: Signature(
+              controller: controller.signatureController,
+              backgroundColor: AppColors.white,
+            ),
+          ),
+          const Divider(),
+          Expanded(
+            flex: 1,
+            child: GestureDetector(
+              onTap: controller.clearSignature,
+              child: const Center(
+                child: TextWidget(
+                  text: 'Ký lại',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w300,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSaveButton(
+    BuildContext context,
+    FlightSignNotifier controller,
+    AsyncValue<File?> state,
+  ) {
+    return CustomButton(
+      height: 60.h,
+      color: AppColors.primary,
+      onPressed: state.isLoading
+          ? null
+          : () async {
+              await controller.saveSignature(
+                context: context,
+                supplyFormIds: supplyFormIds,
+                isSupplierSign: true, // Có thể truyền từ ngoài nếu cần
+              );
+              if (state.hasValue && !state.hasError) {
+                Navigator.pop(context); // Quay lại sau khi thành công
+              }
+            },
+      text: 'Lưu',
     );
   }
 }

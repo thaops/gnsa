@@ -46,8 +46,11 @@ class MainActivity : FlutterActivity() {
             yPosition = printFlightInfo(data, yPosition)
             yPosition = printDivider(yPosition)
             yPosition = printSupplyForms(data, yPosition)
+            yPosition = printThankYou(yPosition)
             yPosition = printDivider(yPosition)
-            yPosition = printThankYou(yPosition) // Thêm lời cảm ơn
+            yPosition = printDivider(yPosition)
+            yPosition = printDivider(yPosition)
+
 
             // Hoàn tất in
             printerManager?.printPage(0)
@@ -192,10 +195,10 @@ class MainActivity : FlutterActivity() {
     private fun printThankYou(startY: Int): Int {
         val yPosition = startY
         val currentTime = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(java.util.Date())
-        val footerText = "Printed on $currentTime - Thank you!"
+        val footerText = "     Printed on $currentTime - Thank you!"
         val footerX = (PAGE_WIDTH - footerText.length * 12) / 2
         printerManager?.drawText(footerText, footerX, yPosition, "simsun", 20, false, false, 0)
-        return yPosition + 32
+        return yPosition + 20
     }
 
     override fun onDestroy() {

@@ -35,7 +35,7 @@ class CustomSignature extends StatelessWidget {
               borderRadius: BorderRadius.circular(12.r),
               border: Border.all(color: AppColors.borderSignature, width: 1),
             ),
-            child: imageUrl == null
+            child: imageUrl!.isEmpty
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
