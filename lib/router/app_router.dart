@@ -51,6 +51,7 @@ class AppRouter {
               return FlightSign(
                 title: extra?['title'] as String? ?? '',
                 supplyFormIds: extra?['supplyFormIds'] as List<String>? ?? [],
+                isSupplierSign: extra?['isSupplierSign'] as bool? ?? true,
               );
             }),
         GoRoute(

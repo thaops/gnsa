@@ -13,11 +13,13 @@ import 'package:signature/signature.dart';
 class FlightSign extends HookConsumerWidget {
   final String title;
   final List<String> supplyFormIds;
+  final bool isSupplierSign;
 
   const FlightSign({
     super.key,
     required this.title,
     required this.supplyFormIds,
+    required this.isSupplierSign,
   });
 
   @override
@@ -50,7 +52,7 @@ class FlightSign extends HookConsumerWidget {
 
   Widget _buildSignatureArea(FlightSignNotifier controller) {
     return Container(
-      height: 0.6.sh, // Dùng ScreenUtil để responsive
+      height: 0.65.sh, // Dùng ScreenUtil để responsive
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.borderSignature, width: 1),
         borderRadius: BorderRadius.circular(12.r),
@@ -97,10 +99,10 @@ class FlightSign extends HookConsumerWidget {
               await controller.saveSignature(
                 context: context,
                 supplyFormIds: supplyFormIds,
-                isSupplierSign: true, // Có thể truyền từ ngoài nếu cần
+                isSupplierSign: isSupplierSign, 
               );
               if (state.hasValue && !state.hasError) {
-                Navigator.pop(context); // Quay lại sau khi thành công
+                Navigator.pop(context,true); // Quay lại sau khi thành công
               }
             },
       text: 'Lưu',

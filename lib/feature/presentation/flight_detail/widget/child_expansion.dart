@@ -13,10 +13,16 @@ class ChildExpansion extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final isEdit = useState(false);
+    final noteState = useState(supplyItem?.note ?? '');
 
     final noteController = useTextEditingController(
       text: supplyItem?.note ?? '',
     );
+    void _saveNote() {
+      supplyItem?.note = noteController.text; // Cập nhật model
+      noteState.value = noteController.text; // Cập nhật trạng thái cục bộ
+      isEdit.value = false; // Thoát chế độ chỉnh sửa
+    }
 
     return Container(
       color: AppColors.white,
@@ -55,8 +61,7 @@ class ChildExpansion extends HookWidget {
                         ),
                         IconButton(
                           onPressed: () {
-                            print(noteController.value.text);
-                            isEdit.value = false;
+                            _saveNote();
                           },
                           icon: Icon(Icons.check, color: AppColors.iconFlight),
                         ),
@@ -67,7 +72,8 @@ class ChildExpansion extends HookWidget {
                         // Bật edit mode
                         isEdit.value = true;
                       },
-                      icon: Icon(Icons.edit_note_sharp, color: AppColors.iconFlight),
+                      icon: Icon(Icons.edit_note_sharp,
+                          color: AppColors.iconFlight),
                     ),
             ],
           ),

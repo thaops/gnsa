@@ -9,5 +9,6 @@ class ApiEndpoints {
   static String supplyFormDetail({ String? supplyFormId , String? supplyFormType }) => "${Config.baseUrl}/supplyform/mobile/get-detail-by-flight?supplyFormId=$supplyFormId&supplyFormType=$supplyFormType";
   static String getSignedSupplyForm({ String? supplyFormId}) => "${Config.baseUrl}/supplyform/mobile/get-signed/$supplyFormId";
   static const String signedForm = "${Config.baseUrl}/supplyform/mobile/signed-form";
+  static const String updateSupplyFormNote = "${Config.baseUrl}/supplyform/mobile/update-note";
 }
  
