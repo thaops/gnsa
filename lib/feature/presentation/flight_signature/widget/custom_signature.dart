@@ -19,7 +19,6 @@ class CustomSignature extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("Image URL in CustomSignature: $imageUrl");
     final screenSize = MediaQuery.of(context).size;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,7 +79,7 @@ class CustomSignature extends StatelessWidget {
                         top: 10,
                         right: 10,
                         child: Container(
-                          width: 44.w,
+                          width: 50.w,
                           height: 44.h,
                           decoration: BoxDecoration(
                               color: AppColors.borderSignature,

@@ -166,13 +166,13 @@ class SupplyItem {
 
   factory SupplyItem.fromJson(Map<String, dynamic> json) {
     return SupplyItem(
-      supplyFormId: json['SupplyFormId'] as String?,
-      supplyId: json['SupplyId'] as String?,
-      categoryName: json['CategoryName'] as String?,
-      supplyName: json['SupplyName'] as String?,
-      suppliedQuantity: json['SuppliedQuantity'] as int?,
-      confirmedQuantity: json['ConfirmedQuantity'] as int?,
-      note: json['Note'] as String?,
+      supplyFormId: json['SupplyFormId'] ?? '',
+      supplyId: json['SupplyId'] ?? '',
+      categoryName: json['CategoryName'] ?? '',
+      supplyName: json['SupplyName'] ?? '',
+      suppliedQuantity: json['SuppliedQuantity'] ?? 0,
+      confirmedQuantity: json['ConfirmedQuantity'] ?? 0,
+      note: json['Note'] ?? '',
     );
   }
 

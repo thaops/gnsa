@@ -1,64 +1,89 @@
 import 'package:flutter/material.dart';
-import 'package:gnsa/common/Services/api_endpoints.dart' show ApiEndpoints;
+import 'package:gnsa/common/Services/api_endpoints.dart';
 import 'package:gnsa/common/Services/services.dart';
 import 'package:gnsa/common/constants/http_status_codes.dart';
 import 'package:gnsa/common/repositoty/dio_api.dart';
 import 'package:gnsa/common/utils/custom_flushbar.dart';
-import 'package:gnsa/common/utils/utils_deviece_udid.dart';
 import 'package:gnsa/router/app_router.dart';
 import 'package:go_router/go_router.dart';
 
 class LoginController extends ChangeNotifier {
   final nameController = TextEditingController();
   final passwordController = TextEditingController();
-  final DioApi dioApi = DioApi();
+  final DioApi _dioApi = DioApi();
   bool _isLoading = false;
-  bool get isLoading => _isLoading;
-  final deviceUdid = UtilsDeviceUdid();
 
-  void _setLoading(bool loading) {
-    _isLoading = loading;
+  bool get isLoading => _isLoading;
+
+  void _setLoading(bool value) {
+    _isLoading = value;
     notifyListeners();
   }
 
-  Future<void> login(BuildContext context) async {
+  void _clearInputs() {
+    nameController.clear();
+    passwordController.clear();
+  }
 
-    // if (nameController.text.isEmpty || passwordController.text.isEmpty) {
-    //   await CustomFlushbar.showWarning(context, message: 'Vui lòng nhập đầy đủ thông tin');
-    //   return;
-    // }
+  Future<void> login(BuildContext context) async {
+    FocusScope.of(context).unfocus();
+    if (!_validateInputs()) {
+      _showWarning(context, 'Vui lòng nhập đầy đủ thông tin');
+      return;
+    }
+
     try {
       _setLoading(true);
-      final response = await dioApi.post(
+      final response = await _dioApi.post(
         ApiEndpoints.login,
         data: {
-          'UserName': "admin",
-          'Password': "123",
+          'UserName': nameController.text.trim(),
+          'Password': passwordController.text,
         },
       );
-      print(response.data);
-      if (response.data['StatusCode'] != HttpStatusCodes.STATUS_CODE_OK) {
-        _setLoading(false);
-        await CustomFlushbar.showError(context, message: 'Tài khoản và mật khẩu không chính xác');
-        return;
-      }
-       CustomFlushbar.showSuccess(context, message: 'Đăng nhập thành công');
-      final token = response.data["Data"]['AccessToken'];
-      final services = await Services.create();
-      await services.saveAccessToken(token);
-      GoRouter.of(context).go(AppRouter.flightList);
+
+      await _handleLoginResponse(response, context);
+      _clearInputs();
     } catch (e) {
-      print(e);
-      await CustomFlushbar.showError(context, message: 'Tài khoản và mật khẩu không chính xác');
+      _handleError(context, e);
     } finally {
       _setLoading(false);
     }
   }
 
-  // @override
-  // void dispose() {
-  //   nameController.dispose();
-  //   passwordController.dispose();
-  //   super.dispose();
-  // }
+  bool _validateInputs() =>
+      nameController.text.isNotEmpty && passwordController.text.isNotEmpty;
+
+  Future<void> _handleLoginResponse(dynamic response, BuildContext context) async {
+    if (response.data['StatusCode'] != HttpStatusCodes.STATUS_CODE_OK) {
+      _showError(context, 'Tài khoản và mật khẩu không chính xác');
+      return;
+    }
+
+    final token = response.data["Data"]['AccessToken'];
+    await Services.create().then((services) => services.saveAccessToken(token));
+    _showSuccess(context, 'Đăng nhập thành công');
+    GoRouter.of(context).go(AppRouter.flightList);
+  }
+
+  void _handleError(BuildContext context, dynamic error) {
+    debugPrint('Login error: $error');
+    _showError(context, 'Tài khoản và mật khẩu không chính xác');
+  }
+
+  void _showWarning(BuildContext context, String message) =>
+      CustomFlushbar.showWarning(context, message: message);
+
+  void _showError(BuildContext context, String message) =>
+      CustomFlushbar.showError(context, message: message);
+
+  void _showSuccess(BuildContext context, String message) =>
+      CustomFlushbar.showSuccess(context, message: message);
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 }

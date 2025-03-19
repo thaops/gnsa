@@ -29,16 +29,9 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
-
     final router = AppRouter.getRouter(accessToken);
-
     return ScreenUtilInit(
-      designSize: Size(
-        width > ScreenSize.widthWeb ? ScreenSize.widthWeb : width,
-        height > ScreenSize.heightWeb ? ScreenSize.heightWeb : height,
-      ),
+      designSize: Size(ScreenSize.width, ScreenSize.height),
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) => MaterialApp.router(

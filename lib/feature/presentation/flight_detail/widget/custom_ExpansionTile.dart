@@ -1,7 +1,6 @@
-// custom_expansion_tile.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:get_storage/get_storage.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:gnsa/feature/presentation/flight_detail/controller/filght_bool_state.dart';
@@ -19,6 +18,7 @@ class CustomExpansionTile extends HookConsumerWidget {
   final bool isExpanded;
   final SupplyForm? supplyForm;
   final VoidCallback? onTap;
+  final VoidCallback onConfirm;
 
   const CustomExpansionTile({
     Key? key,
@@ -31,6 +31,7 @@ class CustomExpansionTile extends HookConsumerWidget {
     required this.isExpanded,
     this.supplyForm,
     this.onTap,
+    required this.onConfirm,
   }) : super(key: key);
 
   @override
@@ -47,10 +48,10 @@ class CustomExpansionTile extends HookConsumerWidget {
       child: Container(
         key: ValueKey(isAllExpanded),
         width: MediaQuery.of(context).size.width * 0.9,
-        padding: const EdgeInsets.all(8),
+        padding: EdgeInsets.all(8.r),
         decoration: BoxDecoration(
           color: backgroundColor ?? AppColors.backgroundTab,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(18.r),
         ),
         child: ExpansionTile(
           initiallyExpanded: isExpandedHook.value,
@@ -73,7 +74,7 @@ class CustomExpansionTile extends HookConsumerWidget {
             children: [
               TextWidget(
                 text: trailingCount,
-                fontSize: 14,
+                fontSize: 12,
                 fontWeight: FontWeight.w500,
               ),
               isConfirmed ? _ComfimerWidget() : const SizedBox(),
@@ -101,6 +102,7 @@ class CustomExpansionTile extends HookConsumerWidget {
                     itemCount:
                         supplyForm?.supplies?[outerIndex].items?.length ?? 0,
                     itemBuilder: (context, innerIndex) => ChildExpansion(
+                      index: (innerIndex + 1).toString(),
                       supplyItem:
                           supplyForm?.supplies?[outerIndex].items?[innerIndex],
                     ),
@@ -115,32 +117,36 @@ class CustomExpansionTile extends HookConsumerWidget {
   }
 
   Widget _ComfimerWidget() {
-    return Column(
-      children: [
-        const SizedBox(height: 10),
-        Container(
-          height: 16,
-          width: 80,
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-          decoration: BoxDecoration(
-            color: AppColors.textSuccess,
-            borderRadius: BorderRadius.circular(10),
+    return InkWell(
+      onTap: () => {
+        onConfirm.call()
+      },
+      child: Column(
+        children: [
+          Container(
+            height: 20.h,
+            width: 70.h,
+            padding:  EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+            decoration: BoxDecoration(
+              color: AppColors.textSuccess,
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.check, color: AppColors.white, size: 8.w),
+                SizedBox(width: 3.w),
+              const  TextWidget(
+                  text: "Đã Xác nhận",
+                  fontSize: 8,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.white,
+                ),
+              ],
+            ),
           ),
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.check, color: AppColors.white, size: 12),
-              SizedBox(width: 3),
-              TextWidget(
-                text: "Đã Xác nhận",
-                fontSize: 8,
-                fontWeight: FontWeight.w500,
-                color: AppColors.white,
-              ),
-            ],
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

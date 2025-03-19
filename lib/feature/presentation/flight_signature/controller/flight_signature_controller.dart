@@ -16,7 +16,6 @@ class FlightSignatureController
       final response = await dioApi
           .get(ApiEndpoints.getSignedSupplyForm(supplyFormId: supplyfromId));
       final data = SignSupplyfrom.fromJson(response.data['Data']);
-      print("data: ${data.supplierSign}");
       state = AsyncValue.data(data);
     } catch (e, stackTrace) {
       print(e);

@@ -19,7 +19,7 @@ class CustomFlightList extends StatelessWidget {
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          height: 100.h,
+          height: 104.h,
           decoration: BoxDecoration(
             color: AppColors.backgroundTab,
             borderRadius: BorderRadius.circular(10),

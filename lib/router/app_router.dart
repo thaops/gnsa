@@ -22,7 +22,7 @@ class AppRouter {
       routes: [
         GoRoute(
           path: login,
-          builder: (context, state) => const Login(),
+          builder: (context, state) =>const  LoginScreen(),
         ),
         GoRoute(
           path: flightList,
@@ -32,7 +32,7 @@ class AppRouter {
           path: flightDetail,
           builder: (context, state) {
             final id = state.extra as String;
-            return FlightDetail(
+            return FlightDetailScreen(
               id: id,
             );
           },

@@ -128,6 +128,26 @@ class DioApi {
     }
   }
 
+    Future<Response> patch(String url, {dynamic data, Options? options}) async {
+    try {
+      final headers = await _getHeaders();
+      final mergedOptions = options?.copyWith(
+            headers: {...?options.headers, ...headers},
+          ) ?? 
+          Options(headers: headers);
+      final response = await dio.patch(
+        url,
+        data: data,
+        options: mergedOptions,
+      );
+      return _handleResponse(response);
+    } on DioError catch (e) {
+      throw Exception('Failed to patch data: ${e.message}');
+    } catch (e) {
+      throw Exception('Unexpected error: $e');
+    }
+  }
+
   Response _handleResponse(Response response) {
     if (response.statusCode == HttpStatusCodes.STATUS_CODE_OK) {
       return response;

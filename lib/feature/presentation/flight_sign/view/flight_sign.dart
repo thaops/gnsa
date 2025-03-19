@@ -102,7 +102,7 @@ class FlightSign extends HookConsumerWidget {
                 isSupplierSign: isSupplierSign, 
               );
               if (state.hasValue && !state.hasError) {
-                Navigator.pop(context,true); // Quay lại sau khi thành công
+                Navigator.pop(context,true); 
               }
             },
       text: 'Lưu',
