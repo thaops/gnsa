@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:gnsa/feature/auth/view/login.dart';
 import 'package:gnsa/feature/presentation/flight_detail/model/flight_detail_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/view/flight_detail.dart';

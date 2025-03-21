@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gnsa/common/Services/services.dart';
+import 'package:gnsa/common/utils/check_internet.dart';
 import 'package:gnsa/common/widgets/app_bar_widget.dart';
 import 'package:gnsa/common/widgets/container_loading.dart';
 import 'package:gnsa/common/widgets/custom_text_field.dart';
@@ -29,6 +31,8 @@ class FlightList extends HookConsumerWidget {
     final currentSearch = useState('');
 
     final focusNode = useFocusNode();
+
+
 
     useEffect(() {
       scrollController.addListener(() {

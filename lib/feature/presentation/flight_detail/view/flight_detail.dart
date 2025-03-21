@@ -166,6 +166,7 @@ class FlightDetailScreen extends HookConsumerWidget {
       Padding(
         padding: EdgeInsets.only(bottom: 16.h),
         child: CupertinoContextMenu(
+          
           actions: [
             CupertinoContextMenuAction(
               onPressed: () => context.push(
@@ -192,7 +193,7 @@ class FlightDetailScreen extends HookConsumerWidget {
             color: AppColors.backgroundTab,
             child: CustomExpansionTile(
               backgroundColor: AppColors.backgroundTab,
-              title: supplyForm.className.toString(),
+              title: " ${supplyForm.category.toString()} - ${supplyForm.className.toString()}",
               subtitle: 'Mã code: ${supplyForm.supplyFormCode}',
               leadingIcon: Icons.airplane_ticket,
               trailingCount: '${supplyForm.totalSupply}',
@@ -230,7 +231,7 @@ class FlightDetailScreen extends HookConsumerWidget {
   void _handleSignButton(BuildContext context, WidgetRef ref) {
     ref.watch(flightDetailControllerProvider).whenData((data) {
       final filterSupplyForm =
-          data.supplyForms!.where((e) => e.status != _kValueSign).toList();
+          data.supplyForms!.where((e) => e.status == _kValueSign).toList();
       final supplyFormIds =
           filterSupplyForm.map((e) => e.supplyFormId!).toList();
 

@@ -69,7 +69,7 @@ class ChildExpansion extends HookConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     TextWidget(
-                      text: "$index. ${supplyItem?.categoryName ?? ''}",
+                      text: "$index. ${supplyItem?.supplyName ?? ''}",
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),

@@ -22,10 +22,24 @@ class FlightPrinter extends HookConsumerWidget {
     final controller = ref.watch(flightPrinterBindingProvider.notifier);
 
     void toggleCheckbox(int index) {
-      checkedStates.value = [
-        for (int i = 0; i < checkedStates.value.length; i++)
-          i == index ? !checkedStates.value[i] : checkedStates.value[i],
-      ];
+
+      final newCheckedStates = List<bool>.from(checkedStates.value);
+      
+      if(index == 0){
+        final check = !newCheckedStates[0];
+        for(int i = 0; i < newCheckedStates.length; i++){
+          newCheckedStates[i] = check;
+        }
+      }else{
+        newCheckedStates[index] = !newCheckedStates[index];
+        final allOthersChecked = listItems
+            .asMap()
+            .entries
+            .skip(1) // Bỏ qua "All"
+            .every((entry) => newCheckedStates[entry.key]);
+        newCheckedStates[0] = allOthersChecked;
+      }
+      checkedStates.value = newCheckedStates;
     }
 
     return Dialog(

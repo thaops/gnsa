@@ -119,17 +119,17 @@ class SupplyForm {
 }
 
 class SupplyGroup {
-  String? supplys;
+  String? categoryName;
   List<SupplyItem>? items;
 
   SupplyGroup({
-    this.supplys,
+    this.categoryName,
     this.items,
   });
 
   factory SupplyGroup.fromJson(Map<String, dynamic> json) {
     return SupplyGroup(
-      supplys: json['Supplys'] as String?,
+      categoryName: json['CategoryName'] as String?,
       items: json['Items'] != null
           ? List<SupplyItem>.from(
               json['Items'].map((item) => SupplyItem.fromJson(item)))
@@ -139,7 +139,7 @@ class SupplyGroup {
 
   Map<String, dynamic> toJson() {
     return {
-      'Supplys': supplys,
+      'CategoryName': categoryName,
       'Items': items?.map((item) => item.toJson()).toList(),
     };
   }

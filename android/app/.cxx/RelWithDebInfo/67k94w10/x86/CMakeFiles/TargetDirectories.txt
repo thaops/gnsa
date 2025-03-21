@@ -1,0 +1,2 @@
+C:/Flutter-dev/NP-Technology/gnsa/android/app/.cxx/RelWithDebInfo/67k94w10/x86/CMakeFiles/edit_cache.dir
+C:/Flutter-dev/NP-Technology/gnsa/android/app/.cxx/RelWithDebInfo/67k94w10/x86/CMakeFiles/rebuild_cache.dir

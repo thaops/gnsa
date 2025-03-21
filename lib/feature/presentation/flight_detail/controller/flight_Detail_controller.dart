@@ -38,17 +38,17 @@ class FlightDetailNotifier extends StateNotifier<AsyncValue<FlightDetailModel>> 
       Map<String, List<dynamic>> groupedSupplies = {};
 
       for (var supply in supplies) {
-        String supplyName = supply['SupplyName'] ?? 'Unknown';
-        if (!groupedSupplies.containsKey(supplyName)) {
-          groupedSupplies[supplyName] = [];
+        String categoryName = supply['CategoryName'] ?? 'Unknown';
+        if (!groupedSupplies.containsKey(categoryName)) {
+          groupedSupplies[categoryName] = [];
         }
-        groupedSupplies[supplyName]!.add(supply);
+        groupedSupplies[categoryName]!.add(supply);
       }
 
       List<Map<String, dynamic>> newSupplies = [];
-      groupedSupplies.forEach((supplyName, items) {
+      groupedSupplies.forEach((categoryName, items) {
         newSupplies.add({
-          'Supplys': supplyName,
+          'CategoryName': categoryName,
           'Items': items,
         });
       });

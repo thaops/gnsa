@@ -90,8 +90,7 @@ class CustomExpansionTile extends HookConsumerWidget {
                 backgroundColor: AppColors.backgroundTab,
                 iconColor: AppColors.primary,
                 title: TextWidget(
-                  text: supplyForm?.supplies?[outerIndex].supplys.toString() ??
-                      '',
+                  text: supplyForm?.supplies?[outerIndex].categoryName.toString() ??'',
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
