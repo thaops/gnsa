@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gnsa/common/Services/services.dart';
-import 'package:gnsa/common/utils/check_internet.dart';
+import 'package:gnsa/common/utils/custom_dialog.dart';
 import 'package:gnsa/common/widgets/app_bar_widget.dart';
 import 'package:gnsa/common/widgets/container_loading.dart';
 import 'package:gnsa/common/widgets/custom_text_field.dart';
 import 'package:gnsa/common/widgets/loading_shimmer.dart';
+import 'package:gnsa/common/widgets/state_err.dart' show StateErr;
 import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:gnsa/common/utils/responsive_helper.dart';
 import 'package:gnsa/feature/presentation/flight_list/model/flights_model.dart';
@@ -31,9 +32,6 @@ class FlightList extends HookConsumerWidget {
     final currentSearch = useState('');
 
     final focusNode = useFocusNode();
-
-
-
     useEffect(() {
       scrollController.addListener(() {
         if (scrollController.position.pixels >=
@@ -50,10 +48,15 @@ class FlightList extends HookConsumerWidget {
     }, []);
 
     void _logout() async {
-      final services = await Services.create();
-      await services.deleteAccessToken();
-      GoRouter.of(context).go(AppRouter.login);
+      final result = await CustomDialog().showConfirmationDialog(
+          context, 'Xác nhận', 'Bạn có chắc chắn muốn đăng xuất?');
+      if (result == true) {
+        final services = await Services.create();
+        await services.deleteAccessToken();
+        GoRouter.of(context).go(AppRouter.login);
+      }
     }
+
     void _onChangedSearch(String value) {
       if (value.isEmpty) {
         ref.read(flightListProvider.notifier).refreshFlights();
@@ -97,7 +100,7 @@ class FlightList extends HookConsumerWidget {
                 _clearSearch();
               },
               onPrefixTap: () {
-               focusNode.unfocus();
+                focusNode.unfocus();
               },
               borderColor: AppColors.backgroundTab,
               onChanged: (value) {
@@ -135,10 +138,10 @@ class FlightList extends HookConsumerWidget {
     return Expanded(
       child: flightListAsync.when(
         loading: () => _buildLoading(),
-        error: (error, stack) => Center(child: Text("Lỗi: $error")),
+        error: (error, stack) => const StateErr(),
         data: (flightsModel) {
           if (flightsModel.data.isEmpty) {
-            return const Center(child: Text("Không có chuyến bay nào."));
+            return const StateErr();
           }
           return _buildFlights(scrollController, flightsModel, isLoadingMore);
         },

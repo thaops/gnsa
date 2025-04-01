@@ -1,4 +1,3 @@
-// flight_detail_screen.dart
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -9,6 +8,7 @@ import 'package:gnsa/common/widgets/app_bar_widget.dart';
 import 'package:gnsa/common/widgets/container_loading.dart';
 import 'package:gnsa/common/widgets/custom_button.dart';
 import 'package:gnsa/common/widgets/loading_shimmer.dart';
+import 'package:gnsa/common/widgets/state_err.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:gnsa/feature/presentation/flight_detail/controller/filght_bool_state.dart';
@@ -68,61 +68,64 @@ class FlightDetailScreen extends HookConsumerWidget {
       );
 
   Widget _buildBody(
-          BuildContext context, WidgetRef ref, double horizontalPadding) =>
-      Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(
-                horizontal: horizontalPadding,
-                vertical: 16,
-              ),
-              child: _buildContent(context, ref),
-            ),
-          ),
-          _buildSignButton(context, ref, horizontalPadding),
-          const SizedBox(height: 16),
-        ],
-      );
-
-  Widget _buildContent(BuildContext context, WidgetRef ref) {
+      BuildContext context, WidgetRef ref, double horizontalPadding) {
     final flightDetailAsync = ref.watch(flightDetailControllerProvider);
-    final isExpanded = ref.watch(isChildExpandedProvider);
-    final flightBoolNotifier = ref.read(isEditProvider.notifier);
 
-    return Center(
-      child: flightDetailAsync.when(
-        error: (error, _) => Center(child: Text('Lỗi: $error')),
-        loading: () => _buildLoading(),
-        data: (data) => _buildSupplyFormList(
-          data,
-          context,
-          isExpanded,
-          flightBoolNotifier,
-          ref,
-        ),
-      ),
+    return flightDetailAsync.when(
+      error: (error, _) => const StateErr(),
+      loading: () => _buildLoading(horizontalPadding),
+      data: (data) => _buildData(horizontalPadding, data, context, ref),
     );
   }
 
-  LoadingShimmer _buildLoading() {
-    return const LoadingShimmer(
-        child: Column(
+  Column _buildData(double horizontalPadding, FlightDetailModel data,
+      BuildContext context, WidgetRef ref) {
+    return Column(
       children: [
-        ContainerLoading(
-          height: 150,
+        Expanded(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(
+              horizontal: horizontalPadding,
+              vertical: 16,
+            ),
+            child: _buildSupplyFormList(
+              data,
+              context,
+              ref.watch(isChildExpandedProvider),
+              ref.read(isEditProvider.notifier),
+              ref,
+            ),
+          ),
         ),
-        TitleRowAll(
-          title: 'DANH SÁCH',
-          subtitle: 'Xem hết',
-        ),
-        ChildLoadingList(
-            child: ContainerLoading(
-          height: 70,
-        ))
+        _buildSignButton(context, ref, horizontalPadding),
+        const SizedBox(height: 16),
       ],
+    );
+  }
+
+  LoadingShimmer _buildLoading(double horizontalPadding) {
+    return LoadingShimmer(
+        child: _bodyState(
+      horizontalPadding,
+      const Column(
+        children: [
+          ContainerLoading(height: 150),
+          TitleRowAll(title: 'DANH SÁCH', subtitle: 'Xem hết'),
+          ChildLoadingList(child: ContainerLoading(height: 70)),
+        ],
+      ),
     ));
   }
+
+  Widget _bodyState(double horizontalPadding, Widget child) => Center(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(
+            horizontal: horizontalPadding,
+            vertical: 16,
+          ),
+          child: child,
+        ),
+      );
 
   Widget _buildSupplyFormList(
     FlightDetailModel data,
@@ -166,7 +169,6 @@ class FlightDetailScreen extends HookConsumerWidget {
       Padding(
         padding: EdgeInsets.only(bottom: 16.h),
         child: CupertinoContextMenu(
-          
           actions: [
             CupertinoContextMenuAction(
               onPressed: () => context.push(
@@ -193,7 +195,8 @@ class FlightDetailScreen extends HookConsumerWidget {
             color: AppColors.backgroundTab,
             child: CustomExpansionTile(
               backgroundColor: AppColors.backgroundTab,
-              title: " ${supplyForm.category.toString()} - ${supplyForm.className.toString()}",
+              title:
+                  " ${supplyForm.category.toString()} - ${supplyForm.className.toString()}",
               subtitle: 'Mã code: ${supplyForm.supplyFormCode}',
               leadingIcon: Icons.airplane_ticket,
               trailingCount: '${supplyForm.totalSupply}',
@@ -203,10 +206,11 @@ class FlightDetailScreen extends HookConsumerWidget {
               supplyForm: supplyForm,
               onConfirm: () => {
                 showDialog(
-                    context: context,
-                    builder: (context) => PopupInformationSign(
-                          supplyfromId: supplyForm.supplyFormId!,
-                        ))
+                  context: context,
+                  builder: (context) => PopupInformationSign(
+                    supplyfromId: supplyForm.supplyFormId!,
+                  ),
+                ),
               },
             ),
           ),
@@ -244,12 +248,21 @@ class FlightDetailScreen extends HookConsumerWidget {
     });
   }
 
-  void _showPrinterDialog(BuildContext context, WidgetRef ref) => showDialog(
-        context: context,
-        builder: (_) => FlightPrinter(
-          flightDetailModel: ref.watch(flightDetailControllerProvider).value!,
-        ),
-      );
+  void _showPrinterDialog(BuildContext context, WidgetRef ref) {
+    final flightDetail = ref.watch(flightDetailControllerProvider).value;
+
+    showDialog(
+      context: context,
+      builder: (_) {
+        if (flightDetail == null) {
+          return const StateErr();
+        }
+        return FlightPrinter(
+          flightDetailModel: flightDetail,
+        );
+      },
+    );
+  }
 }
 
 class TitleRowAll extends StatelessWidget {

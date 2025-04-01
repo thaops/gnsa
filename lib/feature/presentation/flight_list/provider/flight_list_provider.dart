@@ -17,6 +17,7 @@ class FlightListNotifier extends AsyncNotifier<FlightsModel> {
   }
 
   Future<FlightsModel> _fetchFlights({String? search}) async {
+    print("_fetchFlights");
     final dioApi = ref.read(dioApiProvider);
     final response = await dioApi.get(
       ApiEndpoints.flightList,

@@ -46,12 +46,10 @@ class FlightPrinterController extends StateNotifier<FlightDetailModel?> {
     List<String> selectedItems,
   ) {
     if (selectedItems.contains(_kAllOption)) {
-      print("Printing all data: ${flightDetail.toJson()}");
       return flightDetail;
     }
 
     final filteredSupplyForms = _filterSupplyForms(flightDetail, selectedItems);
-    print("Printing filtered data: ${flightDetail.toJson()}");
     return FlightDetailModel(
       flight: flightDetail.flight,
       supplyForms: filteredSupplyForms,

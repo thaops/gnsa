@@ -39,8 +39,6 @@ class FlightSignNotifier extends AsyncNotifier<File?> {
       );
 
       if (response.data['StatusCode'] == HttpStatus.ok) {
-        await CustomFlushbar.showSuccess(context,
-            message: 'Lưu chữ ký thành công');
         state = AsyncValue.data(file);
         clearSignature();
       } else {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gnsa/common/repositoty/device_udid.dart';
@@ -10,12 +11,16 @@ import 'package:gnsa/router/app_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   final services = await Services.create();
   final utilsDeviceUdid = UtilsDeviceUdid();
   final deviceUdid = await DeviceUdid.createDeviceUdid();
   await deviceUdid.saveUdid(await utilsDeviceUdid.getDeviceUid());
   final accessToken = await services.getAccessToken();
-  print(accessToken);
   runApp(
     ProviderScope(
       child: MyApp(accessToken: accessToken),

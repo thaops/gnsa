@@ -62,7 +62,6 @@ class LoginController extends ChangeNotifier {
 
     final token = response.data["Data"]['AccessToken'];
     await Services.create().then((services) => services.saveAccessToken(token));
-    _showSuccess(context, 'Đăng nhập thành công');
     GoRouter.of(context).go(AppRouter.flightList);
   }
 
@@ -77,8 +76,6 @@ class LoginController extends ChangeNotifier {
   void _showError(BuildContext context, String message) =>
       CustomFlushbar.showError(context, message: message);
 
-  void _showSuccess(BuildContext context, String message) =>
-      CustomFlushbar.showSuccess(context, message: message);
 
   @override
   void dispose() {
