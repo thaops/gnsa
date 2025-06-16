@@ -8,7 +8,7 @@ import 'package:gnsa/common/widgets/custom_button.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:gnsa/feature/presentation/flight_detail/model/flight_detail_model.dart';
 import 'package:gnsa/feature/presentation/flight_printer/widget/constom_checkbox.dart';
-import 'package:gnsa/feature/presentation/flight_printer/controller/flight_printer_controller.dart';
+import 'package:gnsa/feature/presentation/flight_printer/provider/flight_printer_provider.dart';
 
 class FlightPrinter extends HookConsumerWidget {
   final FlightDetailModel flightDetailModel;
@@ -19,7 +19,7 @@ class FlightPrinter extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     const listItems = ["All", "Meal", "Beverage", "Equipment", "Towel"];
     final checkedStates = useState<List<bool>>(List.filled(listItems.length, false));
-    final controller = ref.watch(flightPrinterBindingProvider.notifier);
+    final controller = ref.watch(flightPrinterControllerProvider.notifier);
 
     void toggleCheckbox(int index) {
 

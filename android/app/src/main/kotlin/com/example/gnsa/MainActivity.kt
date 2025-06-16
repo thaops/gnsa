@@ -159,11 +159,11 @@ class MainActivity : FlutterActivity() {
             printerManager?.drawText("--------------------------------------------".take(48), 0, yPosition, "simsun", 18, false, false, 0)
             yPosition += lineHeight
 
-            printerManager?.drawText("Route: $routing       Date: ${flightDate.substring(0, 10)}".take(48), 0, yPosition, "simsun", 18, true, false, 0)
+            printerManager?.drawText("Route: $routing       Date: ${flightDate.substring(0, 10)}".take(48), 0, yPosition, "simsun", 18, false, false, 0)
             yPosition += lineHeight
-            printerManager?.drawText("Type: $flightType           Depart: ${departTime.substring(11, 16)}".take(48), 0, yPosition, "simsun", 18, true, false, 0)
+            printerManager?.drawText("Type: $flightType           Depart: ${departTime.substring(11, 16)}".take(48), 0, yPosition, "simsun", 18, false, false, 0)
             yPosition += lineHeight
-            printerManager?.drawText("                           Arrive: ${arrivalTime.substring(11, 16)}".take(48), 0, yPosition, "simsun", 18, true, false, 0)
+            printerManager?.drawText("                           Arrive: ${arrivalTime.substring(11, 16)}".take(48), 0, yPosition, "simsun", 18, false, false, 0)
             yPosition += lineHeight
 
             printerManager?.drawText("--------------------------------------------".take(48), 0, yPosition, "simsun", 18, false, false, 0)

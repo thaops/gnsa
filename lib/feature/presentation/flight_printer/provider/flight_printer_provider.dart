@@ -3,12 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gnsa/common/method_channel/printer_plugin.dart' show UrovoPrinter;
 import 'package:gnsa/common/utils/custom_flushbar.dart';
 import 'package:gnsa/feature/presentation/flight_detail/model/flight_detail_model.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'flight_printer_provider.g.dart';
 
 // Constants
 const _kAllOption = 'All';
 
-class FlightPrinterController extends StateNotifier<FlightDetailModel?> {
-  FlightPrinterController() : super(null);
+@riverpod
+class FlightPrinterController extends _$FlightPrinterController {
+  @override
+  FlightDetailModel? build() {
+    return null;
+  }
 
   Future<void> printJson({
     required BuildContext context,
@@ -75,8 +82,3 @@ class FlightPrinterController extends StateNotifier<FlightDetailModel?> {
     await CustomFlushbar.showError(context, message: message);
   }
 }
-
-final flightPrinterBindingProvider =
-    StateNotifierProvider<FlightPrinterController, FlightDetailModel?>(
-  (ref) => FlightPrinterController(),
-);

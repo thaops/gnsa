@@ -28,9 +28,9 @@ class CustomTextField extends StatefulWidget {
   final bool? isNumberic;
   final Function()? onPrefixTap;
   final TextInputType? keyboardType;
+  final String? errorText;
 
-
-  CustomTextField({
+  const CustomTextField({
     required this.controller,
     required this.hintText,
     this.obscureText = false,
@@ -56,7 +56,8 @@ class CustomTextField extends StatefulWidget {
     this.isNumberic = false,
     this.onChanged,
     this.onPrefixTap,
-    this.keyboardType
+    this.keyboardType,
+    this.errorText,
   });
 
   @override
@@ -65,11 +66,13 @@ class CustomTextField extends StatefulWidget {
 
 class _CustomTextFieldState extends State<CustomTextField> {
   late bool _obscureText;
+  String? _errorText;
 
   @override
   void initState() {
     super.initState();
     _obscureText = widget.obscureText;
+    _errorText = widget.errorText;
   }
 
   void _togglePasswordVisibility() {
@@ -78,88 +81,113 @@ class _CustomTextFieldState extends State<CustomTextField> {
     });
   }
 
+  void _validateInput(String value) {
+    if (value.isEmpty) {
+      setState(() {
+        _errorText = 'Vui lòng nhập thông tin';
+      });
+    } else {
+      setState(() {
+        _errorText = null;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(
-          horizontal: widget.paddingHorizontal ?? 0,
-          vertical: widget.paddingVertical ?? 0),
-      child: Container(
+        horizontal: widget.paddingHorizontal ?? 0,
+        vertical: widget.paddingVertical ?? 0,
+      ),
+      child: SizedBox(
         width: widget.width,
-        decoration: widget.backgroundColor != null
-            ? BoxDecoration(
-                color: widget.backgroundColor ?? Colors.transparent,
-                borderRadius: BorderRadius.circular(widget.borderRadius ?? 12),
-              )
-            : null,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextField(
-              focusNode: widget.focusNode,
-              controller: widget.controller,
-              maxLength: widget.maxLength,
-              minLines: widget.minLines,
-              maxLines: widget.maxLines,
-              keyboardType:widget.keyboardType ?? (widget.isNumberic == true ? TextInputType.number : TextInputType.text) , 
-              style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.black),
-              textAlignVertical: TextAlignVertical.center,
-              onTap: widget.onTap,
-              obscureText: _obscureText,
-              onSubmitted: widget.onSubmit,
-              onChanged: widget.onChanged,
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.symmetric(
-                    horizontal: widget.isMobile ? 12 : 24,
-                    vertical: widget.isMobile ? 12 : 12),
-                hintText: widget.hintText,
-                errorBorder: InputBorder.none,
-                hintStyle: TextStyle(
-                    fontSize: widget.fontSize ?? 16,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey.shade600),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius:
-                      BorderRadius.circular(widget.borderRadius ?? 12),
-                  borderSide: BorderSide(
-                      color: widget.borderColor ?? AppColors.primary),
-                  // Màu border khi focus
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(
-                      widget.borderRadius ?? 12), // Đặt độ bo tròn
-                  borderSide: BorderSide(
-                      color: widget.borderColor ?? Colors.grey.shade400,
-                      width: widget.borderWidth ??
-                          1), // Màu border khi không focus
-                ),
-                prefixIcon: widget.prefixIcon != null
-                    ? IconButton(
-                      onPressed: widget.onPrefixTap,
-                      icon: Icon(
-                          widget.prefixIcon,
-                          size: 24,
-                        ),
-                    )
-                    : null,
-                suffixIcon: widget.suffixIcon != null
-                    ? IconButton(
-                        icon: Icon(
-                          _obscureText
-                              ? Icons.visibility_off
-                              : widget.suffixIcon,
-                          size: 24,
-                        ),
-                        color:widget.colorIconSuffix ?? AppColors.colorIcon,
-                        onPressed: widget.onSuffixTap ?? _togglePasswordVisibility,
-                      )
-                    : null,
+        child: TextField(
+          focusNode: widget.focusNode,
+          controller: widget.controller,
+          autofocus: true,
+          maxLength: widget.maxLength,
+          minLines: widget.minLines,
+          maxLines: widget.maxLines,
+          keyboardType: widget.keyboardType ??
+              (widget.isNumberic == true
+                  ? TextInputType.number
+                  : TextInputType.text),
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: AppColors.black,
+          ),
+          textAlignVertical: TextAlignVertical.center,
+          onTap: widget.onTap,
+          obscureText: _obscureText,
+          onSubmitted: widget.onSubmit,
+          onChanged: (value) {
+            _validateInput(value);
+            widget.onChanged?.call(value);
+          },
+          decoration: InputDecoration(
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: widget.isMobile ? 12 : 24,
+              vertical: widget.isMobile ? 12 : 12,
+            ),
+            hintText: widget.hintText,
+            errorText: _errorText,
+            hintStyle: TextStyle(
+              fontSize: widget.fontSize ?? 16,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey.shade600,
+            ),
+            filled: widget.backgroundColor != null,
+            fillColor: widget.backgroundColor ?? Colors.transparent,
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(widget.borderRadius ?? 12),
+              borderSide: BorderSide(
+                color: widget.borderColor ?? AppColors.primary,
+                width: widget.borderWidth ?? 1,
               ),
             ),
-          ],
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(widget.borderRadius ?? 12),
+              borderSide: BorderSide(
+                color: widget.borderColor ?? Colors.grey.shade400,
+                width: widget.borderWidth ?? 1,
+              ),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(widget.borderRadius ?? 12),
+              borderSide: BorderSide(
+                color: Colors.red,
+                width: widget.borderWidth ?? 1,
+              ),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(widget.borderRadius ?? 12),
+              borderSide: BorderSide(
+                color: Colors.red,
+                width: widget.borderWidth ?? 1,
+              ),
+            ),
+            prefixIcon: widget.prefixIcon != null
+                ? IconButton(
+                    onPressed: widget.onPrefixTap,
+                    icon: Icon(
+                      widget.prefixIcon,
+                      size: 24,
+                    ),
+                  )
+                : null,
+            suffixIcon: widget.suffixIcon != null
+                ? IconButton(
+                    icon: Icon(
+                      _obscureText ? Icons.visibility_off : widget.suffixIcon,
+                      size: 24,
+                    ),
+                    color: widget.colorIconSuffix ?? AppColors.colorIcon,
+                    onPressed: widget.onSuffixTap ?? _togglePasswordVisibility,
+                  )
+                : null,
+          ),
         ),
       ),
     );

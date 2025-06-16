@@ -7,8 +7,8 @@ import 'package:gnsa/common/widgets/loading_shimmer.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:gnsa/feature/presentation/flight_printer/widget/appbar_dialog.dart';
-import 'package:gnsa/feature/presentation/flight_signature/controller/flight_signature_controller.dart';
 import 'package:gnsa/feature/presentation/flight_signature/model/sign_supplyfrom.dart';
+import 'package:gnsa/feature/presentation/flight_signature/provider/flight_signature_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class PopupInformationSign extends HookConsumerWidget {
@@ -20,8 +20,8 @@ class PopupInformationSign extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final flightSignState = ref.read(flightSignatureProvider.notifier);
-    final flightSignAsync = ref.watch(flightSignatureProvider);
+    final flightSignState = ref.read(flightSignatureControllerProvider.notifier);
+    final flightSignAsync = ref.watch(flightSignatureControllerProvider);
     useEffect(() {
       Future.microtask(() => flightSignState.getSingSupplyfrom(supplyfromId));
       return null;

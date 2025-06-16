@@ -69,6 +69,7 @@ class Flight {
       'ActualTimeArrival': actualTimeArrival?.toIso8601String(),
     };
   }
+  
 }
 
 class SupplyForm {

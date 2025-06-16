@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gnsa/common/widgets/custom_text_field.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
-import 'package:gnsa/feature/presentation/flight_detail/controller/filght_supplyfrom_state.dart';
+import 'package:gnsa/feature/presentation/flight_detail/provider/filght_supplyfrom_provider.dart';
 import 'package:gnsa/feature/presentation/flight_detail/model/flight_detail_model.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -32,10 +32,10 @@ class ChildExpansion extends HookConsumerWidget {
       noteState.value = noteController.text;
       supplyItem!.confirmedQuantity = quantity.value;
       isEdit.value = false;
-      ref.read(flightSupplyFormProvider).updateSupplyNote(
-            SupplyFormId: supplyItem?.supplyFormId,
-            SupplyId: supplyItem?.supplyId,
-            ConfirmedQuantity: quantity.value,
+      ref.read(filghtSupplyfromProviderProvider.notifier).updateSupplyNote(
+            supplyFormId: supplyItem?.supplyFormId,
+            supplyId: supplyItem?.supplyId,
+            confirmedQuantity: quantity.value,
             note: noteController.text,
           );
     }

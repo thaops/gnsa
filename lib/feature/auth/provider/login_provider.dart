@@ -1,3 +1,4 @@
+// lib/feature/auth/controller/login_controller.dart
 import 'package:flutter/material.dart';
 import 'package:gnsa/common/Services/api_endpoints.dart';
 import 'package:gnsa/common/Services/services.dart';
@@ -6,24 +7,50 @@ import 'package:gnsa/common/repositoty/dio_api.dart';
 import 'package:gnsa/common/utils/custom_flushbar.dart';
 import 'package:gnsa/router/app_router.dart';
 import 'package:go_router/go_router.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-class LoginController extends ChangeNotifier {
-  final nameController = TextEditingController();
-  final passwordController = TextEditingController();
+part 'login_provider.g.dart';
+
+class LoginState {
+  final TextEditingController nameController;
+  final TextEditingController passwordController;
+
+  LoginState({
+    required this.nameController,
+    required this.passwordController,
+  });
+
+  LoginState copyWith({
+    TextEditingController? nameController,
+    TextEditingController? passwordController,
+  }) {
+    return LoginState(
+      nameController: nameController ?? this.nameController,
+      passwordController: passwordController ?? this.passwordController,
+    );
+  }
+}
+
+@riverpod
+class LoginController extends _$LoginController {
   final DioApi _dioApi = DioApi();
-  bool _isLoading = false;
 
-  bool get isLoading => _isLoading;
-
-  void _setLoading(bool value) {
-    _isLoading = value;
-    notifyListeners();
+  @override
+  FutureOr<LoginState> build() {
+    return LoginState(
+      nameController: TextEditingController(),
+      passwordController: TextEditingController(),
+    );
   }
 
   void _clearInputs() {
-    nameController.clear();
-    passwordController.clear();
+    state.value!.nameController.clear();
+    state.value!.passwordController.clear();
   }
+
+  bool _validateInputs() =>
+      state.value!.nameController.text.isNotEmpty &&
+      state.value!.passwordController.text.isNotEmpty;
 
   Future<void> login(BuildContext context) async {
     FocusScope.of(context).unfocus();
@@ -33,12 +60,11 @@ class LoginController extends ChangeNotifier {
     }
 
     try {
-      _setLoading(true);
       final response = await _dioApi.post(
         ApiEndpoints.login,
         data: {
-          'UserName': nameController.text.trim(),
-          'Password': passwordController.text,
+          'UserName': state.value!.nameController.text.trim(),
+          'Password': state.value!.passwordController.text,
         },
       );
 
@@ -46,13 +72,8 @@ class LoginController extends ChangeNotifier {
       _clearInputs();
     } catch (e) {
       _handleError(context, e);
-    } finally {
-      _setLoading(false);
     }
   }
-
-  bool _validateInputs() =>
-      nameController.text.isNotEmpty && passwordController.text.isNotEmpty;
 
   Future<void> _handleLoginResponse(dynamic response, BuildContext context) async {
     if (response.data['StatusCode'] != HttpStatusCodes.STATUS_CODE_OK) {
@@ -76,11 +97,4 @@ class LoginController extends ChangeNotifier {
   void _showError(BuildContext context, String message) =>
       CustomFlushbar.showError(context, message: message);
 
-
-  @override
-  void dispose() {
-    nameController.dispose();
-    passwordController.dispose();
-    super.dispose();
-  }
 }

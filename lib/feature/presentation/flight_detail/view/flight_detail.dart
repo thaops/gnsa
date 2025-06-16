@@ -11,8 +11,8 @@ import 'package:gnsa/common/widgets/loading_shimmer.dart';
 import 'package:gnsa/common/widgets/state_err.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
-import 'package:gnsa/feature/presentation/flight_detail/controller/filght_bool_state.dart';
 import 'package:gnsa/feature/presentation/flight_detail/model/flight_detail_model.dart';
+import 'package:gnsa/feature/presentation/flight_detail/provider/filght_bool_provider.dart';
 import 'package:gnsa/feature/presentation/flight_detail/provider/flight_detail_provider.dart';
 import 'package:gnsa/feature/presentation/flight_detail/widget/custom_ExpansionTile.dart';
 import 'package:gnsa/feature/presentation/flight_detail/widget/custom_detail_flight.dart';
@@ -23,11 +23,22 @@ import 'package:gnsa/router/app_router.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+// Hằng số cấu hình
+const _kValueSign = 'NotSign';
+const _paddingVertical = 16.0;
+const _paddingHorizontalMobile = 16.0;
+const _paddingWebRatio = 0.3;
+const _paddingTabletRatio = 0.1;
+const _loadingHeightMain = 150.0;
+const _loadingHeightChild = 70.0;
+const _supplyItemBottomPadding = 16.0;
+const _buttonHorizontalPadding = 16.0;
+const _expansionTileRadius = 18.0;
+
+/// Màn hình chi tiết chuyến bay
 class FlightDetailScreen extends HookConsumerWidget {
   const FlightDetailScreen({required this.id, super.key});
   final String id;
-
-  static const String _kValueSign = "NotSign";
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -38,9 +49,7 @@ class FlightDetailScreen extends HookConsumerWidget {
     useEffect(() {
       if (cachedId.value != id) {
         cachedId.value = id;
-        Future.microtask(() => ref
-            .read(flightDetailControllerProvider.notifier)
-            .fetchFlightDetail(id));
+        Future.microtask(() => ref.read(flightDetailProviderProvider.notifier).fetchFlightDetail(id));
       }
       return null;
     }, [id]);
@@ -52,86 +61,79 @@ class FlightDetailScreen extends HookConsumerWidget {
     );
   }
 
-  double _getHorizontalPadding(double width, BuildContext context) =>
-      ResponsiveHelper.isWeb(context)
-          ? width * 0.3
-          : ResponsiveHelper.isTablet(context)
-              ? width * 0.1
-              : 16.0;
+  /// Tính toán padding ngang dựa trên thiết bị
+  double _getHorizontalPadding(double width, BuildContext context) {
+    if (ResponsiveHelper.isWeb(context)) return width * _paddingWebRatio;
+    if (ResponsiveHelper.isTablet(context)) return width * _paddingTabletRatio;
+    return _paddingHorizontalMobile;
+  }
 
-  AppBarWidget _buildAppBar(BuildContext context, WidgetRef ref) =>
-      AppBarWidget(
+  /// Tạo AppBar
+  AppBarWidget _buildAppBar(BuildContext context, WidgetRef ref) => AppBarWidget(
         title: 'Cung ứng vật tư',
         iconRightFirst: Icons.file_present_outlined,
         colorFirst: AppColors.primary,
         onPressedFirst: () => _showPrinterDialog(context, ref),
       );
 
-  Widget _buildBody(
-      BuildContext context, WidgetRef ref, double horizontalPadding) {
-    final flightDetailAsync = ref.watch(flightDetailControllerProvider);
-
+  /// Tạo body
+  Widget _buildBody(BuildContext context, WidgetRef ref, double horizontalPadding) {
+    final flightDetailAsync = ref.watch(flightDetailProviderProvider);
     return flightDetailAsync.when(
-      error: (error, _) => const StateErr(),
+      error: (error, _) => StateErr(error: error.toString()),
       loading: () => _buildLoading(horizontalPadding),
       data: (data) => _buildData(horizontalPadding, data, context, ref),
     );
   }
 
-  Column _buildData(double horizontalPadding, FlightDetailModel data,
-      BuildContext context, WidgetRef ref) {
+  /// Tạo giao diện khi có dữ liệu
+  Column _buildData(double horizontalPadding, FlightDetailModel data, BuildContext context, WidgetRef ref) {
     return Column(
       children: [
         Expanded(
           child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(
-              horizontal: horizontalPadding,
-              vertical: 16,
-            ),
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: _paddingVertical),
             child: _buildSupplyFormList(
               data,
               context,
-              ref.watch(isChildExpandedProvider),
-              ref.read(isEditProvider.notifier),
+              ref.watch(isChildExpandedProviderProvider),
               ref,
             ),
           ),
         ),
         _buildSignButton(context, ref, horizontalPadding),
-        const SizedBox(height: 16),
+        const SizedBox(height: _paddingVertical),
       ],
     );
   }
 
-  LoadingShimmer _buildLoading(double horizontalPadding) {
-    return LoadingShimmer(
+  /// Tạo giao diện khi đang tải
+  LoadingShimmer _buildLoading(double horizontalPadding) => LoadingShimmer(
         child: _bodyState(
-      horizontalPadding,
-      const Column(
-        children: [
-          ContainerLoading(height: 150),
-          TitleRowAll(title: 'DANH SÁCH', subtitle: 'Xem hết'),
-          ChildLoadingList(child: ContainerLoading(height: 70)),
-        ],
-      ),
-    ));
-  }
+          horizontalPadding,
+          const Column(
+            children: [
+              ContainerLoading(height: _loadingHeightMain),
+              TitleRowAll(title: 'DANH SÁCH', subtitle: 'Xem hết'),
+              ChildLoadingList(child: ContainerLoading(height: _loadingHeightChild)),
+            ],
+          ),
+        ),
+      );
 
+  /// Tạo body với padding
   Widget _bodyState(double horizontalPadding, Widget child) => Center(
         child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(
-            horizontal: horizontalPadding,
-            vertical: 16,
-          ),
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: _paddingVertical),
           child: child,
         ),
       );
 
+  /// Tạo danh sách vật tư
   Widget _buildSupplyFormList(
     FlightDetailModel data,
     BuildContext context,
     bool isExpanded,
-    FlightBoolState flightBoolNotifier,
     WidgetRef ref,
   ) =>
       Column(
@@ -143,8 +145,7 @@ class FlightDetailScreen extends HookConsumerWidget {
           TitleRowAll(
             title: 'DANH SÁCH',
             subtitle: 'Xem hết',
-            onClickSeenAll: () =>
-                ref.read(isChildExpandedProvider.notifier).toggle(),
+            onClickSeenAll: () => ref.read(isChildExpandedProviderProvider.notifier).toggle(),
           ),
           ListView.builder(
             shrinkWrap: true,
@@ -154,20 +155,21 @@ class FlightDetailScreen extends HookConsumerWidget {
               context,
               data.supplyForms![index],
               isExpanded,
-              flightBoolNotifier,
+              ref,
             ),
           ),
         ],
       );
 
+  /// Tạo mục vật tư
   Widget _buildSupplyItem(
     BuildContext context,
     SupplyForm supplyForm,
     bool isExpanded,
-    FlightBoolState flightBoolNotifier,
+    WidgetRef ref,
   ) =>
       Padding(
-        padding: EdgeInsets.only(bottom: 16.h),
+        padding: EdgeInsets.only(bottom: _supplyItemBottomPadding.h),
         child: CupertinoContextMenu(
           actions: [
             CupertinoContextMenuAction(
@@ -191,80 +193,64 @@ class FlightDetailScreen extends HookConsumerWidget {
             ),
           ],
           child: Material(
-            borderRadius: BorderRadius.circular(18.r),
+            borderRadius: BorderRadius.circular(_expansionTileRadius.r),
             color: AppColors.backgroundTab,
             child: CustomExpansionTile(
               backgroundColor: AppColors.backgroundTab,
-              title:
-                  " ${supplyForm.category.toString()} - ${supplyForm.className.toString()}",
+              title: '${supplyForm.category} - ${supplyForm.className}',
               subtitle: 'Mã code: ${supplyForm.supplyFormCode}',
               leadingIcon: Icons.airplane_ticket,
               trailingCount: '${supplyForm.totalSupply}',
               isConfirmed: supplyForm.status != _kValueSign,
               isExpanded: isExpanded,
-              onTap: flightBoolNotifier.toggle,
+              onTap: () => ref.read(isChildExpandedProviderProvider.notifier).toggle(),
               supplyForm: supplyForm,
-              onConfirm: () => {
-                showDialog(
-                  context: context,
-                  builder: (context) => PopupInformationSign(
-                    supplyfromId: supplyForm.supplyFormId!,
-                  ),
+              onConfirm: () => showDialog(
+                context: context,
+                builder: (context) => PopupInformationSign(
+                  supplyfromId: supplyForm.supplyFormId!,
                 ),
-              },
+              ),
             ),
           ),
         ),
       );
 
-  Widget _buildSignButton(
-    BuildContext context,
-    WidgetRef ref,
-    double horizontalPadding,
-  ) =>
-      Padding(
+  /// Tạo nút ký xác nhận
+  Widget _buildSignButton(BuildContext context, WidgetRef ref, double horizontalPadding) => Padding(
         padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
         child: CustomButton(
-          horizontalPadding: 16,
+          horizontalPadding: _buttonHorizontalPadding,
           onPressed: () => _handleSignButton(context, ref),
           color: AppColors.primary,
           text: 'Ký xác nhận',
         ),
       );
 
+  /// Xử lý nhấn nút ký xác nhận
   void _handleSignButton(BuildContext context, WidgetRef ref) {
-    ref.watch(flightDetailControllerProvider).whenData((data) {
-      final filterSupplyForm =
-          data.supplyForms!.where((e) => e.status == _kValueSign).toList();
-      final supplyFormIds =
-          filterSupplyForm.map((e) => e.supplyFormId!).toList();
-
+    ref.watch(flightDetailProviderProvider).whenData((data) {
+      final filterSupplyForm = data.supplyForms?.where((e) => e.status == _kValueSign).toList() ?? [];
+      final supplyFormIds = filterSupplyForm.map((e) => e.supplyFormId!).toList();
       if (supplyFormIds.isEmpty) {
-        CustomFlushbar.showError(context,
-            message: 'Không có dữ liệu để ký xác nhận');
+        CustomFlushbar.showError(context, message: 'Không có dữ liệu để ký xác nhận');
         return;
       }
       context.push(AppRouter.flightSignature, extra: supplyFormIds);
     });
   }
 
+  /// Hiển thị dialog in
   void _showPrinterDialog(BuildContext context, WidgetRef ref) {
-    final flightDetail = ref.watch(flightDetailControllerProvider).value;
-
+    final flightDetail = ref.watch(flightDetailProviderProvider).value;
     showDialog(
       context: context,
-      builder: (_) {
-        if (flightDetail == null) {
-          return const StateErr();
-        }
-        return FlightPrinter(
-          flightDetailModel: flightDetail,
-        );
-      },
+      builder: (_) => flightDetail == null ? const StateErr() : FlightPrinter(flightDetailModel: flightDetail),
     );
   }
 }
 
+/// Widget tiêu đề với nút "Xem hết"
 class TitleRowAll extends StatelessWidget {
   const TitleRowAll({
     required this.title,
@@ -279,7 +265,7 @@ class TitleRowAll extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: const EdgeInsets.symmetric(vertical: _paddingVertical),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

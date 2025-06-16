@@ -3,7 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
-import 'package:gnsa/feature/presentation/flight_detail/controller/filght_bool_state.dart';
+import 'package:gnsa/feature/presentation/flight_detail/provider/filght_bool_provider.dart';
 import 'package:gnsa/feature/presentation/flight_detail/model/flight_detail_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/widget/child_expansion.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -38,7 +38,7 @@ class CustomExpansionTile extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isExpandedHook = useState<bool>(isExpanded);
 
-    final isAllExpanded = ref.watch(isChildExpandedProvider);
+    final isAllExpanded = ref.watch(isChildExpandedProviderProvider);
     useEffect(() {
       isExpandedHook.value = isAllExpanded;
       return null;

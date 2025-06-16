@@ -4,7 +4,7 @@ import 'package:gnsa/common/widgets/app_bar_widget.dart';
 import 'package:gnsa/common/widgets/container_loading.dart';
 import 'package:gnsa/common/widgets/loading_shimmer.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
-import 'package:gnsa/feature/presentation/flight_signature/controller/flight_signature_controller.dart';
+import 'package:gnsa/feature/presentation/flight_signature/provider/flight_signature_provider.dart';
 import 'package:gnsa/feature/presentation/flight_signature/model/sign_supplyfrom.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gnsa/feature/presentation/flight_signature/widget/signature_section.dart';
@@ -21,9 +21,15 @@ class FlightSignature extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final flightSignatureAsync = ref.watch(flightSignatureProvider);
+    final flightSignatureAsync = ref.watch(flightSignatureControllerProvider);
+    final flightSignState =
+        ref.read(flightSignatureControllerProvider.notifier);
 
-    _fetchInitialData(ref.read(flightSignatureProvider.notifier));
+    useEffect(() {
+      Future.microtask(
+          () => flightSignState.getSingSupplyfrom(supplyfromId.first));
+      return null;
+    }, [supplyfromId]);
 
     return Scaffold(
       appBar: const AppBarWidget(title: 'Xác nhận'),
@@ -33,8 +39,7 @@ class FlightSignature extends HookConsumerWidget {
           data: (data) => SignatureContent(
             supplyfromId: supplyfromId,
             flightSignature: data,
-            onRefresh: () =>
-                _refreshSignature(ref.read(flightSignatureProvider.notifier)),
+            onRefresh: () => flightSignState.getSingSupplyfrom(supplyfromId.first),
           ),
           error: (err, _) => Center(child: Text(err.toString())),
           loading: () => _buildLoading(context),
@@ -78,19 +83,6 @@ class FlightSignature extends HookConsumerWidget {
         ),
       ),
     ));
-  }
-
-  void _fetchInitialData(FlightSignatureController flightSignState) {
-    useEffect(() {
-      Future.microtask(
-          () => flightSignState.getSingSupplyfrom(supplyfromId.first));
-      return null;
-    }, [supplyfromId]);
-  }
-
-  void _refreshSignature(FlightSignatureController flightSignState) {
-    Future.microtask(
-        () => flightSignState.getSingSupplyfrom(supplyfromId.first));
   }
 }
 

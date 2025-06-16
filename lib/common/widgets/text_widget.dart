@@ -9,6 +9,7 @@ class TextWidget extends StatelessWidget {
   final Color? color;
   final TextAlign? textAlign;
   final double? paddingHorizontal;
+  final double? paddingVertical;
   final int? maxLines;
   const TextWidget(
       {super.key,
@@ -18,12 +19,13 @@ class TextWidget extends StatelessWidget {
       this.color = AppColors.black,
       this.textAlign = TextAlign.left,
       this.paddingHorizontal = 0,
+      this.paddingVertical = 0,
       this.maxLines = 1});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: paddingHorizontal ?? 0),
+      padding: EdgeInsets.symmetric(horizontal: paddingHorizontal!, vertical: paddingVertical!),
       child: Text(
         text,
         textAlign: textAlign,

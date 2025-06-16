@@ -1,9 +1,39 @@
-// // lib/feature/presentation/flight_list/provider/flight_list_provider.dart
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:gnsa/feature/presentation/flight_detail/controller/filght_supplyfrom_state.dart' show FlightSupplyFormState;
-// import 'package:gnsa/feature/presentation/flight_detail/model/supplyform_model.dart' show SupplyForm;
+import 'package:dio/dio.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:gnsa/common/Services/api_endpoints.dart';
+import 'package:gnsa/common/repositoty/dio_api.dart';
 
+part 'filght_supplyfrom_provider.g.dart';
 
-// final flightSupplyFromProvider = StateNotifierProvider<FlightSupplyFormState, AsyncValue<List<SupplyForm>>>(
-//   (ref) => FlightSupplyFormState(),
-// );
+/// Quản lý cập nhật ghi chú vật tư
+@riverpod
+class FilghtSupplyfromProvider extends _$FilghtSupplyfromProvider {
+  @override
+  void build() {
+    // Không cần trạng thái, chỉ cung cấp phương thức
+  }
+
+  /// Cập nhật ghi chú vật tư
+  Future<void> updateSupplyNote({
+    String? supplyFormId,
+    String? supplyId,
+    String? note,
+    int? confirmedQuantity,
+  }) async {
+    final dioApi = ref.read(dioApiProvider);
+    try {
+      await dioApi.patch(
+        ApiEndpoints.updateSupplyFormNote,
+        data: {
+          'SupplyFormId': supplyFormId,
+          'SupplyId': supplyId,
+          'ConfirmedQuantity': confirmedQuantity,
+          'Note': note,
+        },
+      );
+    } catch (e) {
+      print('Error updating supply note: $e');
+      rethrow;
+    }
+  }
+}

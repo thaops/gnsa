@@ -6,8 +6,8 @@ import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:lottie/lottie.dart';
 
 class StateErr extends StatelessWidget {
-  final String? message;
-  const StateErr({super.key, this.message});
+  final String? error;
+  const StateErr({super.key, this.error});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +18,7 @@ class StateErr extends StatelessWidget {
         children: [
           Lottie.asset(Img.err, height: 150.h, width: 150.h),
           TextWidget(
-              text: message ?? 'Dữ Liệu Rỗng',
+              text: error ?? 'Dữ Liệu Rỗng',
               fontSize: 14,
               fontWeight: FontWeight.w400,
               color: AppColors.black.withOpacity(0.5)),
