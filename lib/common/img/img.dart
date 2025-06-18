@@ -6,5 +6,7 @@ class Img {
   static const String loading = 'https://lottie.host/115f7ed4-9155-4505-b6c2-8b4736f63902/tlHwFilyoV.json';
   static const String err = 'assets/err.json';
 
+  static const String preview = 'assets/image/content.png';
+
   static const String logo = 'assets/image/logo_vacs.png';
 }

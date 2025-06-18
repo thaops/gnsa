@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 class ScreenSize {
   //mobile
-  static double width = 360;
-  static double height = 640;
+  static double width = 375;
+  static double height = 812;
 
   //web
   static double widthWeb = 1920;

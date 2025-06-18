@@ -10,6 +10,7 @@ class AppSizes {
   static double get paddingXMedium => 20.0.w;
   static double get paddingLarge => 24.0.w;
   static double get paddingXLarge => 32.0.w;
+  static double get paddingXXXXLarge => 48.0.w;
 
   // Margin
   static double get marginXSmall => 4.0.w;
@@ -55,6 +56,7 @@ class AppSizes {
 
   // Text Field Sizes
   static double get textFieldHeight => 56.0.h;
+  static double get textFieldHeightMax => 64.0.h;
   static double get textFieldBorderWidth => 1.0.w;
 
   // Font Sizes (sử dụng .sp cho chữ)
@@ -85,6 +87,11 @@ class AppSizes {
     static double get heightXXXXXLarge => 192.0.h;
     static double get heightXXXXXXLarge => 256.0.h;
     static double get heightXXXXXXXLarge => 320.0.h;
+
+  
+
+  //tab
+  static double get tabWidth => 150.0.w;
 
 
 }

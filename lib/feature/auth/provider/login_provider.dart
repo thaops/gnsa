@@ -1,4 +1,3 @@
-// lib/feature/auth/controller/login_controller.dart
 import 'package:flutter/material.dart';
 import 'package:gnsa/common/Services/api_endpoints.dart';
 import 'package:gnsa/common/Services/services.dart';
@@ -14,24 +13,32 @@ part 'login_provider.g.dart';
 class LoginState {
   final TextEditingController nameController;
   final TextEditingController passwordController;
+  final String? errorName;
+  final String? errorPassword;
 
   LoginState({
     required this.nameController,
     required this.passwordController,
+    this.errorName,
+    this.errorPassword,
   });
 
   LoginState copyWith({
     TextEditingController? nameController,
     TextEditingController? passwordController,
+    String? errorName,
+    String? errorPassword,
+    bool? isFormValid,
   }) {
     return LoginState(
       nameController: nameController ?? this.nameController,
       passwordController: passwordController ?? this.passwordController,
+      errorName: errorName ?? this.errorName,
+      errorPassword: errorPassword ?? this.errorPassword,
     );
   }
 }
 
-@riverpod
 class LoginController extends _$LoginController {
   final DioApi _dioApi = DioApi();
 
@@ -43,58 +50,48 @@ class LoginController extends _$LoginController {
     );
   }
 
-  void _clearInputs() {
-    state.value!.nameController.clear();
-    state.value!.passwordController.clear();
-  }
-
-  bool _validateInputs() =>
-      state.value!.nameController.text.isNotEmpty &&
-      state.value!.passwordController.text.isNotEmpty;
-
   Future<void> login(BuildContext context) async {
     FocusScope.of(context).unfocus();
-    if (!_validateInputs()) {
-      _showWarning(context, 'Vui lòng nhập đầy đủ thông tin');
+    
+    if(state.value!.nameController.text.isEmpty || state.value!.passwordController.text.isEmpty){
+      state = AsyncValue.data(state.value!.copyWith(
+        errorName: 'Vui lòng nhập tên đăng nhập',
+        errorPassword: 'Vui lòng nhập mật khẩu',
+      ));
       return;
     }
-
+    state = const AsyncValue.loading();
     try {
-      final response = await _dioApi.post(
-        ApiEndpoints.login,
-        data: {
-          'UserName': state.value!.nameController.text.trim(),
-          'Password': state.value!.passwordController.text,
-        },
-      );
+      // final response = await _dioApi.post(
+      //   ApiEndpoints.login,
+      //   data: {
+      //     'UserName': state.value!.nameController.text,
+      //     'Password': state.value!.passwordController.text,
+      //   },
+      // );
 
-      await _handleLoginResponse(response, context);
-      _clearInputs();
+      // if (response.data['StatusCode'] != HttpStatusCodes.STATUS_CODE_OK) {
+      //   CustomFlushbar.showError(context,
+      //       message: 'Tên đăng nhập hoặc mật khẩu không đúng ${response.data['Message']}');
+      //       return;
+      // } 
+      //   final token = response.data["Data"]['AccessToken'];
+      //   await Services.create().then((services) => services.saveAccessToken(token));
+      //   state.value!.nameController.clear();
+      //   state.value!.passwordController.clear();
+      //   state = AsyncValue.data(state.value!.copyWith(
+      //     errorName: null,
+      //     errorPassword: null,
+      //   ));
+      
+          GoRouter.of(context).go(AppRouter.main);
+        
+      
     } catch (e) {
-      _handleError(context, e);
+      state = AsyncValue.error(e, StackTrace.current);
+      if (context.mounted) {
+        CustomFlushbar.showError(context, message: 'Đã xảy ra lỗi: $e');
+      }
     }
   }
-
-  Future<void> _handleLoginResponse(dynamic response, BuildContext context) async {
-    if (response.data['StatusCode'] != HttpStatusCodes.STATUS_CODE_OK) {
-      _showError(context, 'Tài khoản và mật khẩu không chính xác');
-      return;
-    }
-
-    final token = response.data["Data"]['AccessToken'];
-    await Services.create().then((services) => services.saveAccessToken(token));
-    GoRouter.of(context).go(AppRouter.flightList);
-  }
-
-  void _handleError(BuildContext context, dynamic error) {
-    debugPrint('Login error: $error');
-    _showError(context, 'Tài khoản và mật khẩu không chính xác');
-  }
-
-  void _showWarning(BuildContext context, String message) =>
-      CustomFlushbar.showWarning(context, message: message);
-
-  void _showError(BuildContext context, String message) =>
-      CustomFlushbar.showError(context, message: message);
-
 }

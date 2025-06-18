@@ -26,7 +26,6 @@ class FlightSignatureController extends _$FlightSignatureController {
       state = AsyncValue.data(data);
     } catch (e, stackTrace) {
       state = AsyncValue.error(e, stackTrace);
-      rethrow;
     }
   }
 }

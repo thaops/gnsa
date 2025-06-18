@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gnsa/common/design_system/tokens/app_sizes.dart';
 import 'package:gnsa/common/utils/date_utils.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
@@ -32,9 +33,38 @@ class CustomDetailFlight extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
           SizedBox(height: 8.h),
-          TextStar(title: "Chuyến bay :", value: flightDetailModel.flight?.routing.toString() ?? ''),
-          TextStar(title: "Số hiệu :", value: flightDetailModel.flight?.flightNo.toString() ?? ''),
-          TextStar(title: "Giờ bay :", value:DateUtilsCustom.formatStringDate( flightDetailModel.flight?.actualTimeArrival.toString() ?? '')),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextRowTitleValue(
+                      title: "Flight :",
+                      value:
+                          flightDetailModel.flight?.routing.toString() ?? ''),
+                  TextRowTitleValue(
+                      title: "Flight No :",
+                      value:
+                          flightDetailModel.flight?.flightNo.toString() ?? ''),
+                  TextRowTitleValue(
+                      title: "Time :",
+                      value: DateUtilsCustom.formatStringDate(flightDetailModel
+                              .flight?.actualTimeArrival
+                              .toString() ??
+                          '')),
+                ],
+              ),
+              SizedBox(width: AppSizes.spacingMedium.w),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextRowTitleValue(title: "Pk:", value: "3"),
+                  TextRowTitleValue(title: "A/C :", value: "VN320"),
+                ],
+              ),
+            ],
+          )
         ],
       ),
     );

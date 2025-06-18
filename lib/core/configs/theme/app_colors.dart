@@ -24,6 +24,8 @@ class AppColors {
   static final iconFlight = Color(0xffE86339);
   static final borderSignature = Color(0xffD4D6DD);
 
+  static const textButton = Color.fromARGB(255, 255, 187, 44);
+
   static const List<Color> gradientColors = [
     primary,
     white,

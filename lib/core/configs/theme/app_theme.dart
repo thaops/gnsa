@@ -6,6 +6,7 @@ class AppTheme {
       primaryColor: AppColors.primary,
       scaffoldBackgroundColor: AppColors.white,
       brightness: Brightness.light,
+      dialogBackgroundColor: AppColors.white,
       fontFamily: 'Satoshi',
       dividerColor: Colors.transparent,
       sliderTheme:

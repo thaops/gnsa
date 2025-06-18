@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:gnsa/common/design_system/tokens/app_sizes.dart';
+import 'package:gnsa/common/widgets/custom_text_field.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gnsa/common/widgets/app_bar_widget.dart';
@@ -32,6 +34,7 @@ class FlightSign extends HookConsumerWidget {
       appBar: AppBarWidget(
         title: title,
         isBack: false,
+        sizeTitle: 14.sp,
         iconRightFirst: Icons.close,
         onPressedFirst: () => Navigator.pop(context),
       ),
@@ -66,7 +69,24 @@ class FlightSign extends HookConsumerWidget {
               backgroundColor: AppColors.white,
             ),
           ),
-          const Divider(),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: AppSizes.spacingMedium.w),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CustomTextField(
+                  controller: TextEditingController(),
+                  hintText: 'Nhập họ tên',
+                  fontSize: 16,
+                  textInputAction: TextInputAction.done,
+                  borderColor: AppColors.grey.withAlpha(50),
+                ),
+                SizedBox(height: AppSizes.spacingSmall.h),
+                const Divider(),
+              ],
+            ),
+          ),
+
           Expanded(
             flex: 1,
             child: GestureDetector(

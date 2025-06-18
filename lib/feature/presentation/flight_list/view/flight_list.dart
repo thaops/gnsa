@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gnsa/common/Services/services.dart';
+import 'package:gnsa/common/design_system/tokens/app_sizes.dart';
 import 'package:gnsa/common/utils/custom_dialog.dart';
 import 'package:gnsa/common/widgets/app_bar_widget.dart';
 import 'package:gnsa/common/widgets/container_loading.dart';
@@ -19,18 +21,17 @@ import 'package:gnsa/router/app_router.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-// Hằng số cấu hình
 const _searchDebounceDuration = Duration(seconds: 1);
-const _scrollThreshold = 0.8; // Ngưỡng cuộn để tải thêm (80% chiều dài danh sách)
+const _scrollThreshold = 0.8;
 const _paddingHorizontalMobile = 26.0;
 const _paddingWebRatio = 0.3;
 const _paddingTabletRatio = 0.1;
 const _loadingItemHeight = 60.0;
 const _listItemVerticalPadding = 16.0;
 
-/// Widget hiển thị danh sách chuyến bay với khả năng tìm kiếm, tải thêm và đăng xuất
 class FlightList extends HookConsumerWidget {
-  const FlightList({super.key});
+  final bool isMyFlight;
+  const FlightList({super.key, required this.isMyFlight});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -102,16 +103,39 @@ class FlightList extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBarWidget(
-        title: 'Lịch bay',
+        title: isMyFlight ? 'Lịch bay của tôi' : 'Toàn bộ lịch bay',
         isBack: false,
-        iconRightSecond: Icons.logout,
-        onPressedSecond: _logout,
+        widgetRight: InkWell(
+          onTap: () => GoRouter.of(context).go(AppRouter.profile),
+          child:  Padding(
+            padding:  EdgeInsets.only(right: 16.w),
+            child: CachedNetworkImage(
+                imageUrl:
+                    'https://sdmntprpolandcentral.oaiusercontent.com/files/00000000-b468-620a-ba2f-a6e41d3cfda8/raw?se=2025-06-17T10%3A58%3A42Z&sp=r&sv=2024-08-04&sr=b&scid=4b3062b3-f42e-506a-808e-08b26536fb8b&skoid=b0fd38cc-3d33-418f-920e-4798de4acdd1&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-17T06%3A07%3A06Z&ske=2025-06-18T06%3A07%3A06Z&sks=b&skv=2024-08-04&sig=iltlc4A/rdh9WKcZoqKf7gJfV1XgqdcsGKPbQX6oPvE%3D',
+                placeholder: (context, url) => const ContainerLoading(),
+                errorWidget: (context, url, error) => const Icon(Icons.error),
+                imageBuilder: (context, imageProvider) => Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      image: imageProvider,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              
+            ),
+          ),
+        ),
       ),
       body: Container(
         color: AppColors.white,
         padding: _getPadding(context),
         child: Column(
           children: [
+            SizedBox(height: AppSizes.paddingSmall),
             _buildSearchField(
               controller: searchController,
               focusNode: focusNode,
@@ -132,19 +156,18 @@ class FlightList extends HookConsumerWidget {
     );
   }
 
-  /// Trả về padding dựa trên loại thiết bị
   EdgeInsets _getPadding(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     if (ResponsiveHelper.isWeb(context)) {
       return EdgeInsets.symmetric(horizontal: screenWidth * _paddingWebRatio);
     }
     if (ResponsiveHelper.isTablet(context)) {
-      return EdgeInsets.symmetric(horizontal: screenWidth * _paddingTabletRatio);
+      return EdgeInsets.symmetric(
+          horizontal: screenWidth * _paddingTabletRatio);
     }
     return const EdgeInsets.symmetric(horizontal: _paddingHorizontalMobile);
   }
 
-  /// Tạo trường tìm kiếm
   Widget _buildSearchField({
     required TextEditingController controller,
     required FocusNode focusNode,
@@ -168,7 +191,6 @@ class FlightList extends HookConsumerWidget {
     );
   }
 
-  /// Tạo nội dung danh sách chuyến bay
   Widget _buildFlightListContent({
     required AsyncValue<FlightsModel> flightListAsync,
     required ScrollController scrollController,
@@ -191,14 +213,12 @@ class FlightList extends HookConsumerWidget {
     );
   }
 
-  /// Tạo giao diện khi đang tải
   Widget _buildLoading() {
     return const LoadingShimmer(
       child: ChildLoadingList(child: ContainerLoading()),
     );
   }
 
-  /// Tạo danh sách chuyến bay hoặc thông báo rỗng
   Widget _buildFlightData({
     required FlightsModel flightsModel,
     required ScrollController scrollController,
@@ -216,15 +236,15 @@ class FlightList extends HookConsumerWidget {
     );
   }
 
-  /// Tạo danh sách chuyến bay với ListView
   Widget _buildFlightListView({
     required FlightsModel flightsModel,
     required ScrollController scrollController,
     required ValueNotifier<bool> isLoadingMore,
     required BuildContext context,
   }) {
-    final itemCount =
-        isLoadingMore.value ? flightsModel.data.length + 1 : flightsModel.data.length;
+    final itemCount = isLoadingMore.value
+        ? flightsModel.data.length + 1
+        : flightsModel.data.length;
     return Column(
       children: [
         Expanded(
@@ -239,7 +259,8 @@ class FlightList extends HookConsumerWidget {
               }
               final flightData = flightsModel.data[index];
               return Padding(
-                padding: EdgeInsets.symmetric(vertical: _listItemVerticalPadding.h),
+                padding:
+                    EdgeInsets.symmetric(vertical: _listItemVerticalPadding.h),
                 child: CustomFlightList(
                   data: flightData,
                   onTap: () => GoRouter.of(context).push(
@@ -255,14 +276,15 @@ class FlightList extends HookConsumerWidget {
     );
   }
 
-  /// Tải thêm dữ liệu khi cuộn đến ngưỡng
   Future<void> _loadMore(
     WidgetRef ref,
     String searchText,
     ValueNotifier<bool> isLoadingMore,
   ) async {
     isLoadingMore.value = true;
-    await ref.read(flightListNotifierProvider.notifier).loadMore(search: searchText);
+    await ref
+        .read(flightListNotifierProvider.notifier)
+        .loadMore(search: searchText);
     isLoadingMore.value = false;
   }
 }

@@ -41,7 +41,11 @@ class FlightSignature extends HookConsumerWidget {
             flightSignature: data,
             onRefresh: () => flightSignState.getSingSupplyfrom(supplyfromId.first),
           ),
-          error: (err, _) => Center(child: Text(err.toString())),
+          error: (err, _) =>SignatureContent(
+            supplyfromId: supplyfromId,
+            flightSignature: SignSupplyfrom(),
+            onRefresh: () => flightSignState.getSingSupplyfrom(supplyfromId.first),
+          ),
           loading: () => _buildLoading(context),
         ),
       ),

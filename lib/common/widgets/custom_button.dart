@@ -14,6 +14,9 @@ class CustomButton extends StatelessWidget {
   final double? horizontalPadding;
   final double? verticalPadding;
   final int? fontSize;
+  final double? borderRadius;
+  
+  
   const CustomButton({
     Key? key,
     required this.text,
@@ -26,6 +29,7 @@ class CustomButton extends StatelessWidget {
     this.horizontalPadding,
     this.verticalPadding,
     this.fontSize,
+    this.borderRadius,
   }) : super(key: key);
 
   @override
@@ -43,7 +47,7 @@ class CustomButton extends StatelessWidget {
             vertical: verticalPadding ?? 10),
         decoration: BoxDecoration(
           color: isOutlined ? Colors.transparent : color,
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(borderRadius ?? 12.r),
           border:
               Border.all(color: isOutlined ? Colors.black : AppColors.primary),
         ),

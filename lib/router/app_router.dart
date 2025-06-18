@@ -1,10 +1,14 @@
 import 'package:gnsa/feature/auth/view/login.dart';
 import 'package:gnsa/feature/presentation/flight_detail/model/flight_detail_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/view/flight_detail.dart';
+import 'package:gnsa/feature/presentation/flight_detail/view/preview_view.dart';
+import 'package:gnsa/feature/presentation/flight_detail/view/qrcode_view.dart';
 import 'package:gnsa/feature/presentation/flight_list/view/flight_list.dart';
 import 'package:gnsa/feature/presentation/flight_signature/view/flight_signature.dart';
 import 'package:gnsa/feature/presentation/flight_sign/view/flight_sign.dart';
 import 'package:gnsa/feature/presentation/flight_printer/view/flight_printer.dart';
+import 'package:gnsa/feature/profile/profile_view.dart';
+import 'package:gnsa/router/bottom_navigation_main.dart';
 import 'package:go_router/go_router.dart';
 
 class AppRouter {
@@ -14,18 +18,34 @@ class AppRouter {
   static const flightSignature = '/flight-signature';
   static const flightSign = '/flight-sign';
   static const flightPrinter = '/flight-printer';
+  static const main = '/main';
+  static const preview = '/preview';
+  static const qrcode = '/qrcode';
+  static const profile = '/profile';
 
   static GoRouter getRouter(String accessToken) {
     return GoRouter(
-      initialLocation: accessToken.isNotEmpty ? flightList : login,
+      initialLocation: accessToken.isNotEmpty ? main : main,
       routes: [
         GoRoute(
           path: login,
           builder: (context, state) =>const  LoginScreen(),
         ),
         GoRoute(
+          path: main,
+          builder: (context, state) => MainScreen(),
+        ),
+        GoRoute(
           path: flightList,
-          builder: (context, state) => const FlightList(),
+          builder: (context, state) => const FlightList(isMyFlight: false),
+        ),
+        GoRoute(
+          path: preview,
+          builder: (context, state) => const PreviewView(),
+        ),
+        GoRoute(
+          path: qrcode,
+          builder: (context, state) => const QrcodeView(),
         ),
         GoRoute(
           path: flightDetail,
@@ -59,6 +79,10 @@ class AppRouter {
             final flightDetailModel = state.extra as FlightDetailModel;
             return FlightPrinter(flightDetailModel: flightDetailModel);
           },
+        ),
+        GoRoute(
+          path: profile,
+          builder: (context, state) => const ProfileScreen(),
         ),
       ],
     );

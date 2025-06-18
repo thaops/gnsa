@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:gnsa/common/Services/api_endpoints.dart';
 import 'package:gnsa/common/repositoty/dio_api.dart';
@@ -33,7 +32,6 @@ class FilghtSupplyfromProvider extends _$FilghtSupplyfromProvider {
       );
     } catch (e) {
       print('Error updating supply note: $e');
-      rethrow;
     }
   }
 }

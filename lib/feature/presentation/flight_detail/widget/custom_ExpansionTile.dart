@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gnsa/common/design_system/tokens/app_sizes.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:gnsa/feature/presentation/flight_detail/provider/filght_bool_provider.dart';
 import 'package:gnsa/feature/presentation/flight_detail/model/flight_detail_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/widget/child_expansion.dart';
+import 'package:gnsa/feature/presentation/flight_detail/view/poup_create_food.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class CustomExpansionTile extends HookConsumerWidget {
@@ -63,23 +65,29 @@ class CustomExpansionTile extends HookConsumerWidget {
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
-          subtitle: TextWidget(
-            text: subtitle,
-            fontSize: 14,
-            fontWeight: FontWeight.w300,
-          ),
-          trailing: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.end,
+          subtitle: Row(
             children: [
               TextWidget(
-                text: trailingCount,
+                text: subtitle,
                 fontSize: 12,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w300,
               ),
+              SizedBox(width: 10.w),
               isConfirmed ? _ComfimerWidget() : const SizedBox(),
             ],
           ),
+          // trailing: Column(
+          //   mainAxisSize: MainAxisSize.min,
+          //   crossAxisAlignment: CrossAxisAlignment.end,
+          //   children: [
+          //     TextWidget(
+          //       text: trailingCount,
+          //       fontSize: 12,
+          //       fontWeight: FontWeight.w500,
+          //     ),
+          //     isConfirmed ? _ComfimerWidget() : const SizedBox(),
+          //   ],
+          // ),
           children: [
             ListView.builder(
               shrinkWrap: true,
@@ -109,6 +117,33 @@ class CustomExpansionTile extends HookConsumerWidget {
                 ],
               ),
             ),
+             SizedBox(height: AppSizes.spacingSmall),
+
+            InkWell(
+              onTap: () => {
+               showDialog(
+                context: context,
+                builder: (context) => PopupCreateFood()
+              ),
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.9,
+                padding: EdgeInsets.symmetric(horizontal: AppSizes.paddingMedium, vertical: AppSizes.paddingXXSmall),
+                decoration: BoxDecoration(
+                  color: AppColors.backgroundTab,
+                  borderRadius: BorderRadius.circular(18.r),
+                  border: Border.all(color: AppColors.primary, width: 0.5.w),
+                ),
+                child: Center(
+                  child: TextWidget(
+                    text: "+ Thêm xe đẩy",
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+            )
           ],
         ),
       ),
@@ -124,7 +159,7 @@ class CustomExpansionTile extends HookConsumerWidget {
         children: [
           Container(
             height: 20.h,
-            width: 70.h,
+            width: 80.h,
             padding:  EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
             decoration: BoxDecoration(
               color: AppColors.textSuccess,

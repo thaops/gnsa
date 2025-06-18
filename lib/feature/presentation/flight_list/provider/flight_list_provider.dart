@@ -10,19 +10,14 @@ part 'flight_list_provider.g.dart';
 const _defaultPageSize = 20;
 const _initialPageIndex = 1;
 
-/// Notifier quản lý danh sách chuyến bay với tìm kiếm và tải thêm
 @riverpod
 class FlightListNotifier extends _$FlightListNotifier {
-  /// Chỉ số trang hiện tại
   int _pageIndex = _initialPageIndex;
 
-  /// Kích thước trang
   final int _pageSize = _defaultPageSize;
 
-  /// Token để hủy yêu cầu API
   CancelToken _cancelToken = CancelToken();
 
-  /// Lưu trữ danh sách đầy đủ khi không tìm kiếm
   FlightsModel? _fullFlights;
 
   @override
@@ -31,20 +26,60 @@ class FlightListNotifier extends _$FlightListNotifier {
     return _fullFlights!;
   }
 
-  /// Lấy danh sách chuyến bay từ API
-  Future<FlightsModel> _fetchFlights({String? search}) async {
+  Future<FlightsModel> _fetchFlights({String? search, bool isMyFlight = false}) async {
     final dioApi = ref.read(dioApiProvider);
+    final fakeFlightsModel = FlightsModel(
+  statusCode: 200,
+  message: "Success",
+  totalRecord: 2,
+  data: [
+    FlightData(
+      id: "f001",
+      flightNo: "VN123",
+      flightDate: DateTime.parse("2025-06-20T10:00:00"),
+      actualTimeDepart: DateTime.parse("2025-06-20T10:15:00"),
+      actualTimeArrival: DateTime.parse("2025-06-20T12:30:00"),
+      routing: "SGN-HAN",
+      depart: "SGN",
+      arrival: "HAN",
+      status: "Arrived",
+      airlineCode: "VN",
+    ),
+    FlightData(
+      id: "f002",
+      flightNo: "VN456",
+      flightDate: DateTime.parse("2025-06-21T14:00:00"),
+      actualTimeDepart: DateTime.parse("2025-06-21T14:05:00"),
+      actualTimeArrival: DateTime.parse("2025-06-21T16:20:00"),
+      routing: "HAN-DAD",
+      depart: "HAN",
+      arrival: "DAD",
+      status: "On Time",
+      airlineCode: "VN",
+    ),
+  ],
+);
+
+final fakeFlightsModelRemove = isMyFlight ? fakeFlightsModel.data.removeAt(1) : fakeFlightsModel.data;
+
     try {
-      final response = await dioApi.get(
-        ApiEndpoints.flightList,
-        params: {
-          'PageIndex': _pageIndex,
-          'PageSize': _pageSize,
-          'Keyword': search,
-        },
-        cancelToken: _cancelToken,
+      // final response = await dioApi.get(
+      //   ApiEndpoints.flightList,
+      //   params: {
+      //     'PageIndex': _pageIndex,
+      //     'PageSize': _pageSize,
+      //     'Keyword': search,
+      //   },
+      //   cancelToken: _cancelToken,
+      // );
+
+
+      return FlightsModel(
+        statusCode: fakeFlightsModel.statusCode,
+        message: fakeFlightsModel.message,
+        totalRecord: fakeFlightsModel.totalRecord,
+        data: fakeFlightsModelRemove as List<FlightData>,
       );
-      return FlightsModel.fromJson(response.data);
     } catch (e) {
       if (e is DioException && CancelToken.isCancel(e)) {
       }
@@ -52,7 +87,6 @@ class FlightListNotifier extends _$FlightListNotifier {
     }
   }
 
-  /// Làm mới danh sách chuyến bay
   Future<void> refreshFlights({String? search}) async {
     _cancelToken.cancel('Cancelled due to new request');
     _cancelToken = CancelToken();

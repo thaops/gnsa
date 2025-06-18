@@ -105,6 +105,15 @@ class ChildExpansion extends HookConsumerWidget {
               color: AppColors.iconFlight,
               fontWeight: FontWeight.w300,
             ),
+            SizedBox(width: 8.w),
+           !isEdit.value ?
+            TextWidget(
+              text:
+                  "Bổ sung:  ${supplyItem?.confirmedQuantity.toString() ?? ''}",
+              fontSize: 12,
+              color: AppColors.primary,
+              fontWeight: FontWeight.w300,
+            ) : const SizedBox(),
             const Spacer(),
 
             isEdit.value

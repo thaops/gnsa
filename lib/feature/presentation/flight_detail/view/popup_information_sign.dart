@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gnsa/common/utils/date_utils.dart';
 import 'package:gnsa/common/widgets/container_loading.dart';
 import 'package:gnsa/common/widgets/loading_shimmer.dart';
+import 'package:gnsa/common/widgets/state_err.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:gnsa/feature/presentation/flight_printer/widget/appbar_dialog.dart';
@@ -39,7 +40,7 @@ class PopupInformationSign extends HookConsumerWidget {
             const SizedBox(height: 16),
             flightSignAsync.when(
                 data: (data) => _buildPopup(data),
-                error: (err, stackTrace) => Text(err.toString()),
+                error: (err, stackTrace) => StateErr(error: err.toString()),
                 loading: () => _buildLoading())
           ],
         ),
