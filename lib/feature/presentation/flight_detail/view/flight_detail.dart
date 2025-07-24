@@ -10,6 +10,7 @@ import 'package:gnsa/common/widgets/state_err.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:gnsa/feature/presentation/flight_detail/model/flight_detail_model.dart';
+import 'package:gnsa/feature/presentation/flight_detail/model/supplyform_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/provider/filght_bool_provider.dart';
 import 'package:gnsa/feature/presentation/flight_detail/provider/flight_detail_provider.dart';
 import 'package:gnsa/feature/presentation/flight_detail/view/supply_form_list_view.dart';
@@ -53,7 +54,7 @@ class FlightDetailScreen extends HookConsumerWidget {
         body: _buildBody(
             horizontalPadding,
             ref.watch(flightDetailProviderProvider).value ??
-                FlightDetailModel(),
+               SupplyFormModel(),
             context,
             ref,
             tabController));
@@ -62,10 +63,10 @@ class FlightDetailScreen extends HookConsumerWidget {
   void _handleSignButton(BuildContext context, WidgetRef ref) {
     ref.watch(flightDetailProviderProvider).whenData((data) {
       final filterSupplyForm =
-          data.supplyForms?.where((e) => e.status == _kValueSign).toList() ??
+          data.supplyFormDetails?.where((e) => e.supplyType == _kValueSign).toList() ??
               [];
       final supplyFormIds =
-          filterSupplyForm.map((e) => e.supplyFormId!).toList();
+          filterSupplyForm.map((e) => e.supplyFormDetailId!).toList();
       if (supplyFormIds.isEmpty) {
         CustomFlushbar.showError(context,
             message: 'Không có dữ liệu để ký xác nhận');
@@ -159,7 +160,7 @@ AppBarWidget _buildAppBar(BuildContext context, WidgetRef ref) {
     },
   );
 }
-  Widget _buildBody(double horizontalPadding, FlightDetailModel data,
+  Widget _buildBody(double horizontalPadding, SupplyFormModel data,
       BuildContext context, WidgetRef ref, TabController tabController) {
     return Column(
       children: [
@@ -183,7 +184,7 @@ AppBarWidget _buildAppBar(BuildContext context, WidgetRef ref) {
   }
 
   Widget _buildSupplyFormList(
-    FlightDetailModel data,
+    SupplyFormModel data,
     BuildContext context,
     bool isExpanded,
     WidgetRef ref,
@@ -193,7 +194,7 @@ AppBarWidget _buildAppBar(BuildContext context, WidgetRef ref) {
         children: [
           CustomDetailFlight(
             flightDetail: 'Chi tiết chuyến bay:',
-            flightDetailModel: data,
+            supplyFormModel: data,
           ),
           TabBar(
             controller: tabController,
@@ -234,13 +235,13 @@ AppBarWidget _buildAppBar(BuildContext context, WidgetRef ref) {
                 controller: tabController,
                 children: [
                   SupplyFormListView(
-                    supplyForms: data.supplyForms,
+                    supplyForms: data.supplyFormDetails,
                     isExpanded: isExpanded,
                     ref: ref,
                     kValueSign: _kValueSign,
                   ),
                   SupplyFormListView(
-                    supplyForms: data.supplyForms,
+                    supplyForms: data.additionalFormDetails,
                     isExpanded: isExpanded,
                     ref: ref,
                     kValueSign: _kValueSign,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gnsa/feature/presentation/flight_detail/model/supplyform_model.dart';
 import 'package:gnsa/feature/presentation/flight_printer/widget/appbar_dialog.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -11,7 +12,7 @@ import 'package:gnsa/feature/presentation/flight_printer/widget/constom_checkbox
 import 'package:gnsa/feature/presentation/flight_printer/provider/flight_printer_provider.dart';
 
 class FlightPrinter extends HookConsumerWidget {
-  final FlightDetailModel flightDetailModel;
+  final SupplyFormModel flightDetailModel;
 
   const FlightPrinter({super.key, required this.flightDetailModel});
 
@@ -49,7 +50,7 @@ class FlightPrinter extends HookConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            AppbarDialog(title: 'In phiếu - ${flightDetailModel.flight?.flightNo ?? "N/A"}',),
+            AppbarDialog(title: 'In phiếu - ${flightDetailModel.flightInfo?.flightNo ?? "N/A"}',),
             SizedBox(height: 16.h),
             ListView.builder(
               shrinkWrap: true,

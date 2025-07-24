@@ -14,9 +14,9 @@ part 'dio_api.g.dart';
 DioApi dioApi(Ref  ref) {
   final dioApi = DioApi();
   // Đảm bảo DioApi được dispose khi provider bị hủy
-  ref.onDispose(() {
-    dioApi.dio.close();
-  });
+  // ref.onDispose(() {
+  //   dioApi.dio.close();
+  // });
   return dioApi;
 }
 

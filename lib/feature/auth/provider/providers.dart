@@ -1,0 +1,44 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gnsa/common/Services/services.dart';
+import 'package:gnsa/common/repositoty/dio_api.dart';
+import 'package:gnsa/feature/auth/data/datasources/login_remote_data_sources.dart';
+import 'package:gnsa/feature/auth/data/repositories/login_repository_impl.dart';
+import 'package:gnsa/feature/auth/domain/repositories/login_repository.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+// Dio API Provider
+final dioApiProvider = Provider<DioApi>((ref) => DioApi());
+
+// Services Provider
+final sharedPreferencesProvider = FutureProvider<SharedPreferences>((ref) async {
+  return await SharedPreferences.getInstance();
+});
+// Update the servicesProvider to handle loading state
+final servicesProvider = Provider<Services>((ref) {
+  final sharedPreferences = ref.watch(sharedPreferencesProvider);
+  
+  return sharedPreferences.when(
+    data: (prefs) => Services(prefs),
+    loading: () {
+      // Return a default Services instance or throw if you prefer
+      throw Exception('SharedPreferences is still loading');
+    },
+    error: (error, stack) {
+      throw Exception('Failed to load SharedPreferences: $error');
+    },
+  );
+});
+// Data Sources
+final loginRemoteDataSourceProvider = Provider<LoginRemoteDataSources>((ref) {
+  return LoginRemoteDataSourcesImpl(ref.read(dioApiProvider));
+});
+
+// Repositories
+final loginRepositoryProvider = Provider<LoginRepository>((ref) {
+  return LoginRepositoryImpl(ref.read(loginRemoteDataSourceProvider));
+});
+
+// Use Cases
+final loginUseCaseProvider = Provider<LoginUseCase>((ref) {
+  return LoginUseCase(ref.read(loginRepositoryProvider));
+});

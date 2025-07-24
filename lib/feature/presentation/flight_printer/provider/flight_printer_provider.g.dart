@@ -10,7 +10,7 @@ part of 'flight_printer_provider.dart';
 const flightPrinterControllerProvider = FlightPrinterControllerProvider._();
 
 final class FlightPrinterControllerProvider
-    extends $NotifierProvider<FlightPrinterController, FlightDetailModel?> {
+    extends $NotifierProvider<FlightPrinterController, SupplyFormModel?> {
   const FlightPrinterControllerProvider._()
       : super(
           from: null,
@@ -31,31 +31,31 @@ final class FlightPrinterControllerProvider
 
   @$internal
   @override
-  $NotifierProviderElement<FlightPrinterController, FlightDetailModel?>
+  $NotifierProviderElement<FlightPrinterController, SupplyFormModel?>
       $createElement($ProviderPointer pointer) =>
           $NotifierProviderElement(pointer);
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(FlightDetailModel? value) {
+  Override overrideWithValue(SupplyFormModel? value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $ValueProvider<FlightDetailModel?>(value),
+      providerOverride: $ValueProvider<SupplyFormModel?>(value),
     );
   }
 }
 
 String _$flightPrinterControllerHash() =>
-    r'97361dd7e90a2a1622ca448d02e3e7631d48a449';
+    r'8b2f7ffcfa3ab3591e348341946b9d7a373f8a4d';
 
-abstract class _$FlightPrinterController extends $Notifier<FlightDetailModel?> {
-  FlightDetailModel? build();
+abstract class _$FlightPrinterController extends $Notifier<SupplyFormModel?> {
+  SupplyFormModel? build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<FlightDetailModel?>;
+    final ref = this.ref as $Ref<SupplyFormModel?>;
     final element = ref.element as $ClassProviderElement<
-        AnyNotifier<FlightDetailModel?>, FlightDetailModel?, Object?, Object?>;
+        AnyNotifier<SupplyFormModel?>, SupplyFormModel?, Object?, Object?>;
     element.handleValue(ref, created);
   }
 }

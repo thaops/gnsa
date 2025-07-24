@@ -10,7 +10,7 @@ part of 'flight_detail_provider.dart';
 const flightDetailProviderProvider = FlightDetailProviderProvider._();
 
 final class FlightDetailProviderProvider
-    extends $AsyncNotifierProvider<FlightDetailProvider, FlightDetailModel> {
+    extends $AsyncNotifierProvider<FlightDetailProvider, SupplyFormModel> {
   const FlightDetailProviderProvider._()
       : super(
           from: null,
@@ -31,25 +31,24 @@ final class FlightDetailProviderProvider
 
   @$internal
   @override
-  $AsyncNotifierProviderElement<FlightDetailProvider, FlightDetailModel>
+  $AsyncNotifierProviderElement<FlightDetailProvider, SupplyFormModel>
       $createElement($ProviderPointer pointer) =>
           $AsyncNotifierProviderElement(pointer);
 }
 
 String _$flightDetailProviderHash() =>
-    r'17c4028480a0c8c23f919ebba10c82639ca5e7f5';
+    r'287b29c2b7b73c59c1d221b21aa0348c91eb3208';
 
-abstract class _$FlightDetailProvider
-    extends $AsyncNotifier<FlightDetailModel> {
-  FutureOr<FlightDetailModel> build();
+abstract class _$FlightDetailProvider extends $AsyncNotifier<SupplyFormModel> {
+  FutureOr<SupplyFormModel> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<AsyncValue<FlightDetailModel>>;
+    final ref = this.ref as $Ref<AsyncValue<SupplyFormModel>>;
     final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<FlightDetailModel>>,
-        AsyncValue<FlightDetailModel>,
+        AnyNotifier<AsyncValue<SupplyFormModel>>,
+        AsyncValue<SupplyFormModel>,
         Object?,
         Object?>;
     element.handleValue(ref, created);

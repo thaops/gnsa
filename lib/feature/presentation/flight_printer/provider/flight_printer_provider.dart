@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gnsa/common/method_channel/printer_plugin.dart' show UrovoPrinter;
 import 'package:gnsa/common/utils/custom_flushbar.dart';
 import 'package:gnsa/feature/presentation/flight_detail/model/flight_detail_model.dart';
+import 'package:gnsa/feature/presentation/flight_detail/model/supplyform_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'flight_printer_provider.g.dart';
@@ -13,13 +14,13 @@ const _kAllOption = 'All';
 @riverpod
 class FlightPrinterController extends _$FlightPrinterController {
   @override
-  FlightDetailModel? build() {
+  SupplyFormModel? build() {
     return null;
   }
 
   Future<void> printJson({
     required BuildContext context,
-    required FlightDetailModel? flightDetail,
+    required SupplyFormModel? flightDetail,
     required List<String> selectedItems,
   }) async {
     if (!_validateInput(context, flightDetail, selectedItems)) return;
@@ -34,7 +35,7 @@ class FlightPrinterController extends _$FlightPrinterController {
 
   bool _validateInput(
     BuildContext context,
-    FlightDetailModel? flightDetail,
+    SupplyFormModel? flightDetail,
     List<String> selectedItems,
   ) {
     if (flightDetail == null) {
@@ -48,8 +49,8 @@ class FlightPrinterController extends _$FlightPrinterController {
     return true;
   }
 
-  FlightDetailModel _preparePrintData(
-    FlightDetailModel flightDetail,
+  SupplyFormModel _preparePrintData(
+    SupplyFormModel flightDetail,
     List<String> selectedItems,
   ) {
     if (selectedItems.contains(_kAllOption)) {
@@ -57,22 +58,22 @@ class FlightPrinterController extends _$FlightPrinterController {
     }
 
     final filteredSupplyForms = _filterSupplyForms(flightDetail, selectedItems);
-    return FlightDetailModel(
-      flight: flightDetail.flight,
-      supplyForms: filteredSupplyForms,
+    return SupplyFormModel(
+      flightInfo: flightDetail.flightInfo,
+      supplyFormDetails: filteredSupplyForms,
     );
   }
 
-  List<SupplyForm>? _filterSupplyForms(
-    FlightDetailModel flightDetail,
+  List<SupplyFormDetail>? _filterSupplyForms(
+    SupplyFormModel flightDetail,
     List<String> selectedItems,
   ) {
-    return flightDetail.supplyForms?.where((form) {
-      return selectedItems.contains(form.category?.trim());
+    return flightDetail.supplyFormDetails?.where((form) {
+      return selectedItems.contains(form.supplyType?.trim());
     }).toList();
   }
 
-  Future<void> _printData(BuildContext context, FlightDetailModel data) async {
+  Future<void> _printData(BuildContext context, SupplyFormModel data) async {
     final result = await UrovoPrinter().printGnsa(data);
     await CustomFlushbar.showSuccess(context, message: result ?? "Print successful");
     state = data;

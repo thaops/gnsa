@@ -37,7 +37,7 @@ final class FlightSignatureControllerProvider
 }
 
 String _$flightSignatureControllerHash() =>
-    r'da5fa10c13fc757429998b667f971875fcd845f5';
+    r'f5740e4812433444ad29f12a995be18f82b266fe';
 
 abstract class _$FlightSignatureController
     extends $AsyncNotifier<SignSupplyfrom> {

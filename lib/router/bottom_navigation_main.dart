@@ -4,6 +4,8 @@ import 'package:gnsa/feature/presentation/flight_list/view/flight_list.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
 class MainScreen extends StatefulWidget {
+  const MainScreen({Key? key}) : super(key: key);
+
   @override
   _MainScreenState createState() => _MainScreenState();
 }

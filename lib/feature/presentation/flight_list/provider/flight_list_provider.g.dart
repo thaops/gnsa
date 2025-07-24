@@ -6,14 +6,11 @@ part of 'flight_list_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-/// Notifier quản lý danh sách chuyến bay với tìm kiếm và tải thêm
 @ProviderFor(FlightListNotifier)
 const flightListNotifierProvider = FlightListNotifierProvider._();
 
-/// Notifier quản lý danh sách chuyến bay với tìm kiếm và tải thêm
 final class FlightListNotifierProvider
     extends $AsyncNotifierProvider<FlightListNotifier, FlightsModel> {
-  /// Notifier quản lý danh sách chuyến bay với tìm kiếm và tải thêm
   const FlightListNotifierProvider._()
       : super(
           from: null,
@@ -40,7 +37,7 @@ final class FlightListNotifierProvider
 }
 
 String _$flightListNotifierHash() =>
-    r'd3b6666e6ff0b35bcbab3cde32eda81c163b25d0';
+    r'423acadf99feaf45371c6fb4a2d354d9579f764f';
 
 abstract class _$FlightListNotifier extends $AsyncNotifier<FlightsModel> {
   FutureOr<FlightsModel> build();

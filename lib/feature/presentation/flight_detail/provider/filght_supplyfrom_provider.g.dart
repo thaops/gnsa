@@ -48,7 +48,7 @@ final class FilghtSupplyfromProviderProvider
 }
 
 String _$filghtSupplyfromProviderHash() =>
-    r'8385e0ae457c84fa3139e47951f21524559a56ca';
+    r'83d11cffad3ff5132c8bbf219bdc8ea762cb6bc2';
 
 abstract class _$FilghtSupplyfromProvider extends $Notifier<void> {
   void build();

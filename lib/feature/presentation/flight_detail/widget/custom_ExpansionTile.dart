@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gnsa/common/design_system/tokens/app_sizes.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
+import 'package:gnsa/feature/presentation/flight_detail/model/supplyform_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/provider/filght_bool_provider.dart';
 import 'package:gnsa/feature/presentation/flight_detail/model/flight_detail_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/widget/child_expansion.dart';
@@ -18,7 +19,7 @@ class CustomExpansionTile extends HookConsumerWidget {
   final String trailingCount;
   final bool isConfirmed;
   final bool isExpanded;
-  final SupplyForm? supplyForm;
+  final SupplyFormDetail? supplyForm;
   final VoidCallback? onTap;
   final VoidCallback onConfirm;
 
@@ -92,13 +93,13 @@ class CustomExpansionTile extends HookConsumerWidget {
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: supplyForm?.supplies?.length ?? 0,
+              itemCount: supplyForm?.items?.length ?? 0,
               itemBuilder: (context, outerIndex) => ExpansionTile(
                 initiallyExpanded: isExpandedHook.value,
                 backgroundColor: AppColors.backgroundTab,
                 iconColor: AppColors.primary,
                 title: TextWidget(
-                  text: supplyForm?.supplies?[outerIndex].categoryName.toString() ??'',
+                  text: supplyForm?.items?[outerIndex].name.toString() ??'',
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -107,11 +108,10 @@ class CustomExpansionTile extends HookConsumerWidget {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount:
-                        supplyForm?.supplies?[outerIndex].items?.length ?? 0,
+                        supplyForm?.items?.length?? 0,
                     itemBuilder: (context, innerIndex) => ChildExpansion(
-                      index: (innerIndex + 1).toString(),
                       supplyItem:
-                          supplyForm?.supplies?[outerIndex].items?[innerIndex],
+                          supplyForm?.items?[innerIndex],
                     ),
                   ),
                 ],

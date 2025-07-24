@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gnsa/common/repositoty/device_udid.dart';
 import 'package:gnsa/common/services/services.dart';
+import 'package:gnsa/common/utils/navigation_service.dart';
 import 'package:gnsa/common/utils/screen_size.dart';
 import 'package:gnsa/common/utils/utils_deviece_udid.dart';
 import 'package:gnsa/core/configs/theme/app_theme.dart';
@@ -44,6 +45,7 @@ class MyApp extends ConsumerWidget {
         routeInformationParser: router.routeInformationParser,
         routeInformationProvider: router.routeInformationProvider,
         debugShowCheckedModeBanner: false,
+        key: NavigationService.navigatorKey,
         theme: AppTheme.lightTheme,
       ),
     );

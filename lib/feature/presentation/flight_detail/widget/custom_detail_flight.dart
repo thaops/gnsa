@@ -5,15 +5,16 @@ import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gnsa/feature/presentation/flight_detail/model/flight_detail_model.dart';
+import 'package:gnsa/feature/presentation/flight_detail/model/supplyform_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/widget/text_star.dart';
 
 class CustomDetailFlight extends StatelessWidget {
   final String flightDetail;
-  final FlightDetailModel flightDetailModel;
+  final SupplyFormModel supplyFormModel;
   const CustomDetailFlight({
     super.key,
     required this.flightDetail,
-    required this.flightDetailModel,
+    required this.supplyFormModel,
   });
 
   @override
@@ -42,15 +43,15 @@ class CustomDetailFlight extends StatelessWidget {
                   TextRowTitleValue(
                       title: "Flight :",
                       value:
-                          flightDetailModel.flight?.routing.toString() ?? ''),
+                          supplyFormModel.flightInfo?.routing.toString() ?? ''),
                   TextRowTitleValue(
                       title: "Flight No :",
                       value:
-                          flightDetailModel.flight?.flightNo.toString() ?? ''),
+                          supplyFormModel.flightInfo?.flightNo.toString() ?? ''),
                   TextRowTitleValue(
                       title: "Time :",
-                      value: DateUtilsCustom.formatStringDate(flightDetailModel
-                              .flight?.actualTimeArrival
+                      value: DateUtilsCustom.formatStringDate(supplyFormModel
+                              .flightInfo?.departureDate
                               .toString() ??
                           '')),
                 ],

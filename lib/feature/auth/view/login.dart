@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gnsa/common/Services/services_base/async_request_handler.dart';
 import 'package:gnsa/common/design_system/tokens/app_sizes.dart';
 import 'package:gnsa/common/img/img.dart';
-import 'package:gnsa/common/utils/custom_flushbar.dart';
 import 'package:gnsa/common/widgets/custom_button.dart';
 import 'package:gnsa/common/widgets/custom_text_field.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:gnsa/feature/auth/provider/login_provider.dart';
-import 'package:http/http.dart' as ref;
+import 'package:gnsa/feature/auth/provider/model/login_state.dart';
 
 class LoginScreen extends ConsumerWidget {
   const LoginScreen({super.key});
@@ -17,34 +17,32 @@ class LoginScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final loginState = ref.watch(loginControllerProvider);
+    final asyncState = ref.watch(asyncRequestHandlerProvider);
 
-    ref.listen(loginControllerProvider, (previous, next) {
-      next.whenOrNull(
-        error: (error, stack) {
-          CustomFlushbar.showError(context,
-              message: 'Đăng nhập thất bại: $error');
-        },
-      );
-    });
-
-    return Scaffold(
-      body: Stack(
-        children: [
-          loginState.when(
-            data: (state) => _LoginContent(state: state, ref: ref),
-            loading: () => Container(
-              color: Colors.black.withOpacity(0.5),
-              child: const Center(
+    return WillPopScope(
+      onWillPop: () async => !asyncState.isLoading,
+      child: Scaffold(
+        body: Stack(
+          children: [
+            _LoginContent(
+              state: loginState.value!, 
+              ref: ref,
+            ),
+            
+            if (asyncState.isLoading)
+              ModalBarrier(
+                color: Colors.black.withOpacity(0.5),
+                dismissible: false,
+              ),
+              
+            if (asyncState.isLoading)
+              const Center(
                 child: CircularProgressIndicator(
-                  valueColor:
-                      AlwaysStoppedAnimation<Color>(AppColors.primaryV2),
+                  valueColor: AlwaysStoppedAnimation(AppColors.primaryV2),
                 ),
               ),
-            ),
-            error: (error, stack) =>
-                _LoginContent(state: loginState.value!, ref: ref),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -116,7 +114,6 @@ class _LoginHeader extends StatelessWidget {
 class _LoginForm extends StatelessWidget {
   final LoginState state;
   final WidgetRef ref;
-  
 
   const _LoginForm({required this.state, required this.ref});
 
@@ -144,7 +141,7 @@ class _LoginForm extends StatelessWidget {
 class _UsernameField extends HookWidget {
   final TextEditingController controller;
   final WidgetRef ref;
-   _UsernameField({
+  _UsernameField({
     required this.controller,
     required this.ref,
   });
@@ -178,7 +175,7 @@ class _UsernameField extends HookWidget {
 class _PasswordField extends HookWidget {
   final TextEditingController controller;
   final WidgetRef ref;
-   _PasswordField({
+  _PasswordField({
     required this.controller,
     required this.ref,
   });
@@ -196,11 +193,10 @@ class _PasswordField extends HookWidget {
       errorText: errorTextState.value,
       textInputAction: TextInputAction.done,
       onSubmit: () {
-        FocusScope.of(context).unfocus();
         ref.read(loginControllerProvider.notifier).login(context);
       },
       onChanged: (value) {
-        errorTextState.value = value.length < 6 ? 'Ít nhất 6 ký tự' : null;
+        errorTextState.value = value.length < 3 ? 'Ít nhất 3 ký tự' : null;
       },
       onSuffixTap: () {
         obscureText.value = !obscureText.value;
@@ -222,7 +218,6 @@ class _LoginButton extends StatelessWidget {
       height: AppSizes.buttonHeightLarge,
       textColor: AppColors.textButton,
       onPressed: () {
-        FocusScope.of(context).unfocus();
         ref.read(loginControllerProvider.notifier).login(context);
       },
     );

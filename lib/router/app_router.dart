@@ -1,5 +1,6 @@
 import 'package:gnsa/feature/auth/view/login.dart';
 import 'package:gnsa/feature/presentation/flight_detail/model/flight_detail_model.dart';
+import 'package:gnsa/feature/presentation/flight_detail/model/supplyform_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/view/flight_detail.dart';
 import 'package:gnsa/feature/presentation/flight_detail/view/preview_view.dart';
 import 'package:gnsa/feature/presentation/flight_detail/view/qrcode_view.dart';
@@ -10,6 +11,7 @@ import 'package:gnsa/feature/presentation/flight_printer/view/flight_printer.dar
 import 'package:gnsa/feature/profile/profile_view.dart';
 import 'package:gnsa/router/bottom_navigation_main.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gnsa/feature/presentation/test_map.dart';
 
 class AppRouter {
   static const login = '/login';
@@ -22,32 +24,44 @@ class AppRouter {
   static const preview = '/preview';
   static const qrcode = '/qrcode';
   static const profile = '/profile';
+  static const testMap = '/test-map';
 
   static GoRouter getRouter(String accessToken) {
     return GoRouter(
-      initialLocation: accessToken.isNotEmpty ? main : main,
+      initialLocation: accessToken.isNotEmpty ? main : login,
       routes: [
         GoRoute(
+          name: testMap,
+          path: testMap,
+          builder: (context, state) => const TestMap(),
+        ),
+        GoRoute(
+          name: login,
           path: login,
           builder: (context, state) =>const  LoginScreen(),
         ),
         GoRoute(
+          name: main,
           path: main,
           builder: (context, state) => MainScreen(),
         ),
         GoRoute(
+          name: flightList,
           path: flightList,
           builder: (context, state) => const FlightList(isMyFlight: false),
         ),
         GoRoute(
+          name: preview,
           path: preview,
           builder: (context, state) => const PreviewView(),
         ),
         GoRoute(
+          name: qrcode,
           path: qrcode,
           builder: (context, state) => const QrcodeView(),
         ),
         GoRoute(
+          name: flightDetail,
           path: flightDetail,
           builder: (context, state) {
             final id = state.extra as String;
@@ -57,6 +71,7 @@ class AppRouter {
           },
         ),
         GoRoute(
+          name: flightSignature,
           path: flightSignature,
           builder: (context, state) {
             final supplyformId = state.extra as List<String>;
@@ -64,6 +79,7 @@ class AppRouter {
           },
         ),
         GoRoute(
+            name: flightSign,
             path: flightSign,
             builder: (context, state) {
               final extra = state.extra as Map<String, dynamic>?;
@@ -74,13 +90,15 @@ class AppRouter {
               );
             }),
         GoRoute(
+          name: flightPrinter,
           path: flightPrinter,
           builder: (context, state) {
-            final flightDetailModel = state.extra as FlightDetailModel;
+            final flightDetailModel = state.extra as SupplyFormModel;
             return FlightPrinter(flightDetailModel: flightDetailModel);
           },
         ),
         GoRoute(
+          name: profile,
           path: profile,
           builder: (context, state) => const ProfileScreen(),
         ),

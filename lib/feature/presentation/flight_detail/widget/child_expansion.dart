@@ -4,15 +4,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gnsa/common/widgets/custom_text_field.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
+import 'package:gnsa/feature/presentation/flight_detail/model/supplyform_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/provider/filght_supplyfrom_provider.dart';
-import 'package:gnsa/feature/presentation/flight_detail/model/flight_detail_model.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ChildExpansion extends HookConsumerWidget {
   final SupplyItem? supplyItem;
-  final String index;
 
-  const ChildExpansion({Key? key, this.supplyItem, required this.index})
+  const ChildExpansion({Key? key, this.supplyItem})
       : super(key: key);
 
   @override
@@ -28,13 +27,11 @@ class ChildExpansion extends HookConsumerWidget {
     );
     void _saveNote() {
       focusNode.unfocus();
-      supplyItem?.note = noteController.text;
       noteState.value = noteController.text;
-      supplyItem!.confirmedQuantity = quantity.value;
       isEdit.value = false;
       ref.read(filghtSupplyfromProviderProvider.notifier).updateSupplyNote(
-            supplyFormId: supplyItem?.supplyFormId,
-            supplyId: supplyItem?.supplyId,
+            supplyFormId: supplyItem?.supplyFormDetailItemId,
+            supplyId: supplyItem?.supplyFormDetailItemId,
             confirmedQuantity: quantity.value,
             note: noteController.text,
           );
@@ -69,7 +66,7 @@ class ChildExpansion extends HookConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     TextWidget(
-                      text: "$index. ${supplyItem?.supplyName ?? ''}",
+                      text: "${supplyItem?.name ?? ''}",
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),

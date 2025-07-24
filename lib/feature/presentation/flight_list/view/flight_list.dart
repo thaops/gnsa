@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -35,6 +36,7 @@ class FlightList extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+
     // Quản lý trạng thái với hooks
     final scrollController = useScrollController();
     final searchController = useTextEditingController();
@@ -43,7 +45,18 @@ class FlightList extends HookConsumerWidget {
     final currentSearch = useState('');
     final focusNode = useFocusNode();
 
-    // Lắng nghe cuộn để tải thêm dữ liệu
+    // Khởi tạo dữ liệu ban đầu
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(isMyFlightProvider.notifier).update((state) => isMyFlight);
+        ref.read(flightListNotifierProvider.notifier).refreshFlights();
+      });
+      return () {
+        print('Disposing FlightList');
+      };
+    }, [isMyFlight]);
+
+    // Lắng nghe sự kiện cuộn để tải thêm dữ liệu
     useEffect(() {
       void scrollListener() {
         if (scrollController.position.pixels >=
@@ -106,26 +119,25 @@ class FlightList extends HookConsumerWidget {
         title: isMyFlight ? 'Lịch bay của tôi' : 'Toàn bộ lịch bay',
         isBack: false,
         widgetRight: InkWell(
-          onTap: () => GoRouter.of(context).go(AppRouter.profile),
-          child:  Padding(
-            padding:  EdgeInsets.only(right: 16.w),
+          onTap: () => GoRouter.of(context).push(AppRouter.profile),
+          child: Padding(
+            padding: EdgeInsets.only(right: 16.w),
             child: CachedNetworkImage(
-                imageUrl:
-                    'https://sdmntprpolandcentral.oaiusercontent.com/files/00000000-b468-620a-ba2f-a6e41d3cfda8/raw?se=2025-06-17T10%3A58%3A42Z&sp=r&sv=2024-08-04&sr=b&scid=4b3062b3-f42e-506a-808e-08b26536fb8b&skoid=b0fd38cc-3d33-418f-920e-4798de4acdd1&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-17T06%3A07%3A06Z&ske=2025-06-18T06%3A07%3A06Z&sks=b&skv=2024-08-04&sig=iltlc4A/rdh9WKcZoqKf7gJfV1XgqdcsGKPbQX6oPvE%3D',
-                placeholder: (context, url) => const ContainerLoading(),
-                errorWidget: (context, url, error) => const Icon(Icons.error),
-                imageBuilder: (context, imageProvider) => Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      image: imageProvider,
-                      fit: BoxFit.cover,
-                    ),
+              imageUrl:
+                  'https://sdmntprpolandcentral.oaiusercontent.com/files/00000000-b468-620a-ba2f-a6e41d3cfda8/raw?se=2025-06-17T10%3A58%3A42Z&sp=r&sv=2024-08-04&sr=b&scid=4b3062b3-f42e-506a-808e-08b26536fb8b&skoid=b0fd38cc-3d33-418f-920e-4798de4acdd1&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-17T06%3A07%3A06Z&ske=2025-06-18T06%3A07%3A06Z&sks=b&skv=2024-08-04&sig=iltlc4A/rdh9WKcZoqKf7gJfV1XgqdcsGKPbQX6oPvE%3D',
+              placeholder: (context, url) => const ContainerLoading(),
+              errorWidget: (context, url, error) => const Icon(Icons.error),
+              imageBuilder: (context, imageProvider) => Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    image: imageProvider,
+                    fit: BoxFit.cover,
                   ),
                 ),
-              
+              ),
             ),
           ),
         ),
@@ -285,6 +297,6 @@ class FlightList extends HookConsumerWidget {
     await ref
         .read(flightListNotifierProvider.notifier)
         .loadMore(search: searchText);
-    isLoadingMore.value = false;
+    // isLoadingMore.value = false;
   }
 }
