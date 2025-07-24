@@ -1,18 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gnsa/common/Services/services.dart';
-import 'package:gnsa/common/repositoty/dio_api.dart';
+import 'package:gnsa/common/Services/services_base/api_service_ref.dart';
 import 'package:gnsa/feature/auth/data/datasources/login_remote_data_sources.dart';
 import 'package:gnsa/feature/auth/data/repositories/login_repository_impl.dart';
 import 'package:gnsa/feature/auth/domain/repositories/login_repository.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-// Dio API Provider
-final dioApiProvider = Provider<DioApi>((ref) => DioApi());
-
-// Services Provider
-final sharedPreferencesProvider = FutureProvider<SharedPreferences>((ref) async {
-  return await SharedPreferences.getInstance();
-});
 // Update the servicesProvider to handle loading state
 final servicesProvider = Provider<Services>((ref) {
   final sharedPreferences = ref.watch(sharedPreferencesProvider);

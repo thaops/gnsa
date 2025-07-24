@@ -1,25 +1,11 @@
-// import 'package:flutter/material.dart';
-// import 'package:gnsa/common/Services/services_base/base_status.dart';
-// import 'package:gnsa/common/utils/custom_flushbar.dart';
-// import 'package:riverpod_annotation/riverpod_annotation.dart';
+// Dio API Provider
+import 'package:gnsa/common/repositoty/dio_api.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-// class ApiServiceRef {
-//   final Ref ref;
-//   ApiServiceRef(this.ref);
+final dioApiProvider = Provider<DioApi>((ref) => DioApi());
 
-// Future<T> executeApiCall<T>(
-//     {
-//       required TaskEnum task,
-//       required Future<T> Function() apiCall,
-//       required Future<void> Function(T) onSuccess,
-//     }) async {
-//   try {
-//     final result = await apiCall();
-
-//     await onSuccess(result);
-//     return result;
-//   } catch (e, stackTrace) {
-//     throw ApiEx
-//   }
-// }
-// }
+// Services Provider
+final sharedPreferencesProvider = FutureProvider<SharedPreferences>((ref) async {
+  return await SharedPreferences.getInstance();
+});

@@ -1,20 +1,13 @@
-import 'package:gnsa/common/model/base_response_model.dart';
 
-class FlightsModel extends BaseResponseModel {
-  List<FlightData> data;
+class FlightsModel {
+  List<FlightData>? data;
 
   FlightsModel({
-    required super.statusCode,
-    required super.message,
-    required super.totalRecord,
-    required this.data,
-  }) : super();
+     this.data,
+  });
 
   factory FlightsModel.fromJson(Map<String, dynamic> json) {
     return FlightsModel(
-      statusCode: json['StatusCode'] ?? 0,
-      message: json['Message'] ?? '',
-      totalRecord: json['TotalRecord'] ?? 0,
       data: (json['Data'] as List<dynamic>?)
           ?.map((item) => FlightData.fromJson(item))
           .toList() ?? [],  // Kiểm tra null và tạo danh sách rỗng nếu null
@@ -23,19 +16,19 @@ class FlightsModel extends BaseResponseModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'StatusCode': statusCode,
-      'Message': message,
-      'TotalRecord': totalRecord,
-      'Data': data.map((flight) => flight.toJson()).toList(),
+      'Data': data?.map((flight) => flight.toJson()).toList(),
     };
   }
 
   static FlightsModel empty() {
     return FlightsModel(
-      statusCode: 0,
-      message: '',
-      totalRecord: 0,
       data: [],
+    );
+  }
+
+  FlightsModel copyWith({List<FlightData>? data}) {
+    return FlightsModel(
+      data: data ?? this.data,
     );
   }
 }

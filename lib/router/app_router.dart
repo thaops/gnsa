@@ -48,7 +48,7 @@ class AppRouter {
         GoRoute(
           name: flightList,
           path: flightList,
-          builder: (context, state) => const FlightList(isMyFlight: false),
+          builder: (context, state) => const FlightListScreen(isMyFlight: false),
         ),
         GoRoute(
           name: preview,

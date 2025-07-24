@@ -40,6 +40,7 @@ class DioApi {
     final deviceUdid = await DeviceUdid.createDeviceUdid();
     final accessToken = await services.getAccessToken();
     final deviceInfo = await deviceService.getDeviceInfo();
+    print('accessToken: $accessToken');
     return {
       'accept': '*/*',
       'Content-Type': 'application/json',

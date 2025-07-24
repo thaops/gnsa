@@ -11,17 +11,18 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  int _selectedIndex = 0;
+  late PageController _pageController;
+
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(initialPage: 0, keepPage: true);
   }
 
-  int _selectedIndex = 0;
-  late PageController _pageController = PageController();
-
   final List<Widget> _screens = [
-    const FlightList(isMyFlight: true),
-    const FlightList(isMyFlight: false),
+    const FlightListScreen(isMyFlight: true),
+    const FlightListScreen(isMyFlight: false),
   ];
 
   final List<SalomonBottomBarItem> selectedItem = [
@@ -64,27 +65,26 @@ class _MainScreenState extends State<MainScreen> {
       body: PageView(
         controller: _pageController,
         onPageChanged: _onPageChanged,
-        physics: BouncingScrollPhysics(),
+        physics: const BouncingScrollPhysics(),
         children: _screens,
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.only(
-          bottom: 16.0,
-        ),
+        padding: const EdgeInsets.only(bottom: 16.0),
         child: Container(
           margin: EdgeInsets.only(left: 24.w, right: 24.w),
           decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.rectangle,
-              borderRadius: BorderRadius.circular(30),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 2,
-                  blurRadius: 7,
-                  offset: Offset(0, 3),
-                ),
-              ]),
+            color: Colors.white,
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.circular(30),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 2,
+                blurRadius: 7,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
           child: SalomonBottomBar(
             currentIndex: _selectedIndex,
             onTap: _onTabTapped,

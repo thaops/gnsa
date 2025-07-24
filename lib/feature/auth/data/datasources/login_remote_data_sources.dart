@@ -16,7 +16,6 @@ class LoginRemoteDataSourcesImpl implements LoginRemoteDataSources {
       ApiEndpoints.login,
       data: loginRequestModel.toJson(),
     );
-    print("response.data: ${response.data}");
     return LoginResponseModel.fromJson(response.data);
   }
 }

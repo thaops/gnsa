@@ -15,46 +15,44 @@ class AsyncRequestHandler extends StateNotifier<AsyncValue<void>> {
     bool rethrowError = true,
     bool cancelPrevious = true,
   }) async {
-
     if (cancelPrevious && state.isLoading) {
       state = const AsyncValue.data(null);
     }
 
-
     state = const AsyncValue.loading();
-    
+
     try {
       final response = await apiCall();
-      if(!mounted) return response;
+      if (!mounted) return response;
       await onSuccess(response);
       state = const AsyncValue.data(null);
       return response;
     } catch (e, st) {
-      if(rethrowError){
+      if (rethrowError) {
         rethrow;
       }
       await onError?.call(e, st);
-      if(mounted){
+      if (mounted) {
         state = AsyncValue.error(e, st);
       }
 
       return Future.value() as T;
-     
     }
   }
+
   @override
   void dispose() {
     super.dispose();
   }
 }
 
-final asyncRequestHandlerProvider = 
-  StateNotifierProvider<AsyncRequestHandler, AsyncValue<void>>(
-    (ref) {
-      final handler = AsyncRequestHandler();
-      ref.onDispose(() {
-        handler.dispose();
-      });
-      return handler;
-    },
-  );
+final asyncRequestHandlerProvider =
+    StateNotifierProvider<AsyncRequestHandler, AsyncValue<void>>(
+  (ref) {
+    final handler = AsyncRequestHandler();
+    ref.onDispose(() {
+      handler.dispose();
+    });
+    return handler;
+  },
+);

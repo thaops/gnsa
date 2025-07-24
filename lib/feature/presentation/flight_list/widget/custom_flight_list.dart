@@ -4,7 +4,7 @@ import 'package:gnsa/common/img/img.dart';
 import 'package:gnsa/common/utils/date_utils.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
-import 'package:gnsa/feature/presentation/flight_list/model/flights_model.dart';
+import 'package:gnsa/feature/presentation/flight_list/data/model/flights_model.dart';
 
 class CustomFlightList extends StatelessWidget {
   const CustomFlightList({super.key, required this.onTap, required this.data});
@@ -47,7 +47,7 @@ class CustomFlightList extends StatelessWidget {
                   ),
                   Expanded(
                     child: FlightInfoColumn(
-                      flightNo: data.arrival!,
+                      flightNo: data.depart!,
                       flightDate: data.actualTimeArrival!,
                       crossAxisAlignment: CrossAxisAlignment.end,
                     ),

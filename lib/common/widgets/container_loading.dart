@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ContainerLoading extends StatelessWidget {
   final double? height;
-  const ContainerLoading({super.key , this.height = 104});
+  const ContainerLoading({super.key , this.height = 84});
 
   @override
   Widget build(BuildContext context) {
