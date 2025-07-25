@@ -7,14 +7,14 @@ part of 'flight_detail_provider.dart';
 // **************************************************************************
 
 @ProviderFor(FlightDetailProvider)
-const flightDetailProviderProvider = FlightDetailProviderProvider._();
+const flightDetailProviderProvider = FlightDetailProviderFamily._();
 
 final class FlightDetailProviderProvider
     extends $AsyncNotifierProvider<FlightDetailProvider, SupplyFormModel> {
-  const FlightDetailProviderProvider._()
+  const FlightDetailProviderProvider._(
+      {required FlightDetailProviderFamily super.from,
+      required String super.argument})
       : super(
-          from: null,
-          argument: null,
           retry: null,
           name: r'flightDetailProviderProvider',
           isAutoDispose: true,
@@ -25,6 +25,13 @@ final class FlightDetailProviderProvider
   @override
   String debugGetCreateSourceHash() => _$flightDetailProviderHash();
 
+  @override
+  String toString() {
+    return r'flightDetailProviderProvider'
+        ''
+        '($argument)';
+  }
+
   @$internal
   @override
   FlightDetailProvider create() => FlightDetailProvider();
@@ -34,17 +41,56 @@ final class FlightDetailProviderProvider
   $AsyncNotifierProviderElement<FlightDetailProvider, SupplyFormModel>
       $createElement($ProviderPointer pointer) =>
           $AsyncNotifierProviderElement(pointer);
+
+  @override
+  bool operator ==(Object other) {
+    return other is FlightDetailProviderProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
 }
 
 String _$flightDetailProviderHash() =>
-    r'287b29c2b7b73c59c1d221b21aa0348c91eb3208';
+    r'bfac4a0115c4c07b01f64acbb27235ad41fe98a5';
+
+final class FlightDetailProviderFamily extends $Family
+    with
+        $ClassFamilyOverride<FlightDetailProvider, AsyncValue<SupplyFormModel>,
+            SupplyFormModel, FutureOr<SupplyFormModel>, String> {
+  const FlightDetailProviderFamily._()
+      : super(
+          retry: null,
+          name: r'flightDetailProviderProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  FlightDetailProviderProvider call(
+    String id,
+  ) =>
+      FlightDetailProviderProvider._(argument: id, from: this);
+
+  @override
+  String toString() => r'flightDetailProviderProvider';
+}
 
 abstract class _$FlightDetailProvider extends $AsyncNotifier<SupplyFormModel> {
-  FutureOr<SupplyFormModel> build();
+  late final _$args = ref.$arg as String;
+  String get id => _$args;
+
+  FutureOr<SupplyFormModel> build(
+    String id,
+  );
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
+    final created = build(
+      _$args,
+    );
     final ref = this.ref as $Ref<AsyncValue<SupplyFormModel>>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<AsyncValue<SupplyFormModel>>,

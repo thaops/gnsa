@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gnsa/common/method_channel/printer_plugin.dart' show UrovoPrinter;
 import 'package:gnsa/common/utils/custom_flushbar.dart';
-import 'package:gnsa/feature/presentation/flight_detail/model/flight_detail_model.dart';
-import 'package:gnsa/feature/presentation/flight_detail/model/supplyform_model.dart';
+import 'package:gnsa/feature/presentation/flight_detail/data/model/flight_detail_model.dart';
+import 'package:gnsa/feature/presentation/flight_detail/data/model/supplyform_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'flight_printer_provider.g.dart';

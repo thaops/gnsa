@@ -3,11 +3,16 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gnsa/common/design_system/tokens/app_sizes.dart';
 import 'package:shimmer/shimmer.dart';
 
-class LoadingShimmer extends StatelessWidget {
-  final int itemCount;
-  final Widget child;
+enum LoadingShimmerType {
+  list,
+  widget,
+}
 
-  const LoadingShimmer({super.key, required this.child, this.itemCount = 10});
+class LoadingShimmer extends StatelessWidget {
+  final Widget child;
+  final LoadingShimmerType type;
+
+  const LoadingShimmer({super.key, required this.child, this.type = LoadingShimmerType.widget});
 
   @override
   Widget build(BuildContext context) {
@@ -16,8 +21,8 @@ class LoadingShimmer extends StatelessWidget {
       highlightColor: Colors.white,
       child: child,
     );
-    return itemCount > 1 ? ListView.builder(
-      itemCount: itemCount,
+    return type == LoadingShimmerType.list ? ListView.builder(
+      itemCount: 10,
       itemBuilder: (context, index) {
         return Padding(
           padding: EdgeInsets.symmetric(vertical: AppSizes.paddingMedium.h),

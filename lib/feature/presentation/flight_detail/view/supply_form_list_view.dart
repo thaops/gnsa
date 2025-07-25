@@ -2,53 +2,58 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gnsa/common/design_system/tokens/app_sizes.dart';
-import 'package:gnsa/common/widgets/state_err.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
-import 'package:gnsa/feature/presentation/flight_detail/model/supplyform_model.dart';
-import 'package:gnsa/feature/presentation/flight_detail/provider/filght_bool_provider.dart';
-import 'package:gnsa/feature/presentation/flight_detail/provider/flight_detail_provider.dart';
-import 'package:gnsa/feature/presentation/flight_detail/widget/custom_ExpansionTile.dart';
+import 'package:gnsa/feature/presentation/flight_detail/data/model/supplyform_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/view/popup_information_sign.dart';
+import 'package:gnsa/feature/presentation/flight_detail/widget/custom_ExpansionTile.dart';
 import 'package:gnsa/router/app_router.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class SupplyFormListView extends StatelessWidget {
+class SupplyFormListView extends StatefulWidget {
   final List<SupplyFormDetail>? supplyForms;
-  final bool isExpanded;
+  final bool isAdditional;
+  // final bool isExpanded;
   final WidgetRef ref;
   final String? kValueSign;
 
   const SupplyFormListView({
     required this.supplyForms,
-    required this.isExpanded,
+    required this.isAdditional,
+    // required this.isExpanded,
     required this.ref,
     this.kValueSign,
     super.key,
   });
 
   @override
-  Widget build(BuildContext context) {
-    final flightDetailAsync = ref.watch(flightDetailProviderProvider);
+  State<SupplyFormListView> createState() => _SupplyFormListViewState();
+}
 
-    return flightDetailAsync.when(
-      error: (error, _) => StateErr(error: error.toString()),
-      loading: () => const Center(
-        child: CircularProgressIndicator(),
-      ),
-      data: (data) => ListView.builder(
+
+
+class _SupplyFormListViewState extends State<SupplyFormListView> with AutomaticKeepAliveClientMixin {
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    if(widget.supplyForms?.isEmpty == true) return Center(child: Text(widget.isAdditional ? 'Không có phiếu bổ sung' : 'Không có phiếu cung ứng'));
+    return ListView.builder(
       shrinkWrap: true,
       physics: const BouncingScrollPhysics(),
-      itemCount: supplyForms?.length ?? 0,
+      itemCount: widget.supplyForms?.length ?? 0,
       itemBuilder: (context, index) => _buildSupplyItem(
         context,
-        supplyForms![index],
-        isExpanded,
-        ref,
-        kValueSign,
+        widget.supplyForms![index],
+        // isExpanded,
+        widget.ref,
+        widget.isAdditional,
+        widget.kValueSign,
       ),
-    ),
     );
   }
 }
@@ -56,8 +61,9 @@ class SupplyFormListView extends StatelessWidget {
 Widget _buildSupplyItem(
     BuildContext context,
     SupplyFormDetail supplyForm,
-    bool isExpanded,
+    // bool isExpanded,
     WidgetRef ref,
+    bool isAdditional,
     String? kValueSign,
   ) =>
       Padding(
@@ -67,7 +73,7 @@ Widget _buildSupplyItem(
             CupertinoContextMenuAction(
               onPressed: () => context.push(
                 AppRouter.flightSignature,
-                extra: [supplyForm.className],
+                extra: [supplyForm.supplyFormDetailId],
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -89,18 +95,18 @@ Widget _buildSupplyItem(
             color: AppColors.backgroundTab,
             child: CustomExpansionTile(
               backgroundColor: AppColors.backgroundTab,
-              title: '${supplyForm.supplyType} - ${supplyForm.className}',
+              title: '${supplyForm.supplyType} - ${supplyForm.supplyName}',
               subtitle: 'Mã code: ${supplyForm.supplyCode}',
               leadingIcon: Icons.airplane_ticket,
               trailingCount: '${supplyForm.supplyType}',
+              isAdditional: isAdditional,
               isConfirmed: supplyForm.supplyType != kValueSign,
-              isExpanded: isExpanded,
-              onTap: () => ref.read(isChildExpandedProviderProvider.notifier).toggle(),
-              supplyForm: supplyForm,
+              supplyFormDetailId: supplyForm.supplyFormDetailId,
+              detailItems: supplyForm.detailItems,
               onConfirm: () => showDialog(
                 context: context,
                 builder: (context) => PopupInformationSign(
-                  supplyfromId: supplyForm.className,
+                  supplyfromId: supplyForm.supplyFormDetailId,
                 ),
               ),
             ),

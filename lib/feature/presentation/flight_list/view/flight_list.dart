@@ -104,6 +104,7 @@ class _KeepAliveFlightListContentState extends State<KeepAliveFlightListContent>
                           .watch(flightListNotifierProvider(widget.isMyFlight));
                       return flightsAsync.when(
                         loading: () => LoadingShimmer(
+                          type: LoadingShimmerType.list,
                           child: ContainerLoading(height: _loadingItemHeight.h),
                         ),
                         error: (error, stack) =>

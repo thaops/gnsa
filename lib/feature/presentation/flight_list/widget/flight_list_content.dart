@@ -61,7 +61,6 @@ class FlightListContent extends HookConsumerWidget {
         itemBuilder: (context, index) {
           if (index == flights.data!.length) {
             return LoadingShimmer(
-              itemCount: 1,
               child: ContainerLoading());
           }
           final flightData = flights.data![index];

@@ -54,7 +54,7 @@ final class FlightListNotifierProvider
 }
 
 String _$flightListNotifierHash() =>
-    r'b0fe354a37d3ebf11b62f1177153d8552099355c';
+    r'c3c4b389fe1d627dd719539c620c1809b40cdd9a';
 
 final class FlightListNotifierFamily extends $Family
     with

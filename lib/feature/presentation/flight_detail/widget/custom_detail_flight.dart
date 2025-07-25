@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gnsa/common/design_system/tokens/app_sizes.dart';
 import 'package:gnsa/common/utils/date_utils.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gnsa/feature/presentation/flight_detail/model/flight_detail_model.dart';
-import 'package:gnsa/feature/presentation/flight_detail/model/supplyform_model.dart';
+import 'package:gnsa/feature/presentation/flight_detail/data/model/supplyform_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/widget/text_star.dart';
 
 class CustomDetailFlight extends StatelessWidget {
@@ -60,8 +59,8 @@ class CustomDetailFlight extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TextRowTitleValue(title: "Pk:", value: "3"),
-                  TextRowTitleValue(title: "A/C :", value: "VN320"),
+                  TextRowTitleValue(title: "Pk:", value: "${supplyFormModel.flightInfo?.typeApl}"),
+                  TextRowTitleValue(title: "A/C :", value: "${supplyFormModel.flightInfo?.groupNo}"),
                 ],
               ),
             ],

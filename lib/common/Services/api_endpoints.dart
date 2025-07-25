@@ -17,6 +17,9 @@ class ApiEndpoints {
   static const String updateSupplyFormNote =
       "${Config.baseUrl}/supplyform/mobile/update-note";
 
+//supplyfromdetail
   static String supplyFormAllDetail({String? id}) =>
       "${Config.baseUrl}/supplyform/get-supply-form-detail-by-flight-id-mobile?flightId=$id";
+  static String updateSupplyfromItemDetail =
+      "${Config.baseUrl}/supplyform/update-item-in-supply-form-mobile";
 }

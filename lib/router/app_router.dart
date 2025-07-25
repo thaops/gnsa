@@ -1,6 +1,6 @@
 import 'package:gnsa/feature/auth/view/login.dart';
-import 'package:gnsa/feature/presentation/flight_detail/model/flight_detail_model.dart';
-import 'package:gnsa/feature/presentation/flight_detail/model/supplyform_model.dart';
+import 'package:gnsa/feature/presentation/flight_detail/data/model/flight_detail_model.dart';
+import 'package:gnsa/feature/presentation/flight_detail/data/model/supplyform_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/view/flight_detail.dart';
 import 'package:gnsa/feature/presentation/flight_detail/view/preview_view.dart';
 import 'package:gnsa/feature/presentation/flight_detail/view/qrcode_view.dart';
@@ -11,7 +11,6 @@ import 'package:gnsa/feature/presentation/flight_printer/view/flight_printer.dar
 import 'package:gnsa/feature/profile/profile_view.dart';
 import 'package:gnsa/router/bottom_navigation_main.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gnsa/feature/presentation/test_map.dart';
 
 class AppRouter {
   static const login = '/login';
@@ -24,17 +23,12 @@ class AppRouter {
   static const preview = '/preview';
   static const qrcode = '/qrcode';
   static const profile = '/profile';
-  static const testMap = '/test-map';
 
   static GoRouter getRouter(String accessToken) {
     return GoRouter(
       initialLocation: accessToken.isNotEmpty ? main : login,
       routes: [
-        GoRoute(
-          name: testMap,
-          path: testMap,
-          builder: (context, state) => const TestMap(),
-        ),
+
         GoRoute(
           name: login,
           path: login,

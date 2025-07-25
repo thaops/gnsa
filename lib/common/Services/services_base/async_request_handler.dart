@@ -8,35 +8,28 @@ typedef OnError = FutureOr<void> Function(Object error, StackTrace stackTrace);
 class AsyncRequestHandler extends StateNotifier<AsyncValue<void>> {
   AsyncRequestHandler() : super(const AsyncValue.data(null));
 
-  Future<T> execute<T>({
+  Future<T?> execute<T>({
+     AsyncValue<T>? state,
     required ApiCall<T> apiCall,
-    required OnSuccess<T> onSuccess,
+    OnSuccess<T>? onSuccess,
     OnError? onError,
     bool rethrowError = true,
     bool cancelPrevious = true,
   }) async {
-    if (cancelPrevious && state.isLoading) {
-      state = const AsyncValue.data(null);
-    }
 
     state = const AsyncValue.loading();
 
     try {
       final response = await apiCall();
       if (!mounted) return response;
-      await onSuccess(response);
-      state = const AsyncValue.data(null);
+      await onSuccess?.call(response);
       return response;
     } catch (e, st) {
-      if (rethrowError) {
-        rethrow;
-      }
       await onError?.call(e, st);
       if (mounted) {
         state = AsyncValue.error(e, st);
       }
-
-      return Future.value() as T;
+      return null;
     }
   }
 

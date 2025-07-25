@@ -41,14 +41,12 @@ class LoginController extends _$LoginController {
     }
 
     await handler.execute(
+      state: state,
       apiCall: () async {
         return await _performLogin(currentState);
       },
       onSuccess: (response) async {
-        return await _handleLoginSuccess(response, context);
-      },
-      onError: (error, stackTrace) {
-        return _handleLoginError(error, context);
+        await _handleLoginSuccess(response as LoginResponseModel, context);
       },
     );
   }
@@ -76,11 +74,6 @@ class LoginController extends _$LoginController {
     }
   }
 
-  void _handleLoginError(dynamic error, BuildContext context) {
-    if (context.mounted) {
-      CustomFlushbar.showError(context, message: error.toString());
-    }
-  }
 
   Future<bool> _validateForm() async {
     final currentState = state.value;
