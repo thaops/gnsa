@@ -17,9 +17,19 @@ class ApiEndpoints {
   static const String updateSupplyFormNote =
       "${Config.baseUrl}/supplyform/mobile/update-note";
 
+
+
+//new
 //supplyfromdetail
   static String supplyFormAllDetail({String? id}) =>
       "${Config.baseUrl}/supplyform/get-supply-form-detail-by-flight-id-mobile?flightId=$id";
   static String updateSupplyfromItemDetail =
       "${Config.baseUrl}/supplyform/update-item-in-supply-form-mobile";
+  static String getSupplyfromItemDetail =
+      "${Config.baseUrl}/supplyform/get-item-in-supply-form-mobile";
+
+  static String getFlightPreview(String flightId) => "${Config.baseUrl}/supplyform/preview-supply-form-in-mobile?flightId=$flightId";
+  //signed
+  static String getListSignedSupplyForm(String supplyFormDetailId) => "${Config.baseUrl}/supplyform/get-list-signed-supply-form-mobile?supplyFormDetailId=$supplyFormDetailId";
+  static String signedSupplyForm = "${Config.baseUrl}/supplyform/signed-supply-form-mobile";
 }

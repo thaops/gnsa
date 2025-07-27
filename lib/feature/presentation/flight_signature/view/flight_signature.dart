@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gnsa/common/widgets/app_bar_widget.dart';
 import 'package:gnsa/common/widgets/container_loading.dart';
 import 'package:gnsa/common/widgets/loading_shimmer.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/feature/presentation/flight_signature/provider/flight_signature_provider.dart';
-import 'package:gnsa/feature/presentation/flight_signature/model/sign_supplyfrom.dart';
+import 'package:gnsa/feature/presentation/flight_signature/data/model/flight_signature_model.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gnsa/feature/presentation/flight_signature/widget/signature_section.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -21,15 +20,15 @@ class FlightSignature extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final flightSignatureAsync = ref.watch(flightSignatureControllerProvider);
+    final flightSignatureAsync = ref.watch(flightSignatureControllerProvider(supplyfromId.first));
     final flightSignState =
-        ref.read(flightSignatureControllerProvider.notifier);
+        ref.read(flightSignatureControllerProvider(supplyfromId.first).notifier);
 
-    useEffect(() {
-      Future.microtask(
-          () => flightSignState.getSingSupplyfrom(supplyfromId.first));
-      return null;
-    }, [supplyfromId]);
+    // useEffect(() {
+    //   Future.microtask(
+    //       () => flightSignState.getSingSupplyfrom(supplyfromId.first));
+    //   return null;
+    // }, [supplyfromId]);
 
     return Scaffold(
       appBar: const AppBarWidget(title: 'Xác nhận'),
@@ -38,12 +37,12 @@ class FlightSignature extends HookConsumerWidget {
         child: flightSignatureAsync.when(
           data: (data) => SignatureContent(
             supplyfromId: supplyfromId,
-            flightSignature: data,
+            signDetail: data.details!,
             onRefresh: () => flightSignState.getSingSupplyfrom(supplyfromId.first),
           ),
           error: (err, _) =>SignatureContent(
             supplyfromId: supplyfromId,
-            flightSignature: SignSupplyfrom(),
+            signDetail: [],
             onRefresh: () => flightSignState.getSingSupplyfrom(supplyfromId.first),
           ),
           loading: () => _buildLoading(context),
@@ -92,40 +91,31 @@ class FlightSignature extends HookConsumerWidget {
 
 class SignatureContent extends StatelessWidget {
   final List<String> supplyfromId;
-  final SignSupplyfrom flightSignature;
+  final List<SignDetail> signDetail;
   final VoidCallback onRefresh;
 
   const SignatureContent({
     super.key,
     required this.supplyfromId,
-    required this.flightSignature,
+    required this.signDetail,
     required this.onRefresh,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: _kPadding,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SignatureSection(
-            title: 'TIẾP VIÊN XÁC NHẬN',
-            imageUrl: flightSignature.supplierSign ?? '',
-            isSupplierSign: true,
-            supplyfromId: supplyfromId,
-            onRefresh: onRefresh,
-          ),
-          SizedBox(height: _kSpacing.h),
-          SignatureSection(
-            title: 'NHÂN VIÊN XÁC NHẬN',
-            imageUrl: flightSignature.receiveSign ?? '',
-            isSupplierSign: false,
-            supplyfromId: supplyfromId,
-            onRefresh: onRefresh,
-          ),
-        ],
-      ),
+    return ListView.builder(
+      padding: EdgeInsets.symmetric(horizontal: 16.r),
+      itemCount: signDetail.length,
+      itemBuilder: (context, index) {
+        final detail = signDetail[index];
+        return SignatureSection(
+          title: detail.isCrew == true ? 'TIẾP VIÊN XÁC NHẬN' : 'NHÂN VIÊN XÁC NHẬN',
+          imageUrl: detail.imageUrl ?? '',
+          isSupplierSign: detail.isCrew ?? false,
+          supplyfromId: supplyfromId,
+          onRefresh: onRefresh,
+        );
+      },
     );
   }
 }

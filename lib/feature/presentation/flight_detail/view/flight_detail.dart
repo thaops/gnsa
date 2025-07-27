@@ -5,14 +5,15 @@ import 'package:gnsa/common/design_system/tokens/app_sizes.dart';
 import 'package:gnsa/common/utils/responsive_helper.dart';
 import 'package:gnsa/common/widgets/app_bar_widget.dart';
 import 'package:gnsa/common/widgets/custom_button.dart';
+import 'package:gnsa/common/widgets/loading_shimmer.dart';
 import 'package:gnsa/common/widgets/state_err.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/supplyform_model.dart';
-import 'package:gnsa/feature/presentation/flight_detail/provider/filght_bool_provider.dart';
 import 'package:gnsa/feature/presentation/flight_detail/provider/flight_detail_provider.dart';
 import 'package:gnsa/feature/presentation/flight_detail/view/supply_form_list_view.dart';
 import 'package:gnsa/feature/presentation/flight_detail/widget/custom_detail_flight.dart';
+import 'package:gnsa/feature/presentation/flight_detail/widget/custom_loading_case.dart';
 import 'package:gnsa/feature/presentation/flight_printer/view/flight_printer.dart';
 import 'package:gnsa/router/app_router.dart';
 import 'package:go_router/go_router.dart';
@@ -31,10 +32,6 @@ class FlightDetailScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
-    useEffect(() {
-     print("id: $id");
-    }, [id]);
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -122,7 +119,7 @@ class FlightDetailScreen extends HookConsumerWidget {
             context.push(AppRouter.qrcode);
             break;
           case 'preview':
-            context.push(AppRouter.preview);
+            context.push(AppRouter.preview, extra: id);
             break;
         }
       },
@@ -141,12 +138,14 @@ class FlightDetailScreen extends HookConsumerWidget {
         }
         return KeepAliveFlightDetailContent(
           data: data,
-          horizontalPadding: horizontalPadding,
+          horizontalPadding: AppSizes.paddingMedium,
           ref: ref,
           id: id,
         );
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => LoadingShimmer(
+        child: CustomLoadingCase(),
+      ),
       error: (error, stack) => StateErr(error: error.toString()),
     );
   }

@@ -98,6 +98,7 @@ Widget _buildSupplyItem(
               title: '${supplyForm.supplyType} - ${supplyForm.supplyName}',
               subtitle: 'Mã code: ${supplyForm.supplyCode}',
               leadingIcon: Icons.airplane_ticket,
+              supplyType: supplyForm.supplyType,
               trailingCount: '${supplyForm.supplyType}',
               isAdditional: isAdditional,
               isConfirmed: supplyForm.supplyType != kValueSign,

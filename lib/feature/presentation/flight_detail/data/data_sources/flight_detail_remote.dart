@@ -1,11 +1,14 @@
 import 'package:gnsa/common/Services/api_endpoints.dart';
 import 'package:gnsa/common/repositoty/dio_api.dart';
+import 'package:gnsa/feature/presentation/flight_detail/data/model/flight_preview_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/supplyform_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/update_supplyfrom_item_req.dart';
 
 abstract class FlightDetailRemote {
   Future<SupplyFormModel> getFlightDetail(String id);
   Future<String> updateSupplyfromItemDetail(UpdateSupplyfromItemReq req);
+
+  Future<FlightPreviewModel> getFlightPreview(String id);
 }
 
 class FlightDetailRemoteImpl implements FlightDetailRemote {
@@ -19,12 +22,16 @@ class FlightDetailRemoteImpl implements FlightDetailRemote {
 
   @override
   Future<String> updateSupplyfromItemDetail(UpdateSupplyfromItemReq req) async {
-    print("req: ${req.toJson()}");
     final response = await _dioApi.patch(
       ApiEndpoints.updateSupplyfromItemDetail,
       data: req.toJson(),
     );
-    print("response.dataupdate: ${response.data}");
     return response.data['Data'] as String;
+  }
+
+  @override
+  Future<FlightPreviewModel> getFlightPreview(String flightId) async {
+    final response = await _dioApi.get(ApiEndpoints.getFlightPreview(flightId));
+    return FlightPreviewModel.fromJson(response.data['Data'] as Map<String, dynamic>);
   }
 }

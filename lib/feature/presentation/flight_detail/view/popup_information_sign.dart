@@ -8,7 +8,7 @@ import 'package:gnsa/common/widgets/state_err.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:gnsa/feature/presentation/flight_printer/widget/appbar_dialog.dart';
-import 'package:gnsa/feature/presentation/flight_signature/model/sign_supplyfrom.dart';
+import 'package:gnsa/feature/presentation/flight_signature/data/model/flight_signature_model.dart';
 import 'package:gnsa/feature/presentation/flight_signature/provider/flight_signature_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -21,12 +21,7 @@ class PopupInformationSign extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final flightSignState = ref.read(flightSignatureControllerProvider.notifier);
-    final flightSignAsync = ref.watch(flightSignatureControllerProvider);
-    useEffect(() {
-      Future.microtask(() => flightSignState.getSingSupplyfrom(supplyfromId));
-      return null;
-    }, [supplyfromId]);
+    final flightSignAsync = ref.watch(flightSignatureControllerProvider(supplyfromId));
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: Padding(
@@ -39,7 +34,20 @@ class PopupInformationSign extends HookConsumerWidget {
             ),
             const SizedBox(height: 16),
             flightSignAsync.when(
-                data: (data) => _buildPopup(data),
+                data: (data) => Expanded(
+                  child: ListView.builder(
+                    itemCount: data.details?.length ?? 0,
+                    itemBuilder: (context, index) {
+                      final detail = data.details?[index];
+                      return _buildSignName(
+                        img: detail?.imageUrl,
+                        name: detail?.signedInfo,
+                        date: detail?.createdDate,
+                        isSupplier: detail?.isCrew ?? false,
+                      );
+                    },
+                  ),
+                ),
                 error: (err, stackTrace) => StateErr(error: err.toString()),
                 loading: () => _buildLoading())
           ],
@@ -63,23 +71,23 @@ class PopupInformationSign extends HookConsumerWidget {
     ));
   }
 
-  Column _buildPopup(SignSupplyfrom data) {
-    return Column(
-      children: [
-        _buildSignName(
-            img: data.supplierSign.toString(),
-            name: data.supplierName,
-            isSupplier: true,
-            date: DateUtilsCustom.formatStringDate(data.supplierSignDate)),
-        SizedBox(height: 16.h),
-        _buildSignName(
-            img: data.receiveSign.toString(),
-            name: data.receiveName,
-            isSupplier: false,
-            date: DateUtilsCustom.formatStringDate(data.receiverSignDate)),
-      ],
-    );
-  }
+  // Column _buildPopup(SignSupplyfrom data) {
+  //   return Column(
+  //     children: [
+  //       _buildSignName(
+  //           img: data.supplierSign.toString(),
+  //           name: data.supplierName,
+  //           isSupplier: true,
+  //           date: DateUtilsCustom.formatStringDate(data.supplierSignDate)),
+  //       SizedBox(height: 16.h),
+  //       _buildSignName(
+  //           img: data.receiveSign.toString(),
+  //           name: data.receiveName,
+  //           isSupplier: false,
+  //           date: DateUtilsCustom.formatStringDate(data.receiverSignDate)),
+  //     ],
+  //   );
+  // }
 
   Container _buildSignName(
       {String? img, String? name, String? date, bool isSupplier = true}) {

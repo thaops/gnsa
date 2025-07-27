@@ -1,5 +1,4 @@
 import 'package:flutter/services.dart';
-import 'package:gnsa/feature/presentation/flight_detail/data/model/flight_detail_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/supplyform_model.dart';
 
 class UrovoPrinter {

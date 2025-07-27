@@ -1,31 +1,32 @@
 import 'dart:async';
 
-import 'package:gnsa/common/Services/api_endpoints.dart';
-import 'package:gnsa/common/repositoty/dio_api.dart';
-import 'package:gnsa/feature/presentation/flight_signature/model/sign_supplyfrom.dart';
+import 'package:gnsa/common/Services/services_base/async_request_handler.dart';
+import 'package:gnsa/feature/presentation/flight_signature/data/model/flight_signature_model.dart';
+import 'package:gnsa/feature/presentation/flight_signature/provider/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'flight_signature_provider.g.dart';
 
 @riverpod
 class FlightSignatureController extends _$FlightSignatureController {
-
   @override
-  Future<SignSupplyfrom> build() async {
-    return SignSupplyfrom();
+  Future<SignSupplyfrom> build(String supplyfromId) async {
+    return getSingSupplyfrom(supplyfromId);
   }
 
- Future<void> getSingSupplyfrom(String supplyfromId) async {
-    try {
-      state = const AsyncValue.loading();
-      final dioApi = ref.read(dioApiProvider);
-      final response = await dioApi.get(
-        ApiEndpoints.getSignedSupplyForm(supplyFormId: supplyfromId)
-      );
-      final data = SignSupplyfrom.fromJson(response.data['Data']);
-      state = AsyncValue.data(data);
-    } catch (e, stackTrace) {
-      state = AsyncValue.error(e, stackTrace);
-    }
+  Future<SignSupplyfrom> getSingSupplyfrom(String supplyfromId) async {
+    final handleAsync = ref.read(asyncRequestHandlerProvider.notifier);
+    await handleAsync.execute<SignSupplyfrom>(
+      apiCall: () => ref
+          .read(flightSignatureUserCaseProvider)
+          .getSignSupplyfrom(supplyfromId),
+      onSuccess: (data) {
+        state = AsyncValue.data(data);
+      },
+      onError: (error, stackTrace) {
+        state = AsyncValue.error(error, stackTrace);
+      },
+    );
+    return state.value as SignSupplyfrom;
   }
 }

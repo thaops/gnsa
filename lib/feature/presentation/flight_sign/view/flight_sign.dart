@@ -86,7 +86,6 @@ class FlightSign extends HookConsumerWidget {
               ],
             ),
           ),
-
           Expanded(
             flex: 1,
             child: GestureDetector(
@@ -119,10 +118,10 @@ class FlightSign extends HookConsumerWidget {
               await controller.saveSignature(
                 context: context,
                 supplyFormIds: supplyFormIds,
-                isSupplierSign: isSupplierSign, 
+                isSupplierSign: isSupplierSign,
               );
               if (state.hasValue && !state.hasError) {
-                Navigator.pop(context,true); 
+                Navigator.pop(context, true);
               }
             },
       text: 'Lưu',

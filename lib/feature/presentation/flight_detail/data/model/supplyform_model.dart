@@ -46,22 +46,22 @@ class SupplyFormModel extends Equatable {
 }
 
 class FlightInfo extends Equatable {
-  final String flightNo;
-  final String acfNo;
-  final String routing;
+  final String? flightNo;
+  final String? acfNo;
+  final String? routing;
   final DateTime? departureDate;
   final DateTime? arrivalDate;
-  final String typeApl;
-  final String groupNo;
+  final String? typeApl;
+  final String? groupNo;
 
   const FlightInfo({
-    required this.flightNo,
-    required this.acfNo,
-    required this.routing,
+    this.flightNo,
+    this.acfNo,
+    this.routing,
     this.departureDate,
     this.arrivalDate,
-    required this.typeApl,
-    required this.groupNo,
+    this.typeApl,
+    this.groupNo,
   });
 
   factory FlightInfo.fromJson(Map<String, dynamic> json) {

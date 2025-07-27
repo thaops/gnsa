@@ -3,6 +3,7 @@ class UpdateSupplyfromItemReq {
   final String supplyFormDetailItemId;
   final String itemId;
   final int? supplement;
+  final String type;
   final String? note;
 
   UpdateSupplyfromItemReq({
@@ -10,6 +11,7 @@ class UpdateSupplyfromItemReq {
     required this.supplyFormDetailItemId,
     required this.itemId,
     this.supplement,
+    required this.type,
     this.note,
   });
 
@@ -19,6 +21,7 @@ class UpdateSupplyfromItemReq {
       'SupplyFormDetailItemId': supplyFormDetailItemId,
       'ItemId': itemId,
       'Supplement': supplement,
+      'Type': type,
       'Note': note,
     };
   }

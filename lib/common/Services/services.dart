@@ -1,3 +1,4 @@
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Services {
@@ -22,3 +23,7 @@ class Services {
     await _prefs.remove('accessToken'); // Xóa accessToken
   }
 }
+final accessTokenProvider = FutureProvider<String>((ref) async {
+  final services = await Services.create();
+  return services.getAccessToken();
+});

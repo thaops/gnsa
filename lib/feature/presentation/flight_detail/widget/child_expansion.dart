@@ -11,11 +11,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ChildExpansion extends HookConsumerWidget {
   final SupplyItem? supplyItem;
+  final String supplyType;
   final String supplyFormDetailId;
   final String detailItemId;
   final bool isAdditional;
 
-  const ChildExpansion({Key? key, this.supplyItem, required this.supplyFormDetailId, required this.detailItemId, required this.isAdditional})
+  const ChildExpansion({Key? key, this.supplyItem, required this.supplyType, required this.supplyFormDetailId, required this.detailItemId, required this.isAdditional})
       : super(key: key);
 
   @override
@@ -39,6 +40,7 @@ class ChildExpansion extends HookConsumerWidget {
               supplyFormDetailId: supplyFormDetailId,
               supplyFormDetailItemId: detailItemId,
               itemId: supplyItem!.id,
+              type: supplyType,
               supplement: confirmedQuantity.value,
               note: noteController.text,
           ));

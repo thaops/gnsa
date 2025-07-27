@@ -1,13 +1,12 @@
 import 'package:gnsa/feature/auth/view/login.dart';
-import 'package:gnsa/feature/presentation/flight_detail/data/model/flight_detail_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/supplyform_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/view/flight_detail.dart';
 import 'package:gnsa/feature/presentation/flight_detail/view/preview_view.dart';
 import 'package:gnsa/feature/presentation/flight_detail/view/qrcode_view.dart';
 import 'package:gnsa/feature/presentation/flight_list/view/flight_list.dart';
-import 'package:gnsa/feature/presentation/flight_signature/view/flight_signature.dart';
-import 'package:gnsa/feature/presentation/flight_sign/view/flight_sign.dart';
 import 'package:gnsa/feature/presentation/flight_printer/view/flight_printer.dart';
+import 'package:gnsa/feature/presentation/flight_sign/view/flight_sign.dart';
+import 'package:gnsa/feature/presentation/flight_signature/view/flight_signature.dart';
 import 'package:gnsa/feature/profile/profile_view.dart';
 import 'package:gnsa/router/bottom_navigation_main.dart';
 import 'package:go_router/go_router.dart';
@@ -47,7 +46,7 @@ class AppRouter {
         GoRoute(
           name: preview,
           path: preview,
-          builder: (context, state) => const PreviewView(),
+          builder: (context, state) => PreviewView(id: state.extra as String),
         ),
         GoRoute(
           name: qrcode,

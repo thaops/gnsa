@@ -12,6 +12,7 @@ class CustomExpansionTile extends HookConsumerWidget {
   final Color? backgroundColor;
   final String title;
   final String subtitle;
+  final String supplyType;
   final IconData leadingIcon;
   final bool isAdditional;
   final String trailingCount;
@@ -27,6 +28,7 @@ class CustomExpansionTile extends HookConsumerWidget {
     this.backgroundColor,
     required this.title,
     required this.subtitle,
+    required this.supplyType,
     required this.leadingIcon,
     required this.isAdditional,
     required this.trailingCount,
@@ -119,6 +121,7 @@ class CustomExpansionTile extends HookConsumerWidget {
                         final supplyItem = entry.value;
                         return ChildExpansion(
                           supplyItem: supplyItem,
+                          supplyType: supplyType,
                           detailItemId: detailItems![outerIndex].items[groupIndex].itemId,
                           supplyFormDetailId: supplyFormDetailId,
                           isAdditional: isAdditional,

@@ -1,9 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gnsa/common/img/img.dart';
 import 'package:gnsa/common/widgets/custom_button.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
-import 'package:gnsa/common/img/img.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CustomSignature extends StatelessWidget {
   final String title;
@@ -59,8 +60,7 @@ class CustomSignature extends StatelessWidget {
                           textAlign: TextAlign.center,
                           fontWeight: FontWeight.w300,
                           maxLines: 2),
-                     SizedBox(height: 8.h),
-
+                      SizedBox(height: 8.h),
                       CustomButton(
                           width: screenSize.width * 0.4,
                           fontSize: 12,
@@ -72,14 +72,17 @@ class CustomSignature extends StatelessWidget {
                 : Stack(
                     children: [
                       Center(
-                          child: Image.network(imageUrl!,
+                          child: CachedNetworkImage(
+                              imageUrl: imageUrl!,
                               fit: BoxFit.contain,
-                              key: ValueKey(imageUrl),)),
+                              key: ValueKey(imageUrl),
+                              errorWidget: (context, url, error) =>
+                                  const Icon(Icons.error))),
                       Positioned(
                         top: 10,
                         right: 10,
                         child: Container(
-                          width: 50.w,
+                          width: 44.w,
                           height: 44.h,
                           decoration: BoxDecoration(
                               color: AppColors.borderSignature,
