@@ -112,7 +112,7 @@ class ChildExpansion extends HookConsumerWidget {
               fontWeight: FontWeight.w300,
             ),
             SizedBox(width: 8.w),
-           !isEdit.value && !isAdditional ?
+           !isEdit.value && isAdditional ?
             TextWidget(
               text:
                   "Bổ sung:  ${supplyItem?.additionalQuantity.toString() ?? ''}",

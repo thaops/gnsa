@@ -1,5 +1,6 @@
 
 import 'package:flutter/widgets.dart';
+import 'package:gnsa/feature/presentation/flight_sign/data/model/flight_sign_arguments.dart';
 import 'package:gnsa/feature/presentation/flight_signature/widget/custom_signature.dart';
 import 'package:gnsa/router/app_router.dart';
 import 'package:go_router/go_router.dart';
@@ -35,11 +36,11 @@ class SignatureSection extends StatelessWidget {
   Future<void> _navigateToSignature(BuildContext context) async {
     final result = await context.push(
       AppRouter.flightSign,
-      extra: {
-        'title': title,
-        'supplyFormIds': supplyfromId,
-        'isSupplierSign': isSupplierSign,
-      },
+      extra: FlightSignArguments(
+        title: title,
+        supplyFormIds: supplyfromId,
+        isSupplierSign: isSupplierSign,
+      ),
     );
 
     if (result == true) {

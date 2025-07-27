@@ -32,21 +32,24 @@ class FlightDetailScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: _buildAppBar(context, ref),
-      body: _buildBody(context, ref),
-    );
+    final state = ref.watch(
+        flightDetailProviderProvider("D4AFFD21-22F7-4AFA-AD88-008A08D077C0"));
+    return 
+      Scaffold(
+        appBar: _buildAppBar(context, ref, state),
+        body: _buildBody(context, ref, state),
+      );
+    
   }
 
-  void _showPrinterDialog(BuildContext context, WidgetRef ref) {
-    final flightDetail = ref.watch(flightDetailProviderProvider(id)).value;
-    showDialog(
-      context: context,
-      builder: (_) => flightDetail == null
-          ? const StateErr(error: 'Không có dữ liệu chuyến bay')
-          : FlightPrinter(flightDetailModel: flightDetail),
+  void _showPrinterDialog(BuildContext context, WidgetRef ref, AsyncValue<SupplyFormModel> state) {
+    state.when(
+      data: (data) => showDialog(
+        context: context,
+        builder: (_) => FlightPrinter(flightDetailModel: data),
+      ),
+      loading: () => const SizedBox(),
+      error: (error, stack) => StateErr(error: error.toString()),
     );
   }
 
@@ -56,7 +59,7 @@ class FlightDetailScreen extends HookConsumerWidget {
     return _paddingHorizontalMobile;
   }
 
-  AppBarWidget _buildAppBar(BuildContext context, WidgetRef ref) {
+  AppBarWidget _buildAppBar(BuildContext context, WidgetRef ref, AsyncValue<SupplyFormModel> state) {
     return AppBarWidget(
       title: 'Cung ứng vật tư',
       isBack: true,
@@ -113,7 +116,7 @@ class FlightDetailScreen extends HookConsumerWidget {
       onPopupMenuSelected: (value) {
         switch (value) {
           case 'printer':
-            _showPrinterDialog(context, ref);
+            _showPrinterDialog(context, ref, state);
             break;
           case 'qr':
             context.push(AppRouter.qrcode);
@@ -126,10 +129,9 @@ class FlightDetailScreen extends HookConsumerWidget {
     );
   }
 
-  Widget _buildBody(BuildContext context, WidgetRef ref) {
+  Widget _buildBody(BuildContext context, WidgetRef ref, AsyncValue<SupplyFormModel> state) {
     final size = MediaQuery.sizeOf(context);
     final horizontalPadding = _getHorizontalPadding(size.width, context);
-    final state = ref.watch(flightDetailProviderProvider(id));
     return state.when(
       data: (data) {
         if (data.supplyFormId == null &&
@@ -143,8 +145,11 @@ class FlightDetailScreen extends HookConsumerWidget {
           id: id,
         );
       },
-      loading: () => LoadingShimmer(
-        child: CustomLoadingCase(),
+      loading: () => Padding(
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+        child: LoadingShimmer(
+          child: CustomLoadingCase(),
+        ),
       ),
       error: (error, stack) => StateErr(error: error.toString()),
     );
@@ -285,7 +290,7 @@ class _KeepAliveFlightDetailContentState
         child: CustomButton(
           horizontalPadding: _buttonHorizontalPadding,
           onPressed: () {
-            context.push(AppRouter.flightSignature, extra: id);
+            context.push(AppRouter.flightSignature, extra: [id]);
           },
           color: AppColors.primary,
           text: 'Ký xác nhận',

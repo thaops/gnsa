@@ -35,7 +35,7 @@ class DioApi {
   }
 
   /// Lấy headers chung cho tất cả request
-  Future<Map<String, String>> _getHeaders() async {
+  Future<Map<String, String>> _getHeaders({bool isMultipart = false}) async {
     final services = await Services.create();
     final deviceUdid = await DeviceUdid.createDeviceUdid();
     final accessToken = await services.getAccessToken();
@@ -43,7 +43,7 @@ class DioApi {
     print('accessToken: $accessToken');
     return {
       'accept': '*/*',
-      'Content-Type': 'application/json',
+      'Content-Type': isMultipart ? 'multipart/form-data' : 'application/json',
       'Authorization': 'Bearer $accessToken',
       'X_API_ID': 'VN_CREW_2017',
       'X_API_KEY': 'KE4Sc6zqaaHHlpkzStfdpwcmnkvposK6',
@@ -95,9 +95,10 @@ class DioApi {
     String url, {
     dynamic data,
     Options? options,
+    bool isMultipart = false,
   }) async {
     try {
-      final headers = await _getHeaders();
+      final headers = await _getHeaders(isMultipart: isMultipart);
       final mergedOptions = options?.copyWith(
             headers: {...?options.headers, ...headers},
           ) ??
@@ -109,6 +110,7 @@ class DioApi {
       );
       return _handleResponse(response);
     } on DioException catch (e) {
+      print("e: $e");
       throw Exception('Failed to post data: ${e.message}');
     } catch (e) {
       throw Exception('Unexpected error: $e');

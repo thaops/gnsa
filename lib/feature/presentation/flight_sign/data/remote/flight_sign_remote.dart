@@ -11,10 +11,14 @@ class FlightSignRemoteImpl implements FlightSignRemote {
   FlightSignRemoteImpl(this._dioApi);
   @override
   Future<String> saveSignature(FlightSignReq req) async {
+    print("req: $req");
     final response = await _dioApi.post(
       ApiEndpoints.signedSupplyForm,
-      data: req.toJson(),
+      data: await req.toFormData(),
+      isMultipart: true,
     );
+    print("response: $response");
+    
     return response.data['Data'] as String;
   }
 }

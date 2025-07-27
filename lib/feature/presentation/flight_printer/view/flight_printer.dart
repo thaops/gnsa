@@ -5,10 +5,35 @@ import 'package:gnsa/common/utils/screen_size.dart';
 import 'package:gnsa/common/widgets/custom_button.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/supplyform_model.dart';
-import 'package:gnsa/feature/presentation/flight_printer/provider/flight_printer_provider.dart';
 import 'package:gnsa/feature/presentation/flight_printer/widget/appbar_dialog.dart';
 import 'package:gnsa/feature/presentation/flight_printer/widget/constom_checkbox.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+// Bổ sung enum này ở file khác hoặc ngay trong file nếu cần
+enum SupplyFilterType {
+  all,
+  meal,
+  beverage,
+  equipment,
+  towel,
+}
+
+extension SupplyFilterTypeExtension on SupplyFilterType {
+  String get label {
+    switch (this) {
+      case SupplyFilterType.all:
+        return 'All';
+      case SupplyFilterType.meal:
+        return 'Meal';
+      case SupplyFilterType.beverage:
+        return 'Beverage';
+      case SupplyFilterType.equipment:
+        return 'Equipment';
+      case SupplyFilterType.towel:
+        return 'Towel';
+    }
+  }
+}
 
 class FlightPrinter extends HookConsumerWidget {
   final SupplyFormModel flightDetailModel;
@@ -17,28 +42,27 @@ class FlightPrinter extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const listItems = ["All", "Meal", "Beverage", "Equipment", "Towel"];
+    final listItems = SupplyFilterType.values;
     final checkedStates = useState<List<bool>>(List.filled(listItems.length, false));
-    final controller = ref.watch(flightPrinterControllerProvider.notifier);
 
     void toggleCheckbox(int index) {
-
       final newCheckedStates = List<bool>.from(checkedStates.value);
-      
-      if(index == 0){
+
+      if (index == 0) {
         final check = !newCheckedStates[0];
-        for(int i = 0; i < newCheckedStates.length; i++){
+        for (int i = 0; i < newCheckedStates.length; i++) {
           newCheckedStates[i] = check;
         }
-      }else{
+      } else {
         newCheckedStates[index] = !newCheckedStates[index];
         final allOthersChecked = listItems
             .asMap()
             .entries
-            .skip(1) 
+            .skip(1)
             .every((entry) => newCheckedStates[entry.key]);
         newCheckedStates[0] = allOthersChecked;
       }
+
       checkedStates.value = newCheckedStates;
     }
 
@@ -49,7 +73,9 @@ class FlightPrinter extends HookConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            AppbarDialog(title: 'In phiếu - ${flightDetailModel.flightInfo?.flightNo ?? "N/A"}',),
+            AppbarDialog(
+              title: 'In phiếu - ${flightDetailModel.flightInfo?.flightNo ?? "N/A"}',
+            ),
             SizedBox(height: 16.h),
             ListView.builder(
               shrinkWrap: true,
@@ -57,7 +83,7 @@ class FlightPrinter extends HookConsumerWidget {
               itemBuilder: (context, index) => Padding(
                 padding: EdgeInsets.symmetric(vertical: 8.h),
                 child: ConstomCheckbox(
-                  title: listItems[index],
+                  title: listItems[index].label,
                   isChecked: checkedStates.value[index],
                   onTap: () => toggleCheckbox(index),
                 ),
@@ -75,12 +101,11 @@ class FlightPrinter extends HookConsumerWidget {
                     .entries
                     .where((entry) => checkedStates.value[entry.key])
                     .map((entry) => entry.value)
-                    .toList();                
-                    await controller.printJson(
-                  context: context,
-                  flightDetail: flightDetailModel,
-                  selectedItems: selectedItems,
-                );
+                    .where((item) => item != SupplyFilterType.all)
+                    .toList();
+
+                print("In phiếu với: $selectedItems");
+                // await controller.printJson(...);
               },
             ),
           ],
@@ -88,5 +113,4 @@ class FlightPrinter extends HookConsumerWidget {
       ),
     );
   }
-
 }

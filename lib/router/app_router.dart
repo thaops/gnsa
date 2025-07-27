@@ -5,6 +5,7 @@ import 'package:gnsa/feature/presentation/flight_detail/view/preview_view.dart';
 import 'package:gnsa/feature/presentation/flight_detail/view/qrcode_view.dart';
 import 'package:gnsa/feature/presentation/flight_list/view/flight_list.dart';
 import 'package:gnsa/feature/presentation/flight_printer/view/flight_printer.dart';
+import 'package:gnsa/feature/presentation/flight_sign/data/model/flight_sign_arguments.dart';
 import 'package:gnsa/feature/presentation/flight_sign/view/flight_sign.dart';
 import 'package:gnsa/feature/presentation/flight_signature/view/flight_signature.dart';
 import 'package:gnsa/feature/profile/profile_view.dart';
@@ -67,19 +68,17 @@ class AppRouter {
           name: flightSignature,
           path: flightSignature,
           builder: (context, state) {
-            final supplyformId = state.extra as List<String>;
-            return FlightSignature(supplyfromId: supplyformId);
+           List<String> supplyformdetailId = state.extra as List<String> ;
+             return FlightSignature(supplyfromdetailId: supplyformdetailId);
           },
         ),
         GoRoute(
             name: flightSign,
             path: flightSign,
             builder: (context, state) {
-              final extra = state.extra as Map<String, dynamic>?;
+              final args = state.extra as FlightSignArguments?;
               return FlightSign(
-                title: extra?['title'] as String? ?? '',
-                supplyFormIds: extra?['supplyFormIds'] as List<String>? ?? [],
-                isSupplierSign: extra?['isSupplierSign'] as bool? ?? true,
+                arguments: args!,
               );
             }),
         GoRoute(

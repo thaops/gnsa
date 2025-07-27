@@ -105,7 +105,7 @@ class _KeepAliveFlightListContentState extends State<KeepAliveFlightListContent>
                       return flightsAsync.when(
                         loading: () => LoadingShimmer(
                           type: LoadingShimmerType.list,
-                          child: ContainerLoading(height: _loadingItemHeight.h),
+                          child: ContainerLoading(),
                         ),
                         error: (error, stack) =>
                             StateErr(error: error.toString()),

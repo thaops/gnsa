@@ -3,10 +3,14 @@ import 'package:gnsa/common/widgets/app_bar_widget.dart';
 import 'package:gnsa/common/widgets/container_loading.dart';
 import 'package:gnsa/common/widgets/loading_shimmer.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
+import 'package:gnsa/feature/presentation/flight_sign/data/model/flight_sign_arguments.dart';
 import 'package:gnsa/feature/presentation/flight_signature/provider/flight_signature_provider.dart';
 import 'package:gnsa/feature/presentation/flight_signature/data/model/flight_signature_model.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gnsa/feature/presentation/flight_signature/widget/custom_signature.dart';
 import 'package:gnsa/feature/presentation/flight_signature/widget/signature_section.dart';
+import 'package:gnsa/router/app_router.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 // Constants
@@ -14,15 +18,16 @@ const _kPadding = EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0);
 const _kSpacing = 4.0;
 
 class FlightSignature extends HookConsumerWidget {
-  final List<String> supplyfromId;
+  final List<String> supplyfromdetailId;
 
-  const FlightSignature({super.key, required this.supplyfromId});
+  const FlightSignature({super.key, required this.supplyfromdetailId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final flightSignatureAsync = ref.watch(flightSignatureControllerProvider(supplyfromId.first));
-    final flightSignState =
-        ref.read(flightSignatureControllerProvider(supplyfromId.first).notifier);
+    final flightSignatureAsync =
+        ref.watch(flightSignatureControllerProvider(supplyfromdetailId.first));
+    final flightSignState = ref.read(
+        flightSignatureControllerProvider(supplyfromdetailId.first).notifier);
 
     // useEffect(() {
     //   Future.microtask(
@@ -36,14 +41,16 @@ class FlightSignature extends HookConsumerWidget {
         width: double.infinity,
         child: flightSignatureAsync.when(
           data: (data) => SignatureContent(
-            supplyfromId: supplyfromId,
+            supplyfromId: supplyfromdetailId,
             signDetail: data.details!,
-            onRefresh: () => flightSignState.getSingSupplyfrom(supplyfromId.first),
+            onRefresh: () =>
+                flightSignState.getSingSupplyfrom(supplyfromdetailId.first),
           ),
-          error: (err, _) =>SignatureContent(
-            supplyfromId: supplyfromId,
+          error: (err, _) => SignatureContent(
+            supplyfromId: supplyfromdetailId,
             signDetail: [],
-            onRefresh: () => flightSignState.getSingSupplyfrom(supplyfromId.first),
+            onRefresh: () =>
+                flightSignState.getSingSupplyfrom(supplyfromdetailId.first),
           ),
           loading: () => _buildLoading(context),
         ),
@@ -103,19 +110,50 @@ class SignatureContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: EdgeInsets.symmetric(horizontal: 16.r),
-      itemCount: signDetail.length,
-      itemBuilder: (context, index) {
-        final detail = signDetail[index];
-        return SignatureSection(
-          title: detail.isCrew == true ? 'TIẾP VIÊN XÁC NHẬN' : 'NHÂN VIÊN XÁC NHẬN',
-          imageUrl: detail.imageUrl ?? '',
-          isSupplierSign: detail.isCrew ?? false,
-          supplyfromId: supplyfromId,
-          onRefresh: onRefresh,
-        );
-      },
-    );
+    return signDetail.isEmpty
+        ? Column(
+            children: [
+              CustomSignature(
+                  title: 'TIẾP VIÊN XÁC NHẬN',
+                  onPressed: () {
+                    GoRouter.of(context).push(
+                      AppRouter.flightSign,
+                      extra: FlightSignArguments(
+                        title: 'TIẾP VIÊN XÁC NHẬN',
+                        supplyFormIds: supplyfromId,
+                        isSupplierSign: false,
+                      ),
+                    );
+                  }),
+              CustomSignature(
+                  title: 'NHÂN VIÊN XÁC NHẬN',
+                  onPressed: () {
+                    GoRouter.of(context).push(
+                      AppRouter.flightSign,
+                      extra: FlightSignArguments(
+                        title: 'NHÂN VIÊN XÁC NHẬN',
+                        supplyFormIds: supplyfromId,
+                        isSupplierSign: true,
+                      ),
+                    );
+                  }),
+            ],
+          )
+        : ListView.builder(
+            padding: EdgeInsets.symmetric(horizontal: 16.r),
+            itemCount: signDetail.length,
+            itemBuilder: (context, index) {
+              final detail = signDetail[index];
+              return  SignatureSection(
+                title: detail.isCrew == true
+                    ? 'TIẾP VIÊN XÁC NHẬN'
+                    : 'NHÂN VIÊN XÁC NHẬN',
+                imageUrl: detail.imageUrl ?? '',
+                isSupplierSign: detail.isCrew ?? false,
+                supplyfromId: supplyfromId,
+                onRefresh: onRefresh,
+              );
+            },
+          );
   }
 }

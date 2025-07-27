@@ -22,10 +22,12 @@ class FlightDetailRemoteImpl implements FlightDetailRemote {
 
   @override
   Future<String> updateSupplyfromItemDetail(UpdateSupplyfromItemReq req) async {
+    print("req.toJson() ${req.toJson()}");
     final response = await _dioApi.patch(
       ApiEndpoints.updateSupplyfromItemDetail,
       data: req.toJson(),
     );
+    print("response.data['Data'] ${response.data}");
     return response.data['Data'] as String;
   }
 

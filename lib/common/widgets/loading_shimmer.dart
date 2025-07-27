@@ -17,13 +17,10 @@ class LoadingShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var shimmer = Padding(
-      padding: EdgeInsets.symmetric(vertical: padding?.h ?? AppSizes.paddingMedium.h),
-      child: Shimmer.fromColors(
+    var shimmer = Shimmer.fromColors(
         baseColor: Colors.grey.shade200,
         highlightColor: Colors.white,
         child: child,
-      ),
     );
     return type == LoadingShimmerType.list ? ListView.builder(
       itemCount: 10,
