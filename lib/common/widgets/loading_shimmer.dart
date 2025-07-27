@@ -11,15 +11,19 @@ enum LoadingShimmerType {
 class LoadingShimmer extends StatelessWidget {
   final Widget child;
   final LoadingShimmerType type;
+  final double? padding;
 
-  const LoadingShimmer({super.key, required this.child, this.type = LoadingShimmerType.widget});
+  const LoadingShimmer({super.key, required this.child, this.type = LoadingShimmerType.widget, this.padding});
 
   @override
   Widget build(BuildContext context) {
-    var shimmer = Shimmer.fromColors(
-      baseColor: Colors.grey.shade200,
-      highlightColor: Colors.white,
-      child: child,
+    var shimmer = Padding(
+      padding: EdgeInsets.symmetric(vertical: padding?.h ?? AppSizes.paddingMedium.h),
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey.shade200,
+        highlightColor: Colors.white,
+        child: child,
+      ),
     );
     return type == LoadingShimmerType.list ? ListView.builder(
       itemCount: 10,

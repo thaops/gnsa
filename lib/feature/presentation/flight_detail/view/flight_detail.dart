@@ -138,7 +138,7 @@ class FlightDetailScreen extends HookConsumerWidget {
         }
         return KeepAliveFlightDetailContent(
           data: data,
-          horizontalPadding: AppSizes.paddingMedium,
+          horizontalPadding: horizontalPadding,
           ref: ref,
           id: id,
         );
