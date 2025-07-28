@@ -39,6 +39,7 @@ class LoginController extends _$LoginController {
       }
       return;
     }
+    state = AsyncValue.loading();
 
     await handler.execute(
       state: state,
@@ -73,7 +74,6 @@ class LoginController extends _$LoginController {
       GoRouter.of(context).push(AppRouter.main);
     }
   }
-
 
   Future<bool> _validateForm() async {
     final currentState = state.value;

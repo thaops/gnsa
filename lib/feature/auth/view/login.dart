@@ -17,10 +17,9 @@ class LoginScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final loginState = ref.watch(loginControllerProvider);
-    final asyncState = ref.watch(asyncRequestHandlerProvider);
 
     return WillPopScope(
-      onWillPop: () async => !asyncState.isLoading,
+      onWillPop: () async => !loginState.isLoading,
       child: Scaffold(
         body: Stack(
           children: [
@@ -29,13 +28,13 @@ class LoginScreen extends ConsumerWidget {
               ref: ref,
             ),
             
-            if (asyncState.isLoading)
+            if (loginState.isLoading)
               ModalBarrier(
                 color: Colors.black.withOpacity(0.5),
                 dismissible: false,
               ),
               
-            if (asyncState.isLoading)
+            if (loginState.isLoading)
               const Center(
                 child: CircularProgressIndicator(
                   valueColor: AlwaysStoppedAnimation(AppColors.primaryV2),
