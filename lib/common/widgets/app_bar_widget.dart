@@ -8,12 +8,14 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
   final double heightAppBar;
   final bool isBack;
+  final IconData? leadingIcon;
   final IconData? iconRightFirst;
   final IconData? iconRightSecond;
   final Color? colorFirst;
   final Color? colorSecond;
   final double? sizeTitle;
   final bool isTitleCenter;
+  final VoidCallback? onLeadingIconPressed;
   final VoidCallback? onPressedFirst;
   final VoidCallback? onPressedSecond;
   final String? image;
@@ -26,6 +28,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
     Key? key,
     this.title,
     this.heightAppBar = 45,
+    this.leadingIcon,
     this.iconRightFirst,
     this.iconRightSecond,
     this.colorFirst,
@@ -34,6 +37,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
     this.onPressedFirst,
     this.onPressedSecond,
     this.isBack = true,
+    this.onLeadingIconPressed,
     this.image,
     this.isTitleCenter = true,
     this.widgetRight,
@@ -46,16 +50,21 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       automaticallyImplyLeading: false,
       backgroundColor: AppColors.white,
-      leading: isBack
+      leading: leadingIcon != null
           ? IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: Icon(
-                Icons.arrow_back_ios,
-                color: AppColors.primary,
-                size: 20.sp, 
-              ),
+              icon: Icon(leadingIcon!, color: AppColors.primary, size: 20.sp),
+              onPressed: onLeadingIconPressed,
             )
-          : null,
+          : isBack
+              ? IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: Icon(
+                    Icons.arrow_back_ios,
+                    color: AppColors.primary,
+                    size: 20.sp,
+                  ),
+                )
+              : null,
       centerTitle: isTitleCenter,
       title: _buildTitle(),
       actions: _buildActions(),
@@ -74,7 +83,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
       return Image.asset(
         image!,
         fit: BoxFit.cover,
-        width: 100.w, 
+        width: 100.w,
       );
     }
     return null;
@@ -92,12 +101,12 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
           icon: Icon(
             Icons.more_horiz,
             color: AppColors.primary,
-            size: 24.sp, 
+            size: 24.sp,
           ),
           backgroundColor: AppColors.white,
           elevation: 8.0,
-          borderRadius: BorderRadius.circular(8.r), 
-          padding: EdgeInsets.all(8.w), 
+          borderRadius: BorderRadius.circular(8.r),
+          padding: EdgeInsets.all(8.w),
           animationDuration: const Duration(milliseconds: 200),
           animationCurve: Curves.easeInOut,
           textStyle: TextStyle(
@@ -113,7 +122,8 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
     if (widgetRight != null)
       actions.add(
         Container(
-          constraints: BoxConstraints(maxWidth: 50, maxHeight: 50), // Ensure constraints
+          constraints:
+              BoxConstraints(maxWidth: 50, maxHeight: 50), // Ensure constraints
           child: widgetRight,
         ),
       );
@@ -148,5 +158,5 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(heightAppBar.h); 
+  Size get preferredSize => Size.fromHeight(heightAppBar.h);
 }

@@ -9,8 +9,10 @@ import 'package:gnsa/common/widgets/loading_shimmer.dart';
 import 'package:gnsa/common/widgets/state_err.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
+import 'package:gnsa/feature/presentation/flight_detail/data/model/preview_args.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/supplyform_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/provider/flight_detail_provider.dart';
+import 'package:gnsa/feature/presentation/flight_detail/view/preview_view.dart';
 import 'package:gnsa/feature/presentation/flight_detail/view/supply_form_list_view.dart';
 import 'package:gnsa/feature/presentation/flight_detail/widget/custom_detail_flight.dart';
 import 'package:gnsa/feature/presentation/flight_detail/widget/custom_loading_case.dart';
@@ -19,7 +21,7 @@ import 'package:gnsa/router/app_router.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-const _kValueSign = 'NotSign';
+const _kValueSign = 'NotSigned';
 const _paddingVertical = 16.0;
 const _paddingHorizontalMobile = 16.0;
 const _paddingWebRatio = 0.3;
@@ -33,10 +35,11 @@ class FlightDetailScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(
-        flightDetailProviderProvider("D4AFFD21-22F7-4AFA-AD88-008A08D077C0"));
+        flightDetailProviderProvider(id));
     return 
       Scaffold(
-        appBar: _buildAppBar(context, ref, state),
+        resizeToAvoidBottomInset: true,
+        appBar: _buildAppBar(context, ref, state, id),
         body: _buildBody(context, ref, state),
       );
     
@@ -46,7 +49,7 @@ class FlightDetailScreen extends HookConsumerWidget {
     state.when(
       data: (data) => showDialog(
         context: context,
-        builder: (_) => FlightPrinter(flightDetailModel: data),
+        builder: (_) => FlightPrinter(flightDetailModel: data, flightId: id),
       ),
       loading: () => const SizedBox(),
       error: (error, stack) => StateErr(error: error.toString()),
@@ -59,7 +62,7 @@ class FlightDetailScreen extends HookConsumerWidget {
     return _paddingHorizontalMobile;
   }
 
-  AppBarWidget _buildAppBar(BuildContext context, WidgetRef ref, AsyncValue<SupplyFormModel> state) {
+  AppBarWidget _buildAppBar(BuildContext context, WidgetRef ref, AsyncValue<SupplyFormModel> state, String flightId) {
     return AppBarWidget(
       title: 'Cung ứng vật tư',
       isBack: true,
@@ -122,7 +125,7 @@ class FlightDetailScreen extends HookConsumerWidget {
             context.push(AppRouter.qrcode);
             break;
           case 'preview':
-            context.push(AppRouter.preview, extra: id);
+            context.push(AppRouter.preview, extra: PreviewArgs(flightId: flightId));
             break;
         }
       },
@@ -130,10 +133,17 @@ class FlightDetailScreen extends HookConsumerWidget {
   }
 
   Widget _buildBody(BuildContext context, WidgetRef ref, AsyncValue<SupplyFormModel> state) {
+    List<String> idsNotSign = [];
     final size = MediaQuery.sizeOf(context);
     final horizontalPadding = _getHorizontalPadding(size.width, context);
     return state.when(
       data: (data) {
+        data.supplyFormDetails?.forEach((element) {
+          if (element.status == _kValueSign) {
+            idsNotSign.add(element.supplyFormDetailId);
+          }
+        });
+        
         if (data.supplyFormId == null &&
             data.supplyFormDetails?.isEmpty == true) {
           return const Center(child: Text('Không có chi tiết chuyến bay'));
@@ -142,7 +152,8 @@ class FlightDetailScreen extends HookConsumerWidget {
           data: data,
           horizontalPadding: horizontalPadding,
           ref: ref,
-          id: id,
+          ids: idsNotSign,
+          flightId: id,
         );
       },
       loading: () => Padding(
@@ -160,14 +171,16 @@ class KeepAliveFlightDetailContent extends StatefulWidget {
   final SupplyFormModel data;
   final double horizontalPadding;
   final WidgetRef ref;
-  final String id;
+  final List<String> ids;
+  final String flightId;
 
   const KeepAliveFlightDetailContent({
     super.key,
     required this.data,
     required this.horizontalPadding,
     required this.ref,
-    required this.id,
+    required this.ids,
+    required this.flightId,
   });
 
   @override
@@ -204,8 +217,8 @@ class _KeepAliveFlightDetailContentState
                 ),
               ),
             ),
-            _buildSignButton(
-                context, widget.ref, widget.horizontalPadding, widget.id),
+          widget.ids.isEmpty ? const SizedBox() :  _buildSignButton(
+                context, widget.ref, widget.horizontalPadding, widget.ids, widget.flightId),
             const SizedBox(height: _paddingVertical),
           ],
         );
@@ -284,13 +297,17 @@ class _KeepAliveFlightDetailContentState
       );
 
   Widget _buildSignButton(BuildContext context, WidgetRef ref,
-          double horizontalPadding, String id) =>
+          double horizontalPadding, List<String> id, String flightId) =>
       Padding(
         padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
         child: CustomButton(
           horizontalPadding: _buttonHorizontalPadding,
           onPressed: () {
-            context.push(AppRouter.flightSignature, extra: [id]);
+            context.push(AppRouter.flightSignature, extra: id).then((value) {
+              if (value == true) {
+                Future.microtask(() => ref.invalidate(flightDetailProviderProvider(flightId)));
+              }
+            });
           },
           color: AppColors.primary,
           text: 'Ký xác nhận',

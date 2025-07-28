@@ -1,6 +1,7 @@
 import 'package:gnsa/common/Services/api_endpoints.dart';
 import 'package:gnsa/common/repositoty/dio_api.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/flight_preview_model.dart';
+import 'package:gnsa/feature/presentation/flight_detail/data/model/preview_args.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/supplyform_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/update_supplyfrom_item_req.dart';
 
@@ -8,7 +9,7 @@ abstract class FlightDetailRemote {
   Future<SupplyFormModel> getFlightDetail(String id);
   Future<String> updateSupplyfromItemDetail(UpdateSupplyfromItemReq req);
 
-  Future<FlightPreviewModel> getFlightPreview(String id);
+  Future<FlightPreviewModel> getFlightPreview(PreviewArgs args);
 }
 
 class FlightDetailRemoteImpl implements FlightDetailRemote {
@@ -32,8 +33,8 @@ class FlightDetailRemoteImpl implements FlightDetailRemote {
   }
 
   @override
-  Future<FlightPreviewModel> getFlightPreview(String flightId) async {
-    final response = await _dioApi.get(ApiEndpoints.getFlightPreview(flightId));
+  Future<FlightPreviewModel> getFlightPreview(PreviewArgs args) async {
+    final response = await _dioApi.post(ApiEndpoints.getFlightPreview, data: args.toJson());
     return FlightPreviewModel.fromJson(response.data['Data'] as Map<String, dynamic>);
   }
 }

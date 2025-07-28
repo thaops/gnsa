@@ -1,4 +1,5 @@
 import 'package:gnsa/feature/auth/view/login.dart';
+import 'package:gnsa/feature/presentation/flight_detail/data/model/preview_args.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/supplyform_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/view/flight_detail.dart';
 import 'package:gnsa/feature/presentation/flight_detail/view/preview_view.dart';
@@ -47,7 +48,12 @@ class AppRouter {
         GoRoute(
           name: preview,
           path: preview,
-          builder: (context, state) => PreviewView(id: state.extra as String),
+          builder: (context, state) {
+            final args = state.extra as PreviewArgs;
+            return PreviewView(
+              args: args,
+            );
+          },
         ),
         GoRoute(
           name: qrcode,
@@ -86,7 +92,8 @@ class AppRouter {
           path: flightPrinter,
           builder: (context, state) {
             final flightDetailModel = state.extra as SupplyFormModel;
-            return FlightPrinter(flightDetailModel: flightDetailModel);
+            final flightId = state.extra as String;
+            return FlightPrinter(flightDetailModel: flightDetailModel, flightId: flightId);
           },
         ),
         GoRoute(

@@ -1,11 +1,12 @@
 import 'package:gnsa/feature/presentation/flight_detail/data/model/flight_preview_model.dart';
+import 'package:gnsa/feature/presentation/flight_detail/data/model/preview_args.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/supplyform_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/update_supplyfrom_item_req.dart';
 
 abstract class FlightDetailRepository {
   Future<SupplyFormModel> getFlightDetail(String id);
   Future<String> updateSupplyfromItemDetail(UpdateSupplyfromItemReq req);
-  Future<FlightPreviewModel> getFlightPreview(String flightId);
+  Future<FlightPreviewModel> getFlightPreview(PreviewArgs args);
 }
 
 class FlightDetailUserCase {
@@ -21,7 +22,7 @@ class FlightDetailUserCase {
     return await repository.updateSupplyfromItemDetail(req);
   }
 
-  Future<FlightPreviewModel> getFlightPreview(String flightId) async {
-    return await repository.getFlightPreview(flightId);
+  Future<FlightPreviewModel> getFlightPreview(PreviewArgs args) async {
+    return await repository.getFlightPreview(args);
   }
 }

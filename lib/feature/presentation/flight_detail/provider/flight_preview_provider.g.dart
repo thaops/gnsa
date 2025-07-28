@@ -13,7 +13,7 @@ final class FlightPreviewProviderProvider
     extends $AsyncNotifierProvider<FlightPreviewProvider, FlightPreviewModel> {
   const FlightPreviewProviderProvider._(
       {required FlightPreviewProviderFamily super.from,
-      required String super.argument})
+      required PreviewArgs super.argument})
       : super(
           retry: null,
           name: r'flightPreviewProviderProvider',
@@ -54,7 +54,7 @@ final class FlightPreviewProviderProvider
 }
 
 String _$flightPreviewProviderHash() =>
-    r'c2ae1c2832f58123919f4b72352950b405eba9c6';
+    r'dbdba08234469fb035b7917bd491b02d1984cb81';
 
 final class FlightPreviewProviderFamily extends $Family
     with
@@ -63,7 +63,7 @@ final class FlightPreviewProviderFamily extends $Family
             AsyncValue<FlightPreviewModel>,
             FlightPreviewModel,
             FutureOr<FlightPreviewModel>,
-            String> {
+            PreviewArgs> {
   const FlightPreviewProviderFamily._()
       : super(
           retry: null,
@@ -74,9 +74,9 @@ final class FlightPreviewProviderFamily extends $Family
         );
 
   FlightPreviewProviderProvider call(
-    String id,
+    PreviewArgs args,
   ) =>
-      FlightPreviewProviderProvider._(argument: id, from: this);
+      FlightPreviewProviderProvider._(argument: args, from: this);
 
   @override
   String toString() => r'flightPreviewProviderProvider';
@@ -84,11 +84,11 @@ final class FlightPreviewProviderFamily extends $Family
 
 abstract class _$FlightPreviewProvider
     extends $AsyncNotifier<FlightPreviewModel> {
-  late final _$args = ref.$arg as String;
-  String get id => _$args;
+  late final _$args = ref.$arg as PreviewArgs;
+  PreviewArgs get args => _$args;
 
   FutureOr<FlightPreviewModel> build(
-    String id,
+    PreviewArgs args,
   );
   @$mustCallSuper
   @override

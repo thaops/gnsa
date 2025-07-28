@@ -101,7 +101,7 @@ Widget _buildSupplyItem(
               supplyType: supplyForm.supplyType,
               trailingCount: '${supplyForm.supplyType}',
               isAdditional: isAdditional,
-              isConfirmed: supplyForm.supplyType != kValueSign,
+              isNotSigned: supplyForm.status == kValueSign,
               supplyFormDetailId: supplyForm.supplyFormDetailId,
               detailItems: supplyForm.detailItems,
               onConfirm: () => showDialog(

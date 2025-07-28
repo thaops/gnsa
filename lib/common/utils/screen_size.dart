@@ -6,8 +6,8 @@ class ScreenSize {
   static double height = 812;
 
   //web
-  static double widthWeb = 1920;
-  static double heightWeb = 1080;
+  static double widthIpad = 1280;
+  static double heightIpad = 800;
 }
 
 extension MediaQueryValues on BuildContext {

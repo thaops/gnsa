@@ -28,7 +28,7 @@ class ApiEndpoints {
   static String getSupplyfromItemDetail =
       "${Config.baseUrl}/supplyform/get-item-in-supply-form-mobile";
 
-  static String getFlightPreview(String flightId) => "${Config.baseUrl}/supplyform/preview-supply-form-in-mobile?flightId=$flightId";
+  static String getFlightPreview = "${Config.baseUrl}/supplyform/preview-supply-form-in-mobile";
   //signed
   static String getListSignedSupplyForm(String supplyFormDetailId) => "${Config.baseUrl}/supplyform/get-list-signed-supply-form-mobile?supplyFormDetailId=$supplyFormDetailId";
   static String signedSupplyForm = "${Config.baseUrl}/supplyform/signed-supply-form-mobile";

@@ -5,17 +5,18 @@ import 'package:gnsa/common/img/img.dart';
 import 'package:gnsa/common/widgets/custom_button.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
+import 'package:gnsa/feature/presentation/flight_signature/data/model/flight_signature_model.dart';
 
 class CustomSignature extends StatelessWidget {
-  final String title;
+  final CrewInfo? crewInfo;
+  final bool isCrew;
   final Function() onPressed;
   final Function()? onEditPressed;
-  final String? imageUrl;
   const CustomSignature(
       {super.key,
-      required this.title,
+      required this.crewInfo,
+      required this.isCrew,
       required this.onPressed,
-      this.imageUrl,
       this.onEditPressed});
 
   @override
@@ -24,19 +25,24 @@ class CustomSignature extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextWidget(text: title, fontSize: 16, fontWeight: FontWeight.bold),
+        TextWidget(
+            text: isCrew
+                ? 'TIẾP VIÊN XÁC NHẬN'
+                : 'NHÂN VIÊN XÁC NHẬN',
+            fontSize: 16,
+            fontWeight: FontWeight.bold),
         SizedBox(height: 12.h),
         Container(
             width: double.infinity,
             height: screenSize.height * 0.35,
             padding: EdgeInsets.symmetric(
-              horizontal: imageUrl == null ? 40.w : 0,
+              horizontal: crewInfo?.imageUrl == null ? 40.w : 0,
             ),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12.r),
               border: Border.all(color: AppColors.borderSignature, width: 1),
             ),
-            child: imageUrl?.isEmpty ?? true
+            child: crewInfo?.imageUrl?.isEmpty ?? true
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -48,12 +54,14 @@ class CustomSignature extends StatelessWidget {
                         fit: BoxFit.fill,
                       ),
                       SizedBox(height: 12.h),
-                      const TextWidget(
-                          text: 'Chữ ký tiếp viên',
+                      TextWidget(
+                          text: isCrew
+                              ? 'Chữ ký tiếp viên'
+                              : 'Chữ ký nhân viên',
                           fontSize: 16,
                           fontWeight: FontWeight.bold),
                       SizedBox(height: 8.h),
-                      const TextWidget(
+                      TextWidget(
                           text:
                               'Vui lòng ký tên vào để xác nhận đã nhận vật tư',
                           fontSize: 12,
@@ -73,9 +81,9 @@ class CustomSignature extends StatelessWidget {
                     children: [
                       Center(
                           child: CachedNetworkImage(
-                              imageUrl: imageUrl!,
+                              imageUrl: crewInfo?.imageUrl ?? '',
                               fit: BoxFit.contain,
-                              key: ValueKey(imageUrl),
+                              key: ValueKey(crewInfo?.imageUrl),
                               errorWidget: (context, url, error) =>
                                   const Icon(Icons.error))),
                       Positioned(
@@ -88,7 +96,7 @@ class CustomSignature extends StatelessWidget {
                               color: AppColors.borderSignature,
                               borderRadius: BorderRadius.circular(50.r)),
                           child: IconButton(
-                              onPressed: onEditPressed,
+                              onPressed: onPressed,
                               icon: Icon(Icons.edit, size: 24.sp)),
                         ),
                       )

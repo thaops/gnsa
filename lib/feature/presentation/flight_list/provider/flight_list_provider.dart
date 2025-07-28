@@ -23,12 +23,12 @@ class FlightListNotifier extends _$FlightListNotifier {
     return await _fetchFlights(search: null, cancelToken: _cancelToken!);
   }
 
-  Future<FlightsModel> fetchInitialFlights({String? search}) async {
+  Future<FlightsModel> fetchInitialFlights({String? search, DateTime? fromDate, DateTime? toDate}) async {
     if (!ref.mounted) return FlightsModel();
     _cancelToken?.cancel();
     _cancelToken = CancelToken();
     _page = 1;
-    return await _fetchFlights(search: search, cancelToken: _cancelToken!);
+    return await _fetchFlights(search: search, fromDate: fromDate, toDate: toDate, cancelToken: _cancelToken!);
   }
 
   Future<void> loadMore({String? search}) async {
@@ -44,6 +44,8 @@ class FlightListNotifier extends _$FlightListNotifier {
 
   Future<FlightsModel> _fetchFlights({
     String? search,
+    DateTime? fromDate,
+    DateTime? toDate,
     required CancelToken cancelToken,
   }) async {
     try {
@@ -52,6 +54,8 @@ class FlightListNotifier extends _$FlightListNotifier {
         pageSize: _pageSize,
         isMySchedule: _isMyFlight, 
         keyword: search,
+        fromDate: fromDate,
+        toDate: toDate,
       );
       return await ref.read(flightListRepositoryProvider).getFlights(params);
     } catch (e) {
@@ -60,9 +64,9 @@ class FlightListNotifier extends _$FlightListNotifier {
     }
   }
 
-  Future<void> refreshFlights({String? search}) async {
+  Future<void> refreshFlights({String? search, DateTime? fromDate, DateTime? toDate}) async {
     if (!ref.mounted) return;
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => fetchInitialFlights(search: search));
+    state = await AsyncValue.guard(() => fetchInitialFlights(search: search, fromDate: fromDate, toDate: toDate));
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gnsa/common/utils/enum_type_flight.dart';
 import 'package:gnsa/common/widgets/custom_text_field.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
@@ -16,34 +17,42 @@ class ChildExpansion extends HookConsumerWidget {
   final String detailItemId;
   final bool isAdditional;
 
-  const ChildExpansion({Key? key, this.supplyItem, required this.supplyType, required this.supplyFormDetailId, required this.detailItemId, required this.isAdditional})
+  const ChildExpansion(
+      {Key? key,
+      this.supplyItem,
+      required this.supplyType,
+      required this.supplyFormDetailId,
+      required this.detailItemId,
+      required this.isAdditional})
       : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final SupplyFromUpdateProvider = ref.watch(supplyFromUpdateProviderProvider.notifier);
+    final SupplyFromUpdateProvider =
+        ref.watch(supplyFromUpdateProviderProvider.notifier);
     final isEdit = useState(false);
     final noteState = useState(supplyItem?.note ?? '');
     final focusNode = useFocusNode();
 
-    final confirmedQuantity = useState<int>(supplyItem?.confirmedQuantity ?? 0);
+    final confirmedQuantity = useState<int>(supplyItem?.additionalQuantity ?? 0);
 
     final noteController = useTextEditingController(
       text: supplyItem?.note ?? '',
     );
+    final parsedSupplyType = SupplyFormTypeExtension.fromString(supplyType);
     void _saveNote() {
       focusNode.unfocus();
       noteState.value = noteController.text;
       isEdit.value = false;
       SupplyFromUpdateProvider.updateSupplyfromItemDetail(
-            UpdateSupplyfromItemReq(
-              supplyFormDetailId: supplyFormDetailId,
-              supplyFormDetailItemId: detailItemId,
-              itemId: supplyItem!.id,
-              type: supplyType,
-              supplement: confirmedQuantity.value,
-              note: noteController.text,
-          ));
+          UpdateSupplyfromItemReq(
+        supplyFormDetailId: supplyFormDetailId,
+        supplyFormDetailItemId: detailItemId,
+        itemId: supplyItem!.id,
+        type: supplyType,
+        supplement: confirmedQuantity.value,
+        note: noteController.text,
+      ));
     }
 
     void _incrementQuantity() {
@@ -82,58 +91,69 @@ class ChildExpansion extends HookConsumerWidget {
                   ],
                 ),
               ),
+
+              parsedSupplyType?.isEditable == true ? 
               isEdit.value
                   ? _buildWidgetAction(_saveNote, _closeEdit)
                   : IconButton(
                       onPressed: () {
                         isEdit.value = true;
                       },
-                      icon:const Icon(Icons.edit_note_sharp,
+                      icon: const Icon(Icons.edit_note_sharp,
                           color: AppColors.darkBackground),
-                    ),
+                    ) : const SizedBox(),
             ],
           ),
-          _buildSupplyQuantityRow(isEdit: isEdit, decrementQuantity: _decrementQuantity, confirmedQuantity: confirmedQuantity, incrementQuantity: _incrementQuantity),
-          isEdit.value ? _buildNote(context, noteController, focusNode) : const SizedBox(),
+          _buildSupplyQuantityRow(
+              isEdit: isEdit,
+              decrementQuantity: _decrementQuantity,
+              confirmedQuantity: confirmedQuantity,
+              incrementQuantity: _incrementQuantity),
+          isEdit.value
+              ? _buildNote(context, noteController, focusNode)
+              : const SizedBox(),
         ],
       ),
     );
   }
 
-  Row _buildSupplyQuantityRow({required ValueNotifier<bool> isEdit, required void Function() decrementQuantity, required ValueNotifier<int> confirmedQuantity, required void Function() incrementQuantity}) {
+  Row _buildSupplyQuantityRow(
+      {required ValueNotifier<bool> isEdit,
+      required void Function() decrementQuantity,
+      required ValueNotifier<int> confirmedQuantity,
+      required void Function() incrementQuantity}) {
     return Row(
-          children: [
-            SizedBox(width: 8.w),
-            TextWidget(
-              text:
-                  "Cung ứng:  ${supplyItem?.supplyQuantity.toString() ?? ''}",
-              fontSize: 12,
-              color: AppColors.iconFlight,
-              fontWeight: FontWeight.w300,
-            ),
-            SizedBox(width: 8.w),
-           !isEdit.value && isAdditional ?
-            TextWidget(
-              text:
-                  "Bổ sung:  ${supplyItem?.additionalQuantity.toString() ?? ''}",
-              fontSize: 12,
-              color: AppColors.primary,
-              fontWeight: FontWeight.w300,
-            ) : const SizedBox(),
-            const Spacer(),
-
-            isEdit.value
-                ? _buildQuantity(
-                    decrementQuantity: decrementQuantity,
-                    confirmedQuantity: confirmedQuantity,
-                    incrementQuantity: incrementQuantity)
-                : const SizedBox(),
-          ],
-        );
+      children: [
+        SizedBox(width: 8.w),
+        TextWidget(
+          text: "Cung ứng:  ${supplyItem?.supplyQuantity.toString() ?? ''}",
+          fontSize: 12,
+          color: AppColors.iconFlight,
+          fontWeight: FontWeight.w300,
+        ),
+        SizedBox(width: 8.w),
+        !isEdit.value && isAdditional
+            ? TextWidget(
+                text:
+                    "Bổ sung:  ${supplyItem?.additionalQuantity.toString() ?? ''}",
+                fontSize: 12,
+                color: AppColors.primary,
+                fontWeight: FontWeight.w300,
+              )
+            : const SizedBox(),
+        const Spacer(),
+        isEdit.value
+            ? _buildQuantity(
+                decrementQuantity: decrementQuantity,
+                confirmedQuantity: confirmedQuantity,
+                incrementQuantity: incrementQuantity)
+            : const SizedBox(),
+      ],
+    );
   }
 
-  Container _buildNote(
-      BuildContext context, TextEditingController noteController, FocusNode focusNode) {
+  Container _buildNote(BuildContext context,
+      TextEditingController noteController, FocusNode focusNode) {
     return Container(
       margin: EdgeInsets.only(top: 8.h),
       width: MediaQuery.of(context).size.width,
@@ -147,8 +167,10 @@ class ChildExpansion extends HookConsumerWidget {
     );
   }
 
-  Row _buildQuantity({required void Function() decrementQuantity,
-      required ValueNotifier<int> confirmedQuantity, required void Function() incrementQuantity}) {
+  Row _buildQuantity(
+      {required void Function() decrementQuantity,
+      required ValueNotifier<int> confirmedQuantity,
+      required void Function() incrementQuantity}) {
     return Row(
       children: [
         IconButton(

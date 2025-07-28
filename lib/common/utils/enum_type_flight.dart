@@ -6,6 +6,8 @@ enum SupplyFormType {
   cart,
 }
 
+
+
 extension SupplyFormTypeExtension on SupplyFormType {
   String get label {
     switch (this) {
@@ -21,7 +23,21 @@ extension SupplyFormTypeExtension on SupplyFormType {
         return 'Cart';
     }
   }
+
+  bool get isEditable =>
+      this == SupplyFormType.drink ||
+      this == SupplyFormType.equipment ||
+      this == SupplyFormType.cart;
+
+  static SupplyFormType? fromString(String value) {
+    return SupplyFormType.values.firstWhere(
+      (e) => e.name.toLowerCase() == value.toLowerCase(),
+      orElse: () => SupplyFormType.meal, // hoặc null nếu muốn chặt chẽ hơn
+    );
+  }
 }
+
+
 
 bool containsAnySupplyFormType(String title) {
   final lowerTitle = title.toLowerCase();

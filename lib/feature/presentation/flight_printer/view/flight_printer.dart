@@ -4,18 +4,21 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gnsa/common/utils/screen_size.dart';
 import 'package:gnsa/common/widgets/custom_button.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
+import 'package:gnsa/feature/presentation/flight_detail/data/model/preview_args.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/supplyform_model.dart';
 import 'package:gnsa/feature/presentation/flight_printer/widget/appbar_dialog.dart';
 import 'package:gnsa/feature/presentation/flight_printer/widget/constom_checkbox.dart';
+import 'package:gnsa/router/app_router.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-// Bổ sung enum này ở file khác hoặc ngay trong file nếu cần
 enum SupplyFilterType {
   all,
   meal,
-  beverage,
+  drink,
   equipment,
   towel,
+  cart,
 }
 
 extension SupplyFilterTypeExtension on SupplyFilterType {
@@ -25,25 +28,29 @@ extension SupplyFilterTypeExtension on SupplyFilterType {
         return 'All';
       case SupplyFilterType.meal:
         return 'Meal';
-      case SupplyFilterType.beverage:
-        return 'Beverage';
+      case SupplyFilterType.drink:
+        return 'Drink';
       case SupplyFilterType.equipment:
         return 'Equipment';
       case SupplyFilterType.towel:
         return 'Towel';
+      case SupplyFilterType.cart:
+        return 'Cart';
     }
   }
 }
 
 class FlightPrinter extends HookConsumerWidget {
+  final String flightId;
   final SupplyFormModel flightDetailModel;
 
-  const FlightPrinter({super.key, required this.flightDetailModel});
+  const FlightPrinter({super.key, required this.flightDetailModel , required this.flightId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final listItems = SupplyFilterType.values;
-    final checkedStates = useState<List<bool>>(List.filled(listItems.length, false));
+    final checkedStates =
+        useState<List<bool>>(List.filled(listItems.length, false));
 
     void toggleCheckbox(int index) {
       final newCheckedStates = List<bool>.from(checkedStates.value);
@@ -74,7 +81,8 @@ class FlightPrinter extends HookConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             AppbarDialog(
-              title: 'In phiếu - ${flightDetailModel.flightInfo?.flightNo ?? "N/A"}',
+              title:
+                  'In phiếu - ${flightDetailModel.flightInfo?.flightNo ?? "N/A"}',
             ),
             SizedBox(height: 16.h),
             ListView.builder(
@@ -104,8 +112,14 @@ class FlightPrinter extends HookConsumerWidget {
                     .where((item) => item != SupplyFilterType.all)
                     .toList();
 
-                print("In phiếu với: $selectedItems");
                 // await controller.printJson(...);
+                final selectedLabels =
+                    selectedItems.map((e) => e.label).toList();
+
+                GoRouter.of(context).push(AppRouter.preview,
+                    extra: PreviewArgs(
+                        flightId: flightId,
+                        type: selectedLabels));
               },
             ),
           ],

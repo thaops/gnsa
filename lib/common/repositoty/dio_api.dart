@@ -110,9 +110,10 @@ class DioApi {
       );
       return _handleResponse(response);
     } on DioException catch (e) {
-      print("e: $e");
+      print("errors: $e");
       throw Exception('Failed to post data: ${e.message}');
     } catch (e) {
+      print("errorsc: $e");
       throw Exception('Unexpected error: $e');
     }
   }
@@ -186,8 +187,10 @@ class DioApi {
       );
       return _handleResponse(response);
     } on DioException catch (e) {
+      print("errors: $e");
       throw Exception('Failed to patch data: ${e.message}');
     } catch (e) {
+      print("errorsc: $e");
       throw Exception('Unexpected error: $e');
     }
   }

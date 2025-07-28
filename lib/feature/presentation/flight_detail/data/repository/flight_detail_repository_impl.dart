@@ -1,5 +1,6 @@
 import 'package:gnsa/feature/presentation/flight_detail/data/data_sources/flight_detail_remote.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/flight_preview_model.dart';
+import 'package:gnsa/feature/presentation/flight_detail/data/model/preview_args.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/supplyform_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/update_supplyfrom_item_req.dart';
 import 'package:gnsa/feature/presentation/flight_detail/domain/repository/flight_detail_repository.dart';
@@ -18,7 +19,7 @@ class FlightDetailRepositoryImpl implements FlightDetailRepository {
   }
 
   @override
-  Future<FlightPreviewModel> getFlightPreview(String flightId) {
-    return _flightDetailRemote.getFlightPreview(flightId);
+  Future<FlightPreviewModel> getFlightPreview(PreviewArgs args) {
+    return _flightDetailRemote.getFlightPreview(args);
   }
 }

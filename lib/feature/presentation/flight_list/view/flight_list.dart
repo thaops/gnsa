@@ -11,6 +11,8 @@ import 'package:gnsa/common/widgets/state_err.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:gnsa/feature/presentation/flight_list/provider/flight_list_provider.dart';
 import 'package:gnsa/feature/presentation/flight_list/widget/flight_list_content.dart';
+import 'package:gnsa/router/app_router.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 const _searchDebounceDuration = Duration(seconds: 1);
@@ -25,6 +27,25 @@ class FlightListScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return KeepAliveFlightListContent(isMyFlight: isMyFlight);
   }
+}
+
+void _goToProfile(BuildContext context) {
+  GoRouter.of(context).push(AppRouter.profile);
+}
+
+Future<DateTimeRange?> _showDatePicker(
+    BuildContext context, WidgetRef ref) async {
+  final picked = await showDateRangePicker(
+    context: context,
+    firstDate: DateTime(2020),
+    lastDate: DateTime(2100),
+    initialDateRange: DateTimeRange(
+      start: DateTime.now().subtract(const Duration(days: 7)),
+      end: DateTime.now(),
+    ),
+  );
+
+  return picked;
 }
 
 class KeepAliveFlightListContent extends StatefulWidget {
@@ -78,6 +99,26 @@ class _KeepAliveFlightListContentState extends State<KeepAliveFlightListContent>
           appBar: AppBarWidget(
             title: widget.isMyFlight ? 'Lịch bay của tôi' : 'Toàn bộ lịch bay',
             isBack: false,
+            iconRightFirst: Icons.person,
+            onPressedFirst: () {
+              _goToProfile(context);
+            },
+            leadingIcon: Icons.calendar_month_sharp,
+            onLeadingIconPressed: () async {
+              final picked = await _showDatePicker(context, ref);
+              if (picked != null) {
+                ref
+                    .read(
+                        flightListNotifierProvider(widget.isMyFlight).notifier)
+                    .refreshFlights(
+                      search: currentSearch.value.isEmpty
+                          ? null
+                          : currentSearch.value,
+                      fromDate: picked.start,
+                      toDate: picked.end,
+                    );
+              }
+            },
           ),
           body: Padding(
             padding:

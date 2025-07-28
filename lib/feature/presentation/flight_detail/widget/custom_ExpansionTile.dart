@@ -17,7 +17,7 @@ class CustomExpansionTile extends HookConsumerWidget {
   final IconData leadingIcon;
   final bool isAdditional;
   final String trailingCount;
-  final bool isConfirmed;
+  final bool isNotSigned;
   // final bool isExpanded;
   final String supplyFormDetailId;
   final List<DetailItemGroup>? detailItems;
@@ -33,7 +33,7 @@ class CustomExpansionTile extends HookConsumerWidget {
     required this.leadingIcon,
     required this.isAdditional,
     required this.trailingCount,
-    required this.isConfirmed,
+    required this.isNotSigned,
     // required this.isExpanded,
     required this.supplyFormDetailId,
     this.detailItems,
@@ -78,7 +78,7 @@ class CustomExpansionTile extends HookConsumerWidget {
                   fontWeight: FontWeight.w300,
                 ),
               ),
-              isConfirmed ? _comfimerWidget() : const SizedBox(),
+              isNotSigned ? const SizedBox() : _comfimerWidget(),
             ],
           ),
           // trailing: Column(
@@ -123,7 +123,7 @@ class CustomExpansionTile extends HookConsumerWidget {
                         return ChildExpansion(
                           supplyItem: supplyItem,
                           supplyType: supplyType,
-                          detailItemId: detailItems![outerIndex].items[groupIndex].itemId,
+                          detailItemId: detailItems![outerIndex].items[groupIndex].detailItemId,
                           supplyFormDetailId: supplyFormDetailId,
                           isAdditional: isAdditional,
                         );

@@ -1,203 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gnsa/common/design_system/tokens/app_sizes.dart';
-import 'package:gnsa/common/img/img.dart';
+import 'package:gnsa/common/utils/dash_line.dart';
+import 'package:gnsa/common/utils/date_utils.dart';
 import 'package:gnsa/common/widgets/app_bar_widget.dart';
+import 'package:gnsa/common/widgets/container_loading.dart';
 import 'package:gnsa/common/widgets/custom_button.dart';
+import 'package:gnsa/common/widgets/loading_shimmer.dart';
+import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
+import 'package:gnsa/feature/presentation/flight_detail/data/model/flight_preview_model.dart';
+import 'package:gnsa/feature/presentation/flight_detail/data/model/preview_args.dart';
 import 'package:gnsa/feature/presentation/flight_detail/provider/flight_preview_provider.dart';
+import 'package:gnsa/feature/presentation/flight_detail/widget/custom_loading_case.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:intl/intl.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
-// class PreviewView extends ConsumerWidget {
-//   final String id;
-//    PreviewView({super.key, required this.id});
-
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     final flightState = ref.watch(flightPreviewProviderProvider(id));
-//     return Scaffold(
-//       appBar: AppBarWidget(
-//         title: 'Xem trước',
-//       ),
-//       body:   SizedBox.expand(
-//         child: Column(
-//             mainAxisAlignment: MainAxisAlignment.center,
-//             children: [
-//               Expanded(
-//                child: flightState.when(
-//                  data: (data) {
-//                  },
-//                  loading: () =>  Center(child: CircularProgressIndicator()),
-//                  error: (error, stackTrace) => Center(
-//                    child: Text(error.toString()),
-//                  ),
-//                ),
-//               ),
-//               CustomButton(
-//                 horizontalPadding: AppSizes.paddingLarge,
-//                 width: MediaQuery.of(context).size.width * 0.4,
-//                 text: 'In phiếu',
-//                 color: AppColors.primary,
-//                 onPressed: () {},
-//               ),
-//               SizedBox(height: AppSizes.paddingSmall)
-//             ],
-//           ),
-//       ),
-      
-//     );
-//   }
-// }
-
+const double _maxWidth = 400;
+const double _heightDivider = 2;
+const double _dashHeight = 1;
+const double _dashWidth = 5;
+const double _dashSpace = 3;
 
 class PreviewView extends ConsumerWidget {
-  final String id;
-   PreviewView({super.key, required this.id});
+  final PreviewArgs args;
+  const PreviewView({super.key, required this.args});
 
-  // Format date to match vi-VN locale
-  String formatDate(String dateString) {
-    try {
-      final date = DateTime.parse(dateString);
-      final dateFormat = DateFormat('dd/MM/yyyy HH:mm', 'vi_VN');
-      return dateFormat.format(date);
-    } catch (e) {
-      return dateString; // Fallback to raw string if parsing fails
-    }
-  }
-
-  // Placeholder for print functionality
   void handlePrint() {
-    // Implement printing logic here (e.g., using 'printing' package)
     print('Printing supply form...');
-    // For actual printing, you can use a package like `printing`:
-    // Printing.layoutPdf(onLayout: (format) => generatePdf());
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final flightState = ref.watch(flightPreviewProviderProvider(id));
+    final flightState = ref.watch(flightPreviewProviderProvider(args));
     return Scaffold(
       appBar: AppBarWidget(
         title: 'Xem trước',
       ),
       body: flightState.when(
-        data: (data) => SingleChildScrollView(
-          child: Padding(
-            padding:  EdgeInsets.all(AppSizes.paddingMedium),
-            child: ConstrainedBox(
-              constraints:  BoxConstraints(maxWidth: 400),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Flight Information Card
-                  Card(
-                    elevation: 2,
-                    child: Padding(
-                      padding:  EdgeInsets.all(AppSizes.paddingMedium),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                           Text(
-                            'Flight Information',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                           SizedBox(height: AppSizes.paddingSmall),
-                          _buildFlightInfoRow('Flight', data.flightInfo?.routing ?? ''),
-                          _buildFlightInfoRow('Flight No', data.flightInfo?.flightNo ?? ''),
-                          _buildFlightInfoRow('Aircraft', data.flightInfo?.acfNo ?? ''),
-                          _buildFlightInfoRow('Departure', formatDate(data.flightInfo?.departureDate ?? '')),
-                          _buildFlightInfoRow('Arrival', formatDate(data.flightInfo?.arrivalDate ?? '')),
-                          _buildFlightInfoRow('Aircraft Type', data.flightInfo?.typeApl ?? ''),
-                        ],
-                      ),
-                    ),
-                  ),
-                   SizedBox(height: AppSizes.paddingMedium),
-                  // Supply Details Cards
-                  ...data.supplyFormDetails!.map((supply) {
-                    return Padding(
-                      padding:  EdgeInsets.only(bottom: AppSizes.paddingMedium),
-                      child: Card(
-                        elevation: 2,
-                        child: Padding(
-                          padding:  EdgeInsets.all(AppSizes.paddingMedium),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    supply.supplyType ?? '',
-                                    style:  TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  Text(
-                                    supply.supplyCode ?? '',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                               SizedBox(height: AppSizes.paddingSmall),
-                              ...supply.detailItems!.asMap().entries.map((entry) {
-                                final index = entry.key;
-                                final item = entry.value;
-                                return Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          item.itemName ?? '',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.grey[700],
-                                          ),
-                                        ),
-                                        Text(
-                                          item.quantity.toString() ?? '',
-                                          style:  TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    if (index < supply.detailItems!.length - 1)
-                                      Divider(color: Colors.grey.withOpacity(0.3)),
-                                  ],
-                                );
-                              }).toList(),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                   SizedBox(height: AppSizes.paddingMedium),
-                  // Print Button
-                  CustomButton(
-                    horizontalPadding: AppSizes.paddingLarge,
-                    width: MediaQuery.of(context).size.width * 0.4,
-                    text: 'In phiếu',
-                    color: AppColors.primary,
-                    onPressed: handlePrint,
-                  ),
-                   SizedBox(height: AppSizes.paddingSmall),
-                ],
-              ),
-            ),
-          ),
+        data: (data) => _buildPreviewBody(data, context),
+        loading: () => LoadingShimmer(
+          child: CustomLoadingCase(),
         ),
-        loading: () =>  Center(child: CircularProgressIndicator()),
         error: (error, stackTrace) => Center(
           child: Text(error.toString()),
         ),
@@ -205,20 +49,180 @@ class PreviewView extends ConsumerWidget {
     );
   }
 
-  // Helper widget for flight info rows
-  Widget _buildFlightInfoRow(String label, String value) {
-    return Padding(
-      padding:  EdgeInsets.symmetric(vertical: AppSizes.paddingXSmall),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+  SingleChildScrollView _buildPreviewBody(
+      FlightPreviewModel data, BuildContext context) {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+            horizontal: AppSizes.paddingMedium,
+            vertical: AppSizes.paddingSmall),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: _maxWidth),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(
+                color: AppColors.white,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        children: [
+                          _buildFlightInfoRow(
+                              label: 'Flight',
+                              value: data.flightInfo?.routing ?? ''),
+                          _buildFlightInfoRow(
+                              label: 'Flight No',
+                              value: data.flightInfo?.flightNo ?? ''),
+                          _buildFlightInfoRow(
+                              label: 'Aircraft',
+                              value: data.flightInfo?.acfNo ?? ''),
+                          _buildFlightInfoRow(
+                              label: 'Departure',
+                              value: DateUtilsCustom.formatStringDate(
+                                  data.flightInfo?.departureDate ?? '')),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: AppSizes.paddingMedium),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          _buildFlightInfoRow(
+                              label: 'Arrival',
+                              value: DateUtilsCustom.formatStringDate(
+                                  data.flightInfo?.arrivalDate ?? '')),
+                          _buildFlightInfoRow(
+                              label: 'Aircraft Type',
+                              value: data.flightInfo?.typeApl ?? ''),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: AppSizes.paddingXSmall),
+              _buildFlightInfoRow(
+                  label: 'Tên',
+                  value: 'SL',
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween),
+              Divider(
+                height: _heightDivider,
+                color: AppColors.black,
+              ),
+              SizedBox(height: AppSizes.paddingXSmall),
+              ...data.supplyFormDetails?.map((supply) {
+                    return Padding(
+                      padding: EdgeInsets.symmetric(
+                          vertical: AppSizes.paddingMedium),
+                      child: Container(
+                        color: AppColors.white,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildFlightInfoRow(
+                                label: supply.supplyType ?? '',
+                                value: supply.supplyCode ?? '',
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween),
+                            SizedBox(height: AppSizes.paddingSmall),
+                            ...supply.detailItems?.asMap().entries.map((entry) {
+                                  final index = entry.key;
+                                  final item = entry.value;
+                                  return Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: AppSizes.paddingSmall),
+                                    child: Column(
+                                      children: [
+                                        _buildFlightInfoRow(
+                                            label: item.itemName ?? '',
+                                            value:
+                                                item.quantity.toString() ?? '',
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween),
+                                        if (index <
+                                            supply.detailItems!.length - 1)
+                                          Divider(
+                                              color:
+                                                  Colors.grey.withOpacity(0.3)),
+                                      ],
+                                    ),
+                                  );
+                                }).toList() ??
+                                [],
+                            SizedBox(height: AppSizes.paddingMedium),
+                            DashedLine(
+                              height: _dashHeight,
+                              color: AppColors.black,
+                              dashWidth: _dashWidth,
+                              dashSpace: _dashSpace,
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList() ??
+                  [],
+              _buildFlightInfoRow(
+                  label: 'Tổng',
+                  value: '400',
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: AppSizes.paddingSmall),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    TextWidget(
+                      text: 'Quét mã để xem chi tiết phiếu cung ứng',
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w300,
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      color: AppColors.black,
+                    ),
+                    QrImageView(
+                      data: 'https://baomoi.com/',
+                      version: QrVersions.auto,
+                      size: 160.w,
+                    ),
+                  ],
+                ),
+              ),
+              CustomButton(
+                horizontalPadding: AppSizes.paddingLarge,
+                width: MediaQuery.of(context).size.width * 0.4,
+                text: 'In phiếu',
+                color: AppColors.primary,
+                onPressed: handlePrint,
+              ),
+              SizedBox(height: AppSizes.paddingSmall),
+            ],
           ),
-          Text(
-            value,
-            style:  TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFlightInfoRow(
+      {required String label,
+      required String value,
+      MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start}) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: AppSizes.paddingXSmall),
+      child: Row(
+        mainAxisAlignment: mainAxisAlignment,
+        children: [
+          TextWidget(
+            text: "${label}: ",
+            fontSize: 14,
+            fontWeight: FontWeight.w300,
+          ),
+          TextWidget(
+            text: value,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
           ),
         ],
       ),

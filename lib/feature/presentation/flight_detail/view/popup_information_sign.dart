@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -36,20 +37,22 @@ class PopupInformationSign extends HookConsumerWidget {
             flightSignAsync.when(
                 data: (data) => SizedBox(
                   height: AppSizes.heightXXXXLarge,
-                  child: ListView.separated(
-                    itemCount: data.details?.length ?? 0,
-                    itemBuilder: (context, index) {
-                      final detail = data.details?[index];
-                      return _buildSignName(
-                        img: detail?.imageUrl,
-                        name: detail?.signedInfo,
-                        date: detail?.createdDate,
-                        isSupplier: detail?.isCrew ?? false,
-                      );
-                    },
-                    separatorBuilder: (context, index) {
-                      return SizedBox(height: AppSizes.paddingMedium.h);
-                    },
+                  child: Column(
+                    children: [
+                      _buildSignName(
+                        img: data.crew?.imageUrl.toString(),
+                        name: data.crew?.signedInfo,
+                        date: DateUtilsCustom.formatStringDate(data.crew?.createdDate.toString()),
+                        isSupplier: true,
+                      ),
+                      SizedBox(height: 16.h),
+                      _buildSignName(
+                        img: data.employee?.imageUrl.toString(),
+                        name: data.employee?.signedInfo,
+                        date: DateUtilsCustom.formatStringDate(data.employee?.createdDate.toString()),
+                        isSupplier: false,
+                      ),
+                    ],
                   ),
                 ),
                 error: (err, stackTrace) => StateErr(error: err.toString()),
@@ -151,9 +154,10 @@ class PopupInformationSign extends HookConsumerWidget {
             topLeft: Radius.circular(16.r),
             bottomLeft: Radius.circular(16.r),
           ),
-          child: Image(
-            image: NetworkImage(img),
+          child: CachedNetworkImage(
+            imageUrl: img,
             fit: BoxFit.fill,
+            errorWidget: (context, url, error) => const Icon(Icons.error),
           ),
         ),
       ),

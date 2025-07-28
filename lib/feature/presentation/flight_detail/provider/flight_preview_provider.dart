@@ -1,5 +1,6 @@
 import 'package:gnsa/common/Services/services_base/async_request_handler.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/flight_preview_model.dart';
+import 'package:gnsa/feature/presentation/flight_detail/data/model/preview_args.dart';
 import 'package:gnsa/feature/presentation/flight_detail/provider/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -8,16 +9,16 @@ part 'flight_preview_provider.g.dart';
 @riverpod
 class FlightPreviewProvider extends _$FlightPreviewProvider {
   @override
-  FutureOr<FlightPreviewModel> build(String id) {
-    return fetchFlightPreview(id);
+  FutureOr<FlightPreviewModel> build(PreviewArgs args) {
+    return fetchFlightPreview(args);
   }
 
-  Future<FlightPreviewModel> fetchFlightPreview(String id) async {
+  Future<FlightPreviewModel> fetchFlightPreview(PreviewArgs args) async {
     final asyncHander = ref.read(asyncRequestHandlerProvider.notifier);
     return await asyncHander.execute<FlightPreviewModel>(
           state: state,
           apiCall: () =>
-              ref.read(flightDetailUserCaseProvider).getFlightPreview(id),
+              ref.read(flightDetailUserCaseProvider).getFlightPreview(args),
           onSuccess: (response) {
             state = AsyncValue.data(response);
           },
