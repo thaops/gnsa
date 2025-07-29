@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gnsa/common/design_system/tokens/app_sizes.dart';
 import 'package:gnsa/common/utils/responsive_helper.dart';
@@ -12,7 +13,7 @@ import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/preview_args.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/supplyform_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/provider/flight_detail_provider.dart';
-import 'package:gnsa/feature/presentation/flight_detail/view/preview_view.dart';
+import 'package:gnsa/feature/presentation/flight_detail/provider/providers.dart';
 import 'package:gnsa/feature/presentation/flight_detail/view/supply_form_list_view.dart';
 import 'package:gnsa/feature/presentation/flight_detail/widget/custom_detail_flight.dart';
 import 'package:gnsa/feature/presentation/flight_detail/widget/custom_loading_case.dart';
@@ -34,18 +35,20 @@ class FlightDetailScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(
-        flightDetailProviderProvider(id));
-    return 
-      Scaffold(
-        resizeToAvoidBottomInset: true,
-        appBar: _buildAppBar(context, ref, state, id),
-        body: _buildBody(context, ref, state),
-      );
-    
+    useEffect(() {
+      Future.microtask(() => ref.read(flightId.notifier).state = id);
+      return null;
+    }, [id]);
+    final state = ref.watch(flightDetailProviderProvider(id));
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      appBar: _buildAppBar(context, ref, state, id),
+      body: _buildBody(context, ref, state),
+    );
   }
 
-  void _showPrinterDialog(BuildContext context, WidgetRef ref, AsyncValue<SupplyFormModel> state) {
+  void _showPrinterDialog(
+      BuildContext context, WidgetRef ref, AsyncValue<SupplyFormModel> state) {
     state.when(
       data: (data) => showDialog(
         context: context,
@@ -62,7 +65,8 @@ class FlightDetailScreen extends HookConsumerWidget {
     return _paddingHorizontalMobile;
   }
 
-  AppBarWidget _buildAppBar(BuildContext context, WidgetRef ref, AsyncValue<SupplyFormModel> state, String flightId) {
+  AppBarWidget _buildAppBar(BuildContext context, WidgetRef ref,
+      AsyncValue<SupplyFormModel> state, String flightId) {
     return AppBarWidget(
       title: 'Cung ứng vật tư',
       isBack: true,
@@ -125,14 +129,16 @@ class FlightDetailScreen extends HookConsumerWidget {
             context.push(AppRouter.qrcode);
             break;
           case 'preview':
-            context.push(AppRouter.preview, extra: PreviewArgs(flightId: flightId));
+            context.push(AppRouter.preview,
+                extra: PreviewArgs(flightId: flightId));
             break;
         }
       },
     );
   }
 
-  Widget _buildBody(BuildContext context, WidgetRef ref, AsyncValue<SupplyFormModel> state) {
+  Widget _buildBody(
+      BuildContext context, WidgetRef ref, AsyncValue<SupplyFormModel> state) {
     List<String> idsNotSign = [];
     final size = MediaQuery.sizeOf(context);
     final horizontalPadding = _getHorizontalPadding(size.width, context);
@@ -143,7 +149,7 @@ class FlightDetailScreen extends HookConsumerWidget {
             idsNotSign.add(element.supplyFormDetailId);
           }
         });
-        
+
         if (data.supplyFormId == null &&
             data.supplyFormDetails?.isEmpty == true) {
           return const Center(child: Text('Không có chi tiết chuyến bay'));
@@ -217,8 +223,10 @@ class _KeepAliveFlightDetailContentState
                 ),
               ),
             ),
-          widget.ids.isEmpty ? const SizedBox() :  _buildSignButton(
-                context, widget.ref, widget.horizontalPadding, widget.ids, widget.flightId),
+            widget.ids.isEmpty
+                ? const SizedBox()
+                : _buildSignButton(context, widget.ref,
+                    widget.horizontalPadding, widget.ids, widget.flightId),
             const SizedBox(height: _paddingVertical),
           ],
         );
@@ -281,12 +289,14 @@ class _KeepAliveFlightDetailContentState
                   supplyForms: data.supplyFormDetails,
                   // isExpanded: isExpanded,
                   ref: ref,
+                  flightId: widget.flightId,
                   isAdditional: false,
                   kValueSign: _kValueSign,
                 ),
                 SupplyFormListView(
                   supplyForms: data.additionalFormDetails,
                   ref: ref,
+                  flightId: widget.flightId,
                   isAdditional: true,
                   kValueSign: _kValueSign,
                 ),
@@ -305,7 +315,8 @@ class _KeepAliveFlightDetailContentState
           onPressed: () {
             context.push(AppRouter.flightSignature, extra: id).then((value) {
               if (value == true) {
-                Future.microtask(() => ref.invalidate(flightDetailProviderProvider(flightId)));
+                Future.microtask(() =>
+                    ref.invalidate(flightDetailProviderProvider(flightId)));
               }
             });
           },

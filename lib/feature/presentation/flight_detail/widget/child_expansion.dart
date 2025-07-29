@@ -7,7 +7,10 @@ import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/supplyform_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/update_supplyfrom_item_req.dart';
+import 'package:gnsa/feature/presentation/flight_detail/provider/flight_detail_provider.dart';
+import 'package:gnsa/feature/presentation/flight_detail/provider/providers.dart';
 import 'package:gnsa/feature/presentation/flight_detail/provider/supply_from_update_provider.dart';
+import 'package:gnsa/feature/presentation/flight_detail/view/flight_detail.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ChildExpansion extends HookConsumerWidget {
@@ -52,7 +55,9 @@ class ChildExpansion extends HookConsumerWidget {
         type: supplyType,
         supplement: confirmedQuantity.value,
         note: noteController.text,
-      ));
+      )).then((value) {
+        ref.read(flightDetailProviderProvider(ref.read(flightId),isSkipLoading: true).notifier).fetchFlightDetail(ref.read(flightId),isSkipLoading: true);
+      });
     }
 
     void _incrementQuantity() {
@@ -67,6 +72,8 @@ class ChildExpansion extends HookConsumerWidget {
 
     void _closeEdit() {
       focusNode.unfocus();
+      noteController.text = noteState.value;
+      confirmedQuantity.value = supplyItem?.additionalQuantity ?? 0;
       isEdit.value = false;
     }
 

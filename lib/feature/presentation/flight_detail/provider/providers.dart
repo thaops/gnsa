@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:gnsa/common/Services/services_base/api_service_ref.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/data_sources/flight_detail_remote.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/repository/flight_detail_repository_impl.dart';
@@ -14,3 +15,5 @@ final flightDetailRepositoryProvider = Provider<FlightDetailRepository>((ref) {
 final flightDetailUserCaseProvider = Provider<FlightDetailUserCase>((ref) {
   return FlightDetailUserCase(ref.read(flightDetailRepositoryProvider));
 });
+
+final flightId = StateProvider<String>((ref) => '');

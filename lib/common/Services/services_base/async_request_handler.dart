@@ -15,9 +15,12 @@ class AsyncRequestHandler extends StateNotifier<AsyncValue<void>> {
     OnError? onError,
     bool rethrowError = true,
     bool cancelPrevious = true,
+    bool isSkipLoading = false,
   }) async {
 
-    state = const AsyncValue.loading();
+    if (!isSkipLoading) {
+      state = const AsyncValue.loading();
+    }
 
     try {
       final response = await apiCall();

@@ -5,54 +5,53 @@ import 'package:gnsa/common/design_system/tokens/app_sizes.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/supplyform_model.dart';
+import 'package:gnsa/feature/presentation/flight_detail/provider/flight_detail_provider.dart';
 import 'package:gnsa/feature/presentation/flight_detail/view/popup_information_sign.dart';
 import 'package:gnsa/feature/presentation/flight_detail/widget/custom_ExpansionTile.dart';
 import 'package:gnsa/router/app_router.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class SupplyFormListView extends StatefulWidget {
+class SupplyFormListView extends HookConsumerWidget {
   final List<SupplyFormDetail>? supplyForms;
   final bool isAdditional;
-  // final bool isExpanded;
   final WidgetRef ref;
   final String? kValueSign;
+  final String flightId;
 
   const SupplyFormListView({
     required this.supplyForms,
     required this.isAdditional,
-    // required this.isExpanded,
     required this.ref,
     this.kValueSign,
+    required this.flightId,
     super.key,
   });
 
   @override
-  State<SupplyFormListView> createState() => _SupplyFormListViewState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final supplyFormData = ref.watch(flightDetailProviderProvider(flightId,isSkipLoading: true)).when(
+          data: (data) {
+            return isAdditional ? data.additionalFormDetails : data.supplyFormDetails;
+          },
+          loading: () => supplyForms ?? [],
+          error: (_, __) => supplyForms ?? [],
+        );
 
+    if (supplyFormData?.isEmpty ?? true) {
+      return Center(child: Text(isAdditional ? 'Không có phiếu bổ sung' : 'Không có phiếu cung ứng'));
+    }
 
-
-class _SupplyFormListViewState extends State<SupplyFormListView> with AutomaticKeepAliveClientMixin {
-
-  @override
-  bool get wantKeepAlive => true;
-
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
-    if(widget.supplyForms?.isEmpty == true) return Center(child: Text(widget.isAdditional ? 'Không có phiếu bổ sung' : 'Không có phiếu cung ứng'));
     return ListView.builder(
       shrinkWrap: true,
       physics: const BouncingScrollPhysics(),
-      itemCount: widget.supplyForms?.length ?? 0,
+      itemCount: supplyFormData?.length ?? 0,
       itemBuilder: (context, index) => _buildSupplyItem(
         context,
-        widget.supplyForms![index],
-        // isExpanded,
-        widget.ref,
-        widget.isAdditional,
-        widget.kValueSign,
+        supplyFormData![index],
+        ref,
+        isAdditional,
+        kValueSign,
       ),
     );
   }

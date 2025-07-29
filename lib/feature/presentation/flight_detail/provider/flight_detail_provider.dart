@@ -8,11 +8,11 @@ part 'flight_detail_provider.g.dart';
 @riverpod
 class FlightDetailProvider extends _$FlightDetailProvider {
   @override
-  FutureOr<SupplyFormModel> build(String id) async {
-    return fetchFlightDetail(id);
+  FutureOr<SupplyFormModel> build(String id,{bool isSkipLoading = false}) async {
+    return fetchFlightDetail(id,isSkipLoading: isSkipLoading);
   }
 
-  Future<SupplyFormModel> fetchFlightDetail(String id) async {
+  Future<SupplyFormModel> fetchFlightDetail(String id,{bool isSkipLoading = false}) async {
     if (!ref.mounted) {
       return SupplyFormModel();
     }
@@ -24,8 +24,8 @@ class FlightDetailProvider extends _$FlightDetailProvider {
             state = AsyncValue.data(response);
           },
           cancelPrevious: true,
+          isSkipLoading: isSkipLoading,
         ) ??
         SupplyFormModel();
   }
-
 }

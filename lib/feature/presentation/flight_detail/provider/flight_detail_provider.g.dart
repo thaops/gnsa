@@ -13,7 +13,11 @@ final class FlightDetailProviderProvider
     extends $AsyncNotifierProvider<FlightDetailProvider, SupplyFormModel> {
   const FlightDetailProviderProvider._(
       {required FlightDetailProviderFamily super.from,
-      required String super.argument})
+      required (
+        String, {
+        bool isSkipLoading,
+      })
+          super.argument})
       : super(
           retry: null,
           name: r'flightDetailProviderProvider',
@@ -29,7 +33,7 @@ final class FlightDetailProviderProvider
   String toString() {
     return r'flightDetailProviderProvider'
         ''
-        '($argument)';
+        '$argument';
   }
 
   @$internal
@@ -54,12 +58,19 @@ final class FlightDetailProviderProvider
 }
 
 String _$flightDetailProviderHash() =>
-    r'bfac4a0115c4c07b01f64acbb27235ad41fe98a5';
+    r'1a76ac08c2485edef292125027ee2b6ffb96683c';
 
 final class FlightDetailProviderFamily extends $Family
     with
-        $ClassFamilyOverride<FlightDetailProvider, AsyncValue<SupplyFormModel>,
-            SupplyFormModel, FutureOr<SupplyFormModel>, String> {
+        $ClassFamilyOverride<
+            FlightDetailProvider,
+            AsyncValue<SupplyFormModel>,
+            SupplyFormModel,
+            FutureOr<SupplyFormModel>,
+            (
+              String, {
+              bool isSkipLoading,
+            })> {
   const FlightDetailProviderFamily._()
       : super(
           retry: null,
@@ -70,26 +81,36 @@ final class FlightDetailProviderFamily extends $Family
         );
 
   FlightDetailProviderProvider call(
-    String id,
-  ) =>
-      FlightDetailProviderProvider._(argument: id, from: this);
+    String id, {
+    bool isSkipLoading = false,
+  }) =>
+      FlightDetailProviderProvider._(argument: (
+        id,
+        isSkipLoading: isSkipLoading,
+      ), from: this);
 
   @override
   String toString() => r'flightDetailProviderProvider';
 }
 
 abstract class _$FlightDetailProvider extends $AsyncNotifier<SupplyFormModel> {
-  late final _$args = ref.$arg as String;
-  String get id => _$args;
+  late final _$args = ref.$arg as (
+    String, {
+    bool isSkipLoading,
+  });
+  String get id => _$args.$1;
+  bool get isSkipLoading => _$args.isSkipLoading;
 
   FutureOr<SupplyFormModel> build(
-    String id,
-  );
+    String id, {
+    bool isSkipLoading = false,
+  });
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build(
-      _$args,
+      _$args.$1,
+      isSkipLoading: _$args.isSkipLoading,
     );
     final ref = this.ref as $Ref<AsyncValue<SupplyFormModel>>;
     final element = ref.element as $ClassProviderElement<
