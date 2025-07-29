@@ -9,6 +9,7 @@ import 'package:gnsa/feature/presentation/flight_detail/view/poup_create_food.da
 import 'package:gnsa/feature/presentation/flight_detail/widget/child_expansion.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+const _cartTitle = "Cart";
 class CustomExpansionTile extends HookConsumerWidget {
   final Color? backgroundColor;
   final String title;
@@ -134,7 +135,8 @@ class CustomExpansionTile extends HookConsumerWidget {
               ),
             ),
             SizedBox(height: AppSizes.spacingSmall),
-            if (containsAnySupplyFormType(title) && isAdditional) _addCart(context)
+            if (title.contains(_cartTitle))
+             _addCart(context)
           ],
         ),
       ),
@@ -144,7 +146,7 @@ class CustomExpansionTile extends HookConsumerWidget {
   InkWell _addCart(BuildContext context) {
     return InkWell(
       onTap: () => {
-        showDialog(context: context, builder: (context) => PopupCreateFood()),
+        showDialog(context: context, builder: (context) => PopupCreateFood(supplyFormDetailId: supplyFormDetailId)),
       },
       child: Container(
         width: MediaQuery.of(context).size.width * 0.9,

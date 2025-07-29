@@ -28,6 +28,10 @@ class ApiEndpoints {
   static String getSupplyfromItemDetail =
       "${Config.baseUrl}/supplyform/get-item-in-supply-form-mobile";
 
+  //cart
+  static String addCart = "${Config.baseUrl}/cart/add-cart-to-supply-form";
+  static String getListCart = "${Config.baseUrl}/cart/get-list-cart";
+
   static String getFlightPreview = "${Config.baseUrl}/supplyform/preview-supply-form-in-mobile";
   //signed
   static String getListSignedSupplyForm(String supplyFormDetailId) => "${Config.baseUrl}/supplyform/get-list-signed-supply-form-mobile?supplyFormDetailId=$supplyFormDetailId";
