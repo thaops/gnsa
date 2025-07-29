@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gnsa/common/Services/services_base/async_request_handler.dart';
 import 'package:gnsa/common/design_system/tokens/app_sizes.dart';
 import 'package:gnsa/common/img/img.dart';
 import 'package:gnsa/common/widgets/custom_button.dart';
@@ -24,16 +23,14 @@ class LoginScreen extends ConsumerWidget {
         body: Stack(
           children: [
             _LoginContent(
-              state: loginState.value!, 
+              state: loginState.value!,
               ref: ref,
             ),
-            
             if (loginState.isLoading)
               ModalBarrier(
                 color: Colors.black.withOpacity(0.5),
                 dismissible: false,
               ),
-              
             if (loginState.isLoading)
               const Center(
                 child: CircularProgressIndicator(
@@ -110,7 +107,42 @@ class _LoginHeader extends StatelessWidget {
   }
 }
 
-class _LoginForm extends StatelessWidget {
+void _validateForm(
+  BuildContext context,
+  WidgetRef ref,
+  TextEditingController usernameController,
+  TextEditingController passwordController,
+  void Function(String?) setUsernameError,
+  void Function(String?) setPasswordError,
+) {
+  final username = usernameController.text;
+  final password = passwordController.text;
+
+  bool isValid = true;
+
+  if (username.isEmpty) {
+    setUsernameError('Vui lòng nhập tên đăng nhập');
+    isValid = false;
+  } else if (username.contains('@')) {
+    setUsernameError('Email không hợp lệ');
+    isValid = false;
+  } else {
+    setUsernameError(null);
+  }
+
+  if (password.length < 3) {
+    setPasswordError('Mật khẩu phải có ít nhất 3 ký tự');
+    isValid = false;
+  } else {
+    setPasswordError(null);
+  }
+
+  if (isValid) {
+    ref.read(loginControllerProvider.notifier).login(context);
+  }
+}
+
+class _LoginForm extends HookWidget {
   final LoginState state;
   final WidgetRef ref;
 
@@ -118,50 +150,66 @@ class _LoginForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final usernameError = useState<String?>(null);
+    final passwordError = useState<String?>(null);
+
     return Column(
       children: [
         _UsernameField(
           controller: state.nameController,
           ref: ref,
+          errorText: usernameError.value,
+          setError: (value) => usernameError.value = value,
         ),
         SizedBox(height: AppSizes.paddingXMedium),
         _PasswordField(
           controller: state.passwordController,
           ref: ref,
+          errorText: passwordError.value,
+          setError: (value) => passwordError.value = value,
         ),
         SizedBox(height: AppSizes.paddingLarge),
-        _LoginButton(ref: ref),
+        _LoginButton(
+          validateForm: () => _validateForm(
+            context,
+            ref,
+            state.nameController,
+            state.passwordController,
+            (value) => usernameError.value = value,
+            (value) => passwordError.value = value,
+          ),
+        ),
       ],
     );
   }
 }
 
-// ignore: must_be_immutable
 class _UsernameField extends HookWidget {
   final TextEditingController controller;
   final WidgetRef ref;
-  _UsernameField({
+  final String? errorText;
+  final void Function(String?) setError;
+
+  const _UsernameField({
     required this.controller,
     required this.ref,
+    required this.errorText,
+    required this.setError,
   });
 
   @override
   Widget build(BuildContext context) {
-    final errorTextState = useState<String?>("Vui lòng nhập tên đăng nhập");
     return CustomTextField(
       controller: controller,
       hintText: 'Tên đăng nhập',
       autofocus: true,
       keyboardType: TextInputType.emailAddress,
       borderColor: AppColors.primaryV2,
-      errorText: errorTextState.value,
+      errorText: errorText,
       textInputAction: TextInputAction.next,
       onChanged: (value) {
-        errorTextState.value = value.isEmpty
-            ? 'Vui lòng nhập tên đăng nhập'
-            : value.contains('@')
-                ? 'Email không hợp lệ'
-                : null;
+        // Không validate trong onChanged
+        setError(null); // Xóa lỗi khi người dùng nhập
       },
       onSubmit: () {
         FocusScope.of(context).nextFocus();
@@ -170,32 +218,35 @@ class _UsernameField extends HookWidget {
   }
 }
 
-// ignore: must_be_immutable
 class _PasswordField extends HookWidget {
   final TextEditingController controller;
   final WidgetRef ref;
-  _PasswordField({
+  final String? errorText;
+  final void Function(String?) setError;
+
+  const _PasswordField({
     required this.controller,
     required this.ref,
+    required this.errorText,
+    required this.setError,
   });
 
   @override
   Widget build(BuildContext context) {
     final obscureText = useState(true);
-    final errorTextState = useState<String?>("Vui lòng nhập mật khẩu");
 
     return CustomTextField(
       controller: controller,
       hintText: 'Mật khẩu',
       obscureText: obscureText.value,
       suffixIcon: obscureText.value ? Icons.visibility : Icons.visibility_off,
-      errorText: errorTextState.value,
+      errorText: errorText,
       textInputAction: TextInputAction.done,
       onSubmit: () {
         ref.read(loginControllerProvider.notifier).login(context);
       },
       onChanged: (value) {
-        errorTextState.value = value.length < 3 ? 'Ít nhất 3 ký tự' : null;
+        setError(null); // Xóa lỗi khi người dùng nhập
       },
       onSuffixTap: () {
         obscureText.value = !obscureText.value;
@@ -205,9 +256,11 @@ class _PasswordField extends HookWidget {
 }
 
 class _LoginButton extends StatelessWidget {
-  final WidgetRef ref;
+  final void Function() validateForm;
 
-  const _LoginButton({required this.ref});
+  const _LoginButton({
+    required this.validateForm,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -217,7 +270,7 @@ class _LoginButton extends StatelessWidget {
       height: AppSizes.buttonHeightLarge,
       textColor: AppColors.textButton,
       onPressed: () {
-        ref.read(loginControllerProvider.notifier).login(context);
+        validateForm();
       },
     );
   }

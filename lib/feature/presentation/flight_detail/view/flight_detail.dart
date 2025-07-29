@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gnsa/common/design_system/tokens/app_sizes.dart';
 import 'package:gnsa/common/utils/responsive_helper.dart';
 import 'package:gnsa/common/widgets/app_bar_widget.dart';
-import 'package:gnsa/common/widgets/custom_button.dart';
 import 'package:gnsa/common/widgets/loading_shimmer.dart';
 import 'package:gnsa/common/widgets/state_err.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
@@ -14,20 +11,17 @@ import 'package:gnsa/feature/presentation/flight_detail/data/model/preview_args.
 import 'package:gnsa/feature/presentation/flight_detail/data/model/supplyform_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/provider/flight_detail_provider.dart';
 import 'package:gnsa/feature/presentation/flight_detail/provider/providers.dart';
-import 'package:gnsa/feature/presentation/flight_detail/view/supply_form_list_view.dart';
-import 'package:gnsa/feature/presentation/flight_detail/widget/custom_detail_flight.dart';
 import 'package:gnsa/feature/presentation/flight_detail/widget/custom_loading_case.dart';
+import 'package:gnsa/feature/presentation/flight_detail/widget/keep_alive_flight_detail_content.dart';
 import 'package:gnsa/feature/presentation/flight_printer/view/flight_printer.dart';
 import 'package:gnsa/router/app_router.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 const _kValueSign = 'NotSigned';
-const _paddingVertical = 16.0;
 const _paddingHorizontalMobile = 16.0;
 const _paddingWebRatio = 0.3;
 const _paddingTabletRatio = 0.1;
-const _buttonHorizontalPadding = 16.0;
 
 class FlightDetailScreen extends HookConsumerWidget {
   const FlightDetailScreen({required this.id, super.key});
@@ -126,7 +120,7 @@ class FlightDetailScreen extends HookConsumerWidget {
             _showPrinterDialog(context, ref, state);
             break;
           case 'qr':
-            context.push(AppRouter.qrcode);
+            context.push(AppRouter.qrcode, extra: flightId);
             break;
           case 'preview':
             context.push(AppRouter.preview,
@@ -171,157 +165,4 @@ class FlightDetailScreen extends HookConsumerWidget {
       error: (error, stack) => StateErr(error: error.toString()),
     );
   }
-}
-
-class KeepAliveFlightDetailContent extends StatefulWidget {
-  final SupplyFormModel data;
-  final double horizontalPadding;
-  final WidgetRef ref;
-  final List<String> ids;
-  final String flightId;
-
-  const KeepAliveFlightDetailContent({
-    super.key,
-    required this.data,
-    required this.horizontalPadding,
-    required this.ref,
-    required this.ids,
-    required this.flightId,
-  });
-
-  @override
-  _KeepAliveFlightDetailContentState createState() =>
-      _KeepAliveFlightDetailContentState();
-}
-
-class _KeepAliveFlightDetailContentState
-    extends State<KeepAliveFlightDetailContent>
-    with AutomaticKeepAliveClientMixin {
-  @override
-  bool get wantKeepAlive => true;
-
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
-    return HookBuilder(
-      builder: (context) {
-        final tabController = useTabController(initialLength: 2);
-        return Column(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: widget.horizontalPadding,
-                  vertical: _paddingVertical,
-                ),
-                child: _buildSupplyFormList(
-                  widget.data,
-                  context,
-                  // widget.ref.watch(isChildExpandedProviderProvider),
-                  widget.ref,
-                  tabController,
-                ),
-              ),
-            ),
-            widget.ids.isEmpty
-                ? const SizedBox()
-                : _buildSignButton(context, widget.ref,
-                    widget.horizontalPadding, widget.ids, widget.flightId),
-            const SizedBox(height: _paddingVertical),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildSupplyFormList(
-    SupplyFormModel data,
-    BuildContext context,
-    // bool isExpanded,
-    WidgetRef ref,
-    TabController tabController,
-  ) =>
-      Column(
-        children: [
-          CustomDetailFlight(
-            flightDetail: 'Chi tiết chuyến bay:',
-            supplyFormModel: data,
-          ),
-          TabBar(
-            controller: tabController,
-            labelColor: AppColors.primary,
-            unselectedLabelColor: Colors.grey,
-            indicatorColor: AppColors.primary,
-            tabs: [
-              Tab(
-                child: SizedBox(
-                  width: AppSizes.tabWidth,
-                  child: Text(
-                    'Phiếu cung ứng',
-                    style: TextStyle(
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-              Tab(
-                child: SizedBox(
-                  width: AppSizes.tabWidth,
-                  child: Text(
-                    'Phiếu bổ sung',
-                    style: TextStyle(
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Flexible(
-            child: TabBarView(
-              controller: tabController,
-              children: [
-                SupplyFormListView(
-                  supplyForms: data.supplyFormDetails,
-                  // isExpanded: isExpanded,
-                  ref: ref,
-                  flightId: widget.flightId,
-                  isAdditional: false,
-                  kValueSign: _kValueSign,
-                ),
-                SupplyFormListView(
-                  supplyForms: data.additionalFormDetails,
-                  ref: ref,
-                  flightId: widget.flightId,
-                  isAdditional: true,
-                  kValueSign: _kValueSign,
-                ),
-              ],
-            ),
-          ),
-        ],
-      );
-
-  Widget _buildSignButton(BuildContext context, WidgetRef ref,
-          double horizontalPadding, List<String> id, String flightId) =>
-      Padding(
-        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-        child: CustomButton(
-          horizontalPadding: _buttonHorizontalPadding,
-          onPressed: () {
-            context.push(AppRouter.flightSignature, extra: id).then((value) {
-              if (value == true) {
-                Future.microtask(() =>
-                    ref.invalidate(flightDetailProviderProvider(flightId)));
-              }
-            });
-          },
-          color: AppColors.primary,
-          text: 'Ký xác nhận',
-        ),
-      );
 }

@@ -28,7 +28,6 @@ class LoginController extends _$LoginController {
     if (!context.mounted) return;
 
     FocusScope.of(context).unfocus();
-    if (!await _validateForm()) return;
 
     final handler = ref.read(asyncRequestHandlerProvider.notifier);
     final currentState = state.value;
@@ -73,30 +72,6 @@ class LoginController extends _$LoginController {
     if (context.mounted) {
       GoRouter.of(context).push(AppRouter.main);
     }
-  }
-
-  Future<bool> _validateForm() async {
-    final currentState = state.value;
-    if (currentState == null) return false;
-
-    var isValid = true;
-    var newState = currentState.copyWith(errorName: null, errorPassword: null);
-
-    if (currentState.nameController.text.isEmpty) {
-      newState = newState.copyWith(errorName: 'Vui lòng nhập tên đăng nhập');
-      isValid = false;
-    }
-
-    if (currentState.passwordController.text.isEmpty) {
-      newState = newState.copyWith(errorPassword: 'Vui lòng nhập mật khẩu');
-      isValid = false;
-    }
-
-    if (!isValid) {
-      state = AsyncData(newState);
-    }
-
-    return isValid;
   }
 
   void _clearForm() {

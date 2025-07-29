@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gnsa/common/design_system/tokens/app_sizes.dart';
 import 'package:gnsa/common/widgets/container_loading.dart';
 import 'package:gnsa/common/widgets/loading_shimmer.dart';
+import 'package:gnsa/common/widgets/text_widget.dart';
+import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:gnsa/feature/presentation/flight_list/data/model/flights_model.dart';
 import 'package:gnsa/feature/presentation/flight_list/provider/flight_list_provider.dart';
 import 'package:gnsa/feature/presentation/flight_list/widget/custom_flight_list.dart';
@@ -29,26 +31,6 @@ class FlightListContent extends HookConsumerWidget {
     final scrollController = useScrollController();
     final isLoadingMore = useState(false);
 
-    // useEffect(() {
-    //   void listener() {
-    //     if (scrollController.position.pixels >=
-    //         scrollController.position.maxScrollExtent * _scrollThreshold) {
-    //       isLoadingMore.value = true;
-    //       ref.read(flightListNotifierProvider(isMyFlight).notifier)
-    //           .loadMore(search: searchText)
-    //           .then((_) => isLoadingMore.value = false);
-    //     }
-    //   }
-    //   scrollController.addListener(listener);
-    //   return () => scrollController.removeListener(listener);
-    // }, [searchText]);
-
-    // if (flights.data == null || flights.data!.isEmpty) {
-    //   return const Center(
-    //     child: Text('Không tìm thấy chuyến bay phù hợp'),
-    //   );
-    // }
-
     useEffect(() {
       void listener() {
         if (scrollController.position.pixels >=
@@ -68,6 +50,17 @@ class FlightListContent extends HookConsumerWidget {
       scrollController.addListener(listener);
       return () => scrollController.removeListener(listener);
     }, [scrollController, searchText]);
+
+    if (flights.data?.isEmpty ?? true) {
+      return Center(
+        child: TextWidget(
+          fontSize: 12,
+          fontWeight: FontWeight.w300,
+          color: AppColors.black,
+          text: isMyFlight ? 'Không có chuyến bay của bạn' : 'Không có chuyến bay',
+        ),
+      );
+    }
 
     return RefreshIndicator(
       onRefresh: () async {

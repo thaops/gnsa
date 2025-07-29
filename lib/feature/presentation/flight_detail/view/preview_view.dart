@@ -166,7 +166,7 @@ class PreviewView extends ConsumerWidget {
                   [],
               _buildFlightInfoRow(
                   label: 'Tổng',
-                  value: '400',
+                  value: data.totalSupply.toString() ?? '',
                   mainAxisAlignment: MainAxisAlignment.spaceBetween),
               Padding(
                 padding: EdgeInsets.symmetric(vertical: AppSizes.paddingSmall),
@@ -183,7 +183,7 @@ class PreviewView extends ConsumerWidget {
                       color: AppColors.black,
                     ),
                     QrImageView(
-                      data: 'https://baomoi.com/',
+                      data: data.linkUrl ?? '',
                       version: QrVersions.auto,
                       size: 160.w,
                     ),

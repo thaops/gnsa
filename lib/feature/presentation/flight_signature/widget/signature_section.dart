@@ -12,6 +12,7 @@ class SignatureSection extends StatelessWidget {
   final bool isCrew;
   final List<String> supplyfromId;
   final VoidCallback onRefresh;
+  final bool isSupplement;
 
   const SignatureSection({
     super.key,
@@ -20,6 +21,7 @@ class SignatureSection extends StatelessWidget {
     required this.isCrew,
     required this.supplyfromId,
     required this.onRefresh,
+    required this.isSupplement,
   });
 
   @override
@@ -41,6 +43,7 @@ class SignatureSection extends StatelessWidget {
         title: isCrew ? 'TIẾP VIÊN XÁC NHẬN' : 'NHÂN VIÊN XÁC NHẬN',
         supplyFormIds: supplyfromId,
         isSupplierSign: isSupplierSign,
+        isSupplement: isSupplement,
       ),
     );
 

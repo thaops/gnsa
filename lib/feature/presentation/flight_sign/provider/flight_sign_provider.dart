@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:gnsa/common/Services/services_base/async_request_handler.dart';
-import 'package:gnsa/common/utils/custom_flushbar.dart';
 import 'package:gnsa/feature/presentation/flight_sign/data/model/flight_sign_req.dart';
 import 'package:gnsa/feature/presentation/flight_sign/provider/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -27,6 +26,7 @@ Future<void> saveSignature({
   required List<String> supplyFormDetailIds,
   required bool isCrew,
   required String signedName,
+  required bool isSupplement,
 }) async {
   final asyncRequestHandler = ref.read(asyncRequestHandlerProvider.notifier);
 
@@ -41,6 +41,7 @@ Future<void> saveSignature({
           signedName: signedName,
           isCrew: isCrew,
           signedFile: file,
+          isSupplement: isSupplement,
         ),
       );
       return response;

@@ -11,6 +11,7 @@ abstract class FlightDetailRepository {
   Future<FlightPreviewModel> getFlightPreview(PreviewArgs args);
   Future<List<CardItemModel>> getListCart();
   Future<bool> addCardItem(CardAddReqModel req);
+  Future<String> getQr(String flightId);
 }
 
 class FlightDetailUserCase {
@@ -36,5 +37,9 @@ class FlightDetailUserCase {
 
   Future<bool> addCardItem(CardAddReqModel req) async {
     return await repository.addCardItem(req);
+  }
+
+  Future<String> getQr(String flightId) async {
+    return await repository.getQr(flightId);
   }
 }

@@ -2,11 +2,15 @@ class FlightPreviewModel {
   final String? supplyFormId;
   final FlightInfo? flightInfo;
   final List<SupplyFormDetail>? supplyFormDetails;
+  final int? totalSupply;
+  final String? linkUrl;
 
   FlightPreviewModel({
     this.supplyFormId,
     this.flightInfo,
     this.supplyFormDetails,
+    this.totalSupply,
+    this.linkUrl,
   });
 
   factory FlightPreviewModel.fromJson(Map<String, dynamic> json) {
@@ -16,6 +20,8 @@ class FlightPreviewModel {
       supplyFormDetails: (json['SupplyFormDetails'] as List<dynamic>? ?? [])
           .map((e) => SupplyFormDetail.fromJson(e))
           .toList(),
+      totalSupply: json['TotalSupply'] as int?,
+      linkUrl: json['LinkUrl'] as String?,
     );
   }
 
@@ -24,6 +30,8 @@ class FlightPreviewModel {
         'FlightInfo': flightInfo?.toJson(),
         'SupplyFormDetails':
             supplyFormDetails?.map((e) => e.toJson()).toList(),
+        'TotalSupply': totalSupply,
+        'LinkUrl': linkUrl,
       };
 }
 

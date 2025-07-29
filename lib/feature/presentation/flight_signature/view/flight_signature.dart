@@ -20,15 +20,18 @@ const _kSpacing = 6.0;
 const _idNotData = '00000000-0000-0000-0000-000000000000';
 
 class FlightSignature extends HookConsumerWidget {
+  final bool isSupplement;
   final List<String> supplyfromdetailId;
 
-  const FlightSignature({super.key, required this.supplyfromdetailId});
+  const FlightSignature(
+      {super.key,
+      required this.supplyfromdetailId,
+      required this.isSupplement});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    for (var element in supplyfromdetailId) {
-      print("elementID: $element");
-    }
+    print("arguments: ${supplyfromdetailId.first}");
+
     final flightSignatureAsync =
         ref.watch(flightSignatureControllerProvider(supplyfromdetailId.first));
     final flightSignState = ref.read(
@@ -42,23 +45,22 @@ class FlightSignature extends HookConsumerWidget {
 
     return Scaffold(
       appBar: const AppBarWidget(title: 'Xác nhận'),
-      body: SizedBox(
-        width: double.infinity,
-        child: flightSignatureAsync.when(
-          data: (data) => SignatureContent(
-            supplyfromId: supplyfromdetailId,
-            signDetail: data,
-            onRefresh: () =>
-                flightSignState.getSingSupplyfrom(supplyfromdetailId.first),
-          ),
-          error: (err, _) => SignatureContent(
-            supplyfromId: supplyfromdetailId,
-            signDetail: SignSupplyfrom(),
-            onRefresh: () =>
-                flightSignState.getSingSupplyfrom(supplyfromdetailId.first),
-          ),
-          loading: () => _buildLoading(context),
+      body: flightSignatureAsync.when(
+        data: (data) => SignatureContent(
+          supplyfromId: supplyfromdetailId,
+          signDetail: data,
+          onRefresh: () =>
+              flightSignState.getSingSupplyfrom(supplyfromdetailId.first),
+          isSupplement: isSupplement,
         ),
+        error: (err, _) => SignatureContent(
+          supplyfromId: supplyfromdetailId,
+          signDetail: SignSupplyfrom(),
+          onRefresh: () =>
+              flightSignState.getSingSupplyfrom(supplyfromdetailId.first),
+          isSupplement: isSupplement,
+        ),
+        loading: () => _buildLoading(context),
       ),
     );
   }
@@ -80,8 +82,10 @@ class FlightSignature extends HookConsumerWidget {
               fontWeight: FontWeight.bold,
             ),
             SizedBox(height: _kSpacing.h),
-            ContainerLoading(
-              height: height * 0.26,
+            Expanded(
+              child: ContainerLoading(
+                height: height * 0.26,
+              ),
             ),
             SizedBox(height: AppSizes.spacingLarge.h),
             const TextWidget(
@@ -91,8 +95,10 @@ class FlightSignature extends HookConsumerWidget {
               fontWeight: FontWeight.bold,
             ),
             SizedBox(height: _kSpacing.h),
-            ContainerLoading(
-              height: height * 0.26,
+            Expanded(
+              child: ContainerLoading(
+                height: height * 0.26,
+              ),
             )
           ],
         ),
@@ -105,12 +111,14 @@ class SignatureContent extends StatelessWidget {
   final List<String> supplyfromId;
   final SignSupplyfrom signDetail;
   final VoidCallback onRefresh;
+  final bool isSupplement;
 
   const SignatureContent({
     super.key,
     required this.supplyfromId,
     required this.signDetail,
     required this.onRefresh,
+    required this.isSupplement,
   });
 
   @override
@@ -120,61 +128,90 @@ class SignatureContent extends StatelessWidget {
       child: Column(
         spacing: AppSizes.spacingMedium.h,
         children: [
-          CustomSignature(
-              crewInfo: signDetail.crew,
-              isCrew: true,
-              onPressed: () {
-                GoRouter.of(context)
-                    .push(
-                  AppRouter.flightSign,
-                  extra: FlightSignArguments(
-                    title: 'TIẾP VIÊN XÁC NHẬN',
-                    supplyFormIds: supplyfromId,
-                    isSupplierSign: true,
-                  ),
-                )
-                    .then((value) {
-                  if (value == true) {
-                    Future.microtask(onRefresh);
-                  }
-                });
-              }),
-          CustomSignature(
-              crewInfo: signDetail.employee,
-              isCrew: false,
-              onPressed: () {
-                GoRouter.of(context)
-                    .push(
-                  AppRouter.flightSign,
-                  extra: FlightSignArguments(
-                    title: 'NHÂN VIÊN XÁC NHẬN',
-                    supplyFormIds: supplyfromId,
-                    isSupplierSign: false,
-                  ),
-                )
-                    .then((value) {
-                  if (value == true) {
-                    Future.microtask(onRefresh);
-                  }
-                });
-              }),
+          Expanded(
+            child: CustomSignature(
+                crewInfo: signDetail.crew,
+                isCrew: true,
+                onPressed: () {
+                  GoRouter.of(context)
+                      .push(
+                    AppRouter.flightSign,
+                    extra: FlightSignArguments(
+                      title: 'TIẾP VIÊN XÁC NHẬN',
+                      supplyFormIds: supplyfromId,
+                      isSupplierSign: true,
+                      isSupplement: isSupplement,
+                    ),
+                  )
+                      .then((value) {
+                    if (value == true) {
+                      Future.microtask(onRefresh);
+                    }
+                  });
+                }),
+          ),
+          Expanded(
+            child: CustomSignature(
+                crewInfo: signDetail.employee,
+                isCrew: false,
+                onPressed: () {
+                  GoRouter.of(context)
+                      .push(
+                    AppRouter.flightSign,
+                    extra: FlightSignArguments(
+                      title: 'NHÂN VIÊN XÁC NHẬN',
+                      supplyFormIds: supplyfromId,
+                      isSupplierSign: false,
+                      isSupplement: isSupplement,
+                    ),
+                  )
+                      .then((value) {
+                    if (value == true) {
+                      Future.microtask(onRefresh);
+                    }
+                  });
+                }),
+          ),
           signDetail.employee?.id != _idNotData &&
                   signDetail.crew?.id != _idNotData
-              ? Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: AppSizes.paddingMedium.r),
-                  child: CustomButton(
-                    horizontalPadding: AppSizes.paddingMedium.r,
-                    onPressed: () {
-                      GoRouter.of(context).pop(true);
-                    },
-                    color: AppColors.primary,
-                    text: 'Xác nhận',
-                  ),
-                )
+              ? _buildComfirm(context)
               : const SizedBox(),
         ],
       ),
+    );
+  }
+
+  Column _buildComfirm(BuildContext context) {
+    return Column(
+      spacing: AppSizes.spacingSmall,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            TextWidget(
+              text: 'Tổng số vật tư',
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w300,
+              color: AppColors.black,
+            ),
+            TextWidget(
+              text: signDetail.totalSupply.toString(),
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w500,
+              color: AppColors.black,
+            ),
+          ],
+        ),
+        CustomButton(
+          horizontalPadding: AppSizes.paddingMedium.r,
+          onPressed: () {
+            GoRouter.of(context).pop(true);
+          },
+          color: AppColors.primary,
+          text: 'Xác nhận',
+        ),
+        SizedBox(height: AppSizes.spacingMedium.h),
+      ],
     );
   }
 }

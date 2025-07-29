@@ -17,8 +17,6 @@ class ApiEndpoints {
   static const String updateSupplyFormNote =
       "${Config.baseUrl}/supplyform/mobile/update-note";
 
-
-
 //new
 //supplyfromdetail
   static String supplyFormAllDetail({String? id}) =>
@@ -32,8 +30,15 @@ class ApiEndpoints {
   static String addCart = "${Config.baseUrl}/cart/add-cart-to-supply-form";
   static String getListCart = "${Config.baseUrl}/cart/get-list-cart";
 
-  static String getFlightPreview = "${Config.baseUrl}/supplyform/preview-supply-form-in-mobile";
+  static String getFlightPreview =
+      "${Config.baseUrl}/supplyform/preview-supply-form-in-mobile";
   //signed
-  static String getListSignedSupplyForm(String supplyFormDetailId) => "${Config.baseUrl}/supplyform/get-list-signed-supply-form-mobile?supplyFormDetailId=$supplyFormDetailId";
-  static String signedSupplyForm = "${Config.baseUrl}/supplyform/signed-supply-form-mobile";
+  static String getListSignedSupplyForm(String supplyFormDetailId) =>
+      "${Config.baseUrl}/supplyform/get-list-signed-supply-form-mobile?supplyFormDetailId=$supplyFormDetailId";
+  static String signedSupplyForm =
+      "${Config.baseUrl}/supplyform/signed-supply-form-mobile";
+
+  //qr
+  static String qr(String flightId) =>
+      "${Config.baseUrl}/supplyform/get-qr-code-by-flight-id-mobile?flightId=$flightId";
 }

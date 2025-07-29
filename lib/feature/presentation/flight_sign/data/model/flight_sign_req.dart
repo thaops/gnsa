@@ -8,18 +8,19 @@ class FlightSignReq {
   final String signedName;
   final bool isCrew;
   final File signedFile;
+  final bool isSupplement;
 
   FlightSignReq({
     required this.supplyFormDetailIds,
     required this.signedName,
     required this.isCrew,
     required this.signedFile,
+    required this.isSupplement,
   });
 
   Future<FormData> toFormData() async {
     final formMap = <String, dynamic>{};
 
-    // Gửi danh sách từng ID đúng theo multipart
     for (var id in supplyFormDetailIds) {
       formMap.putIfAbsent('SupplyFormDetailIds', () => []).add(id);
     }
@@ -32,6 +33,7 @@ class FlightSignReq {
         filename: signedFile.path.split('/').last,
         contentType: MediaType('image', 'png'),
       ),
+      'IsSupplement': isSupplement.toString(),
     });
 
     return FormData.fromMap(formMap);
@@ -42,5 +44,6 @@ class FlightSignReq {
         'SignedName': signedName,
         'IsCrew': isCrew,
         'Signed': signedFile.path,
+        'IsSupplement': isSupplement,
       };
 }

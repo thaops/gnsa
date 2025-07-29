@@ -3,12 +3,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ContainerLoading extends StatelessWidget {
   final double? height;
-  const ContainerLoading({super.key , this.height = 84});
+  final double? width;
+  const ContainerLoading({super.key , this.height = 84, this.width});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-              width: double.infinity,
+              width: width?.w ?? double.infinity,
               height: height?.h,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),

@@ -34,4 +34,9 @@ class FlightDetailRepositoryImpl implements FlightDetailRepository {
   Future<bool> addCardItem(CardAddReqModel req) {
     return _flightDetailRemote.addCardItem(req);
   }
+  
+  @override
+  Future<String> getQr(String flightId) {
+    return _flightDetailRemote.getQr(flightId);
+  }
 }

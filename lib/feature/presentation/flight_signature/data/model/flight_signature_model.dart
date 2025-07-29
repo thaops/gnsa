@@ -1,10 +1,12 @@
 class SignSupplyfrom {
   final String? supplyFormDetailId;
+  final int? totalSupply;
   final CrewInfo? crew;
   final CrewInfo? employee;
 
   SignSupplyfrom({
     this.supplyFormDetailId,
+    this.totalSupply,
     this.crew,
     this.employee,
   });
@@ -20,6 +22,7 @@ class SignSupplyfrom {
 
     return SignSupplyfrom(
       supplyFormDetailId: json['SupplyFormDetailId']?.toString() ?? '',
+      totalSupply: json['TotalSupply']?.toInt() ?? 0,
       crew: CrewInfo.fromJson(json['Crew']),
       employee: CrewInfo.fromJson(json['Employee']),
     );
@@ -27,6 +30,7 @@ class SignSupplyfrom {
 
   Map<String, dynamic> toJson() => {
         'SupplyFormDetailId': supplyFormDetailId,
+        'TotalSupply': totalSupply,
         'Crew': crew?.toJson(),
         'Employee': employee?.toJson(),
       };

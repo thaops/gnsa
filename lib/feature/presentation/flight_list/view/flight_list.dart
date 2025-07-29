@@ -16,7 +16,6 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 const _searchDebounceDuration = Duration(seconds: 1);
-const _loadingItemHeight = 60.0;
 const _listItemVerticalPadding = 16.0;
 
 class FlightListScreen extends HookConsumerWidget {

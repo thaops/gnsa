@@ -17,6 +17,8 @@ abstract class FlightDetailRemote {
 
   Future<bool> addCardItem(CardAddReqModel req);
 
+  Future<String> getQr(String flightId);
+
 }
 
 class FlightDetailRemoteImpl implements FlightDetailRemote {
@@ -54,5 +56,11 @@ class FlightDetailRemoteImpl implements FlightDetailRemote {
   Future<bool> addCardItem(CardAddReqModel req) async {
     final response = await _dioApi.post(ApiEndpoints.addCart, data: req.toJson());
     return response.data['Data'] as bool;
+  }
+
+  @override
+  Future<String> getQr(String flightId) async {
+    final response = await _dioApi.get(ApiEndpoints.qr(flightId));
+    return response.data['Data'] as String;
   }
 }

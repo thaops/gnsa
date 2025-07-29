@@ -8,6 +8,7 @@ import 'package:gnsa/feature/presentation/flight_list/view/flight_list.dart';
 import 'package:gnsa/feature/presentation/flight_printer/view/flight_printer.dart';
 import 'package:gnsa/feature/presentation/flight_sign/data/model/flight_sign_arguments.dart';
 import 'package:gnsa/feature/presentation/flight_sign/view/flight_sign.dart';
+import 'package:gnsa/feature/presentation/flight_signature/data/model/flight_signature_ag.dart';
 import 'package:gnsa/feature/presentation/flight_signature/view/flight_signature.dart';
 import 'package:gnsa/feature/profile/profile_view.dart';
 import 'package:gnsa/router/bottom_navigation_main.dart';
@@ -58,7 +59,7 @@ class AppRouter {
         GoRoute(
           name: qrcode,
           path: qrcode,
-          builder: (context, state) => const QrcodeView(),
+          builder: (context, state) => QrcodeView(flightId: state.extra as String),
         ),
         GoRoute(
           name: flightDetail,
@@ -74,8 +75,8 @@ class AppRouter {
           name: flightSignature,
           path: flightSignature,
           builder: (context, state) {
-           List<String> supplyformdetailId = state.extra as List<String> ;
-             return FlightSignature(supplyfromdetailId: supplyformdetailId);
+         final args = state.extra as FlightSignatureAg;
+             return FlightSignature(supplyfromdetailId: args.supplyformdetailId, isSupplement: args.isSupplement);
           },
         ),
         GoRoute(

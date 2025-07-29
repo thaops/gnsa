@@ -8,6 +8,7 @@ import 'package:gnsa/feature/presentation/flight_detail/data/model/supplyform_mo
 import 'package:gnsa/feature/presentation/flight_detail/provider/flight_detail_provider.dart';
 import 'package:gnsa/feature/presentation/flight_detail/view/popup_information_sign.dart';
 import 'package:gnsa/feature/presentation/flight_detail/widget/custom_ExpansionTile.dart';
+import 'package:gnsa/feature/presentation/flight_signature/data/model/flight_signature_ag.dart';
 import 'package:gnsa/router/app_router.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -72,7 +73,7 @@ Widget _buildSupplyItem(
             CupertinoContextMenuAction(
               onPressed: () => context.push(
                 AppRouter.flightSignature,
-                extra: [supplyForm.supplyFormDetailId],
+                extra: FlightSignatureAg(supplyformdetailId: [supplyForm.supplyFormDetailId], isSupplement: isAdditional),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
