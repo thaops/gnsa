@@ -55,6 +55,7 @@ class _LoginContent extends StatelessWidget {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: SingleChildScrollView(
+        physics: const ClampingScrollPhysics(),
         child: ConstrainedBox(
           constraints: BoxConstraints(
             minHeight: MediaQuery.of(context).size.height * 0.85,
@@ -152,6 +153,8 @@ class _LoginForm extends HookWidget {
   Widget build(BuildContext context) {
     final usernameError = useState<String?>(null);
     final passwordError = useState<String?>(null);
+    final usernameFocus = useFocusNode();
+    final passwordFocus = useFocusNode();
 
     return Column(
       children: [
@@ -160,6 +163,8 @@ class _LoginForm extends HookWidget {
           ref: ref,
           errorText: usernameError.value,
           setError: (value) => usernameError.value = value,
+          focusNode: usernameFocus,
+          nextFocusNode: passwordFocus,
         ),
         SizedBox(height: AppSizes.paddingXMedium),
         _PasswordField(
@@ -167,6 +172,7 @@ class _LoginForm extends HookWidget {
           ref: ref,
           errorText: passwordError.value,
           setError: (value) => passwordError.value = value,
+          focusNode: passwordFocus,
         ),
         SizedBox(height: AppSizes.paddingLarge),
         _LoginButton(
@@ -189,12 +195,16 @@ class _UsernameField extends HookWidget {
   final WidgetRef ref;
   final String? errorText;
   final void Function(String?) setError;
+  final FocusNode? focusNode;
+  final FocusNode? nextFocusNode;
 
   const _UsernameField({
     required this.controller,
     required this.ref,
     required this.errorText,
     required this.setError,
+    this.focusNode,
+    this.nextFocusNode,
   });
 
   @override
@@ -207,12 +217,12 @@ class _UsernameField extends HookWidget {
       borderColor: AppColors.primaryV2,
       errorText: errorText,
       textInputAction: TextInputAction.next,
+      focusNode: focusNode,
       onChanged: (value) {
-        // Không validate trong onChanged
-        setError(null); // Xóa lỗi khi người dùng nhập
+        setError(null);
       },
       onSubmit: () {
-        FocusScope.of(context).nextFocus();
+        nextFocusNode?.requestFocus();
       },
     );
   }
@@ -223,12 +233,14 @@ class _PasswordField extends HookWidget {
   final WidgetRef ref;
   final String? errorText;
   final void Function(String?) setError;
+  final FocusNode? focusNode;
 
   const _PasswordField({
     required this.controller,
     required this.ref,
     required this.errorText,
     required this.setError,
+    this.focusNode,
   });
 
   @override
@@ -242,11 +254,12 @@ class _PasswordField extends HookWidget {
       suffixIcon: obscureText.value ? Icons.visibility : Icons.visibility_off,
       errorText: errorText,
       textInputAction: TextInputAction.done,
+      focusNode: focusNode,
       onSubmit: () {
         ref.read(loginControllerProvider.notifier).login(context);
       },
       onChanged: (value) {
-        setError(null); // Xóa lỗi khi người dùng nhập
+        setError(null);
       },
       onSuffixTap: () {
         obscureText.value = !obscureText.value;

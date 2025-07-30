@@ -18,8 +18,8 @@ android {
 
     defaultConfig {
         applicationId = "com.vacs.gnsa"
-        minSdk = 23 // Đặt giá trị cụ thể cho minSdk
-        targetSdk = 33 // Đặt giá trị cụ thể cho targetSdk
+        minSdk = 23
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
     }

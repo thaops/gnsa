@@ -149,7 +149,9 @@ class CustomTextField extends StatelessWidget {
         onChanged: onChanged,
         onSubmitted: (value) {
           onSubmit?.call();
-          focusNode?.unfocus();
+          // if (textInputAction == TextInputAction.done) {
+          //   focusNode?.unfocus();
+          // }
         },
       ),
     );
