@@ -1,3 +1,3 @@
 class Config {
-  static const baseUrl = "https://vacs-api-dev.azurewebsites.net/api";
+  static const baseUrl = "https://gnsa-api-dev.azurewebsites.net/api";
 }

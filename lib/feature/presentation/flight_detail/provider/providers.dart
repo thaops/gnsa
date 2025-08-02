@@ -17,3 +17,4 @@ final flightDetailUserCaseProvider = Provider<FlightDetailUserCase>((ref) {
 });
 
 final flightId = StateProvider<String>((ref) => '');
+

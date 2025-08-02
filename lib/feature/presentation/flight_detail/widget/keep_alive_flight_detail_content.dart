@@ -6,6 +6,9 @@ import 'package:gnsa/common/widgets/custom_button.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/supplyform_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/provider/flight_detail_provider.dart';
+import 'package:gnsa/feature/presentation/flight_detail/provider/ids_not_sign_provider.dart';
+import 'package:gnsa/feature/presentation/flight_detail/provider/providers.dart';
+import 'package:gnsa/feature/presentation/flight_detail/view/flight_detail.dart';
 import 'package:gnsa/feature/presentation/flight_detail/view/supply_form_list_view.dart';
 import 'package:gnsa/feature/presentation/flight_detail/widget/custom_detail_flight.dart';
 import 'package:gnsa/feature/presentation/flight_signature/data/model/flight_signature_ag.dart';
@@ -15,13 +18,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 const _kValueSign = 'NotSigned';
 const _paddingVertical = 16.0;
-const _buttonHorizontalPadding = 16.0;
 
 class KeepAliveFlightDetailContent extends StatefulWidget {
   final SupplyFormModel data;
   final double horizontalPadding;
   final WidgetRef ref;
-  final List<String> ids;
   final String flightId;
 
   const KeepAliveFlightDetailContent({
@@ -29,7 +30,6 @@ class KeepAliveFlightDetailContent extends StatefulWidget {
     required this.data,
     required this.horizontalPadding,
     required this.ref,
-    required this.ids,
     required this.flightId,
   });
 
@@ -134,18 +134,19 @@ class _KeepAliveFlightDetailContentState
                         flightId: widget.flightId,
                         isAdditional: false,
                         kValueSign: _kValueSign,
+                        isSupplement: false,
                       ),
                     ),
-                    widget.ids.isEmpty
+                    ref.watch(idsNotSignProvider).isEmpty
                         ? const SizedBox()
                         : _buildSignButton(
                             context,
                             widget.ref,
                             widget.horizontalPadding,
-                            widget.ids,
+                            ref.watch(idsNotSignProvider),
                             widget.flightId,
                             false),
-                    const SizedBox(height: _paddingVertical),
+                    // const SizedBox(height: _paddingVertical),
                   ],
                 ),
                 Column(
@@ -157,18 +158,19 @@ class _KeepAliveFlightDetailContentState
                         flightId: widget.flightId,
                         isAdditional: true,
                         kValueSign: _kValueSign,
+                        isSupplement: true,
                       ),
                     ),
-                    widget.ids.isEmpty
+                    ref.watch(idsNotSignAdditionalProvider).isEmpty
                         ? const SizedBox()
-                        :   _buildSignButton(
+                        : _buildSignButton(
                             context,
                             widget.ref,
                             widget.horizontalPadding,
-                            widget.ids,
+                            ref.watch(idsNotSignAdditionalProvider),
                             widget.flightId,
                             true),
-                    const SizedBox(height: _paddingVertical),
+                    // const SizedBox(height: _paddingVertical),
                   ],
                 ),
               ],
@@ -187,19 +189,30 @@ class _KeepAliveFlightDetailContentState
       Padding(
         padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
         child: CustomButton(
-          horizontalPadding: _buttonHorizontalPadding,
-          onPressed: () {
-            context
-                .push(AppRouter.flightSignature,
-                    extra: FlightSignatureAg(
-                        supplyformdetailId: id, isSupplement: isSupplement))
-                .then((value) {
-              if (value == true) {
-                Future.microtask(() =>
-                    ref.invalidate(flightDetailProviderProvider(flightId)));
+          // horizontalPadding: _buttonHorizontalPadding,
+          onPressed: () async {
+            final result = await context.push(AppRouter.flightSignature,
+                extra: FlightSignatureAg(
+                    supplyformdetailId: id,
+                    isSupplement: isSupplement,
+                    isSignAll: true));
+
+            if (result == true) {
+              try {
+                await ref
+                    .refresh(flightDetailProviderProvider(flightId).future);
+
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Đã ký xác nhận thành công')),
+                  );
+                }
+              } catch (e) {
+                ref.invalidate(flightDetailProviderProvider(flightId));
               }
-            });
+            }
           },
+
           color: AppColors.primary,
           text: 'Ký xác nhận',
         ),

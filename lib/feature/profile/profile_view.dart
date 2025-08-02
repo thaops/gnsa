@@ -1,13 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/material.dart';
 import 'package:gnsa/common/Services/services.dart';
 import 'package:gnsa/common/widgets/app_bar_widget.dart';
-import 'package:gnsa/feature/auth/provider/providers.dart';
 import 'package:gnsa/router/app_router.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart';
-import 'package:shared_preferences/src/shared_preferences_legacy.dart';
 
 class ProfileApp extends StatelessWidget {
   const ProfileApp({super.key});

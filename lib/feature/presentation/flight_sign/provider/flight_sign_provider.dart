@@ -30,11 +30,11 @@ Future<void> saveSignature({
 }) async {
   final asyncRequestHandler = ref.read(asyncRequestHandlerProvider.notifier);
 
+state = const AsyncValue.loading();
   await asyncRequestHandler.execute(
     state: state,
     apiCall: () async {
       final file = await _generateSignatureFile();
-
       final response = await ref.read(flightSignUserCaseProvider).saveSignature(
         FlightSignReq(
           supplyFormDetailIds: supplyFormDetailIds,

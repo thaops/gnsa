@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,16 +14,23 @@ class CustomSignature extends StatelessWidget {
   final bool isCrew;
   final Function() onPressed;
   final Function()? onEditPressed;
+  final Uint8List? signatureBytes;
+  final String? signedName;
   const CustomSignature(
       {super.key,
       required this.crewInfo,
       required this.isCrew,
       required this.onPressed,
-      this.onEditPressed});
+      this.onEditPressed,
+      required this.signatureBytes,
+      required this.signedName});
 
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
+    final hasTempSignature = signatureBytes != null;
+    final hasServerSignature =
+        crewInfo?.imageUrl != null && crewInfo!.imageUrl!.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -32,16 +41,16 @@ class CustomSignature extends StatelessWidget {
         SizedBox(height: 12.h),
         Expanded(
           child: Container(
-              // width: double.infinity,
+              width: double.infinity,
               // height: screenSize.height * 0.35,
-              // padding: EdgeInsets.symmetric(
-              //   horizontal: crewInfo?.imageUrl == null ? 40.w : 0,
-              // ),
+              padding: EdgeInsets.symmetric(
+                horizontal: (hasServerSignature || hasTempSignature) ? 40.w : 0,
+              ),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12.r),
                 border: Border.all(color: AppColors.borderSignature, width: 1),
               ),
-              child: crewInfo?.imageUrl?.isEmpty ?? true
+              child: !(hasServerSignature || hasTempSignature)
                   ? Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -54,8 +63,9 @@ class CustomSignature extends StatelessWidget {
                         ),
                         SizedBox(height: 12.h),
                         TextWidget(
-                            text:
-                                isCrew ? 'Chữ ký tiếp viên' : 'Chữ ký nhân viên',
+                            text: isCrew
+                                ? 'Chữ ký tiếp viên'
+                                : 'Chữ ký nhân viên',
                             fontSize: 16,
                             fontWeight: FontWeight.bold),
                         SizedBox(height: 8.h),
@@ -78,15 +88,18 @@ class CustomSignature extends StatelessWidget {
                   : Stack(
                       children: [
                         Center(
-                            child: CachedNetworkImage(
-                                imageUrl: crewInfo?.imageUrl ?? '',
-                                fit: BoxFit.fill,
-                                key: ValueKey(crewInfo?.imageUrl),
-                                errorWidget: (context, url, error) =>
-                                    const Icon(Icons.error))),
+                            child: hasTempSignature
+                                ? Image.memory(signatureBytes!,
+                                    fit: BoxFit.fill)
+                                : CachedNetworkImage(
+                                    imageUrl: crewInfo?.imageUrl ?? '',
+                                    fit: BoxFit.fill,
+                                    key: ValueKey(crewInfo?.imageUrl),
+                                    errorWidget: (context, url, error) =>
+                                        const Icon(Icons.error))),
                         Positioned(
-                          top: 10,
-                          right: 10,
+                          top: 5,
+                          right: 5,
                           child: Container(
                             width: 44.w,
                             height: 44.h,

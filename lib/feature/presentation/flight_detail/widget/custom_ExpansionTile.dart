@@ -5,11 +5,15 @@ import 'package:gnsa/common/utils/enum_type_flight.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
 import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/supplyform_model.dart';
+import 'package:gnsa/feature/presentation/flight_detail/provider/flight_detail_provider.dart';
+import 'package:gnsa/feature/presentation/flight_detail/provider/providers.dart';
 import 'package:gnsa/feature/presentation/flight_detail/view/poup_create_food.dart';
 import 'package:gnsa/feature/presentation/flight_detail/widget/child_expansion.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 const _cartTitle = "Cart";
+const _kValueSign = 'NotSigned';
+
 class CustomExpansionTile extends HookConsumerWidget {
   final Color? backgroundColor;
   final String title;
@@ -19,6 +23,7 @@ class CustomExpansionTile extends HookConsumerWidget {
   final bool isAdditional;
   final String trailingCount;
   final bool isNotSigned;
+  // final String status;
   // final bool isExpanded;
   final String supplyFormDetailId;
   final List<DetailItemGroup>? detailItems;
@@ -35,6 +40,7 @@ class CustomExpansionTile extends HookConsumerWidget {
     required this.isAdditional,
     required this.trailingCount,
     required this.isNotSigned,
+    // required this.status,
     // required this.isExpanded,
     required this.supplyFormDetailId,
     this.detailItems,
@@ -124,7 +130,9 @@ class CustomExpansionTile extends HookConsumerWidget {
                         return ChildExpansion(
                           supplyItem: supplyItem,
                           supplyType: supplyType,
-                          detailItemId: detailItems![outerIndex].items[groupIndex].detailItemId,
+                          detailItemId: detailItems![outerIndex]
+                              .items[groupIndex]
+                              .detailItemId,
                           supplyFormDetailId: supplyFormDetailId,
                           isAdditional: isAdditional,
                         );
@@ -135,18 +143,23 @@ class CustomExpansionTile extends HookConsumerWidget {
               ),
             ),
             SizedBox(height: AppSizes.spacingSmall),
-            if (title.contains(_cartTitle))
-             _addCart(context)
+            if (title.contains(_cartTitle)) _addCart(context, ref)
           ],
         ),
       ),
     );
   }
 
-  InkWell _addCart(BuildContext context) {
+  InkWell _addCart(BuildContext context, WidgetRef ref) {
+
     return InkWell(
       onTap: () => {
-        showDialog(context: context, builder: (context) => PopupCreateFood(supplyFormDetailId: supplyFormDetailId)),
+        showDialog(
+            context: context,
+            builder: (context) =>
+                PopupCreateFood(supplyFormDetailId: supplyFormDetailId)).then((value) {
+                  ref.refresh(flightDetailProviderProvider(ref.read(flightId)));
+                }),
       },
       child: Container(
         width: MediaQuery.of(context).size.width * 0.9,

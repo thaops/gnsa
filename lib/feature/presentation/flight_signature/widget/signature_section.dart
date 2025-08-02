@@ -1,4 +1,6 @@
 
+import 'dart:typed_data';
+
 import 'package:flutter/widgets.dart';
 import 'package:gnsa/feature/presentation/flight_sign/data/model/flight_sign_arguments.dart';
 import 'package:gnsa/feature/presentation/flight_signature/data/model/flight_signature_model.dart';
@@ -13,6 +15,8 @@ class SignatureSection extends StatelessWidget {
   final List<String> supplyfromId;
   final VoidCallback onRefresh;
   final bool isSupplement;
+  final Uint8List? signatureBytes;
+  final String? signedName;
 
   const SignatureSection({
     super.key,
@@ -22,12 +26,16 @@ class SignatureSection extends StatelessWidget {
     required this.supplyfromId,
     required this.onRefresh,
     required this.isSupplement,
+    required this.signatureBytes,
+    required this.signedName,
   });
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: CustomSignature(
+        signatureBytes: signatureBytes,
+        signedName: signedName,
         crewInfo: crewInfo,
         isCrew: isCrew,
         onPressed: () => _navigateToSignature(context),
@@ -44,6 +52,7 @@ class SignatureSection extends StatelessWidget {
         supplyFormIds: supplyfromId,
         isSupplierSign: isSupplierSign,
         isSupplement: isSupplement,
+        signedName: crewInfo.signedInfo ?? '',
       ),
     );
 

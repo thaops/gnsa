@@ -76,7 +76,10 @@ class AppRouter {
           path: flightSignature,
           builder: (context, state) {
          final args = state.extra as FlightSignatureAg;
-             return FlightSignature(supplyfromdetailId: args.supplyformdetailId, isSupplement: args.isSupplement);
+             return FlightSignature(
+              supplyfromdetailId: args.supplyformdetailId,
+              isSupplement: args.isSupplement,
+              isSignAll: args.isSignAll);
           },
         ),
         GoRoute(

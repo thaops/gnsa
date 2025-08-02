@@ -3,12 +3,14 @@ class FlightSignArguments {
   final List<String> supplyFormIds;
   final bool isSupplierSign;
   final bool isSupplement;
+  final String signedName;
 
   FlightSignArguments({
     required this.title,
     required this.supplyFormIds,
     required this.isSupplierSign,
     required this.isSupplement,
+    required this.signedName,
   });
 
   Map<String, dynamic> toMap() {
@@ -17,6 +19,7 @@ class FlightSignArguments {
       'supplyFormIds': supplyFormIds,
       'isSupplierSign': isSupplierSign,
       'isSupplement': isSupplement,
+      'signedName': signedName,
     };
   }
 
@@ -26,6 +29,7 @@ class FlightSignArguments {
       supplyFormIds: List<String>.from(map['supplyFormIds'] ?? []),
       isSupplierSign: map['isSupplierSign'] as bool? ?? true,
       isSupplement: map['isSupplement'] as bool? ?? true,
+      signedName: map['signedName'] as String? ?? '',
     );
   }
 }

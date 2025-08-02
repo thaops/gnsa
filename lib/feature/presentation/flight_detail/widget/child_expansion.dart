@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gnsa/common/design_system/tokens/app_sizes.dart';
 import 'package:gnsa/common/utils/enum_type_flight.dart';
 import 'package:gnsa/common/widgets/custom_text_field.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
@@ -10,8 +11,8 @@ import 'package:gnsa/feature/presentation/flight_detail/data/model/update_supply
 import 'package:gnsa/feature/presentation/flight_detail/provider/flight_detail_provider.dart';
 import 'package:gnsa/feature/presentation/flight_detail/provider/providers.dart';
 import 'package:gnsa/feature/presentation/flight_detail/provider/supply_from_update_provider.dart';
-import 'package:gnsa/feature/presentation/flight_detail/view/flight_detail.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
 
 class ChildExpansion extends HookConsumerWidget {
   final SupplyItem? supplyItem;
@@ -179,12 +180,16 @@ class ChildExpansion extends HookConsumerWidget {
       required ValueNotifier<int> confirmedQuantity,
       required void Function() incrementQuantity}) {
     return Row(
+      spacing: AppSizes.spacingSmall,
       children: [
-        IconButton(
-          onPressed: () {
+        InkWell(
+          onTap: () {
             decrementQuantity();
           },
-          icon: const Icon(Icons.remove, color: AppColors.primary),
+          child: SizedBox(
+            width: 32.w,
+            height: 32.h,
+            child: const Icon(Icons.remove, color: AppColors.primary)),
         ),
         TextWidget(
           text: confirmedQuantity.value.toString(),
@@ -192,11 +197,14 @@ class ChildExpansion extends HookConsumerWidget {
           color: AppColors.primary,
           fontWeight: FontWeight.w300,
         ),
-        IconButton(
-          onPressed: () {
+        InkWell(
+          onTap: () {
             incrementQuantity();
           },
-          icon: const Icon(Icons.add, color: AppColors.primary),
+          child: SizedBox(
+            width: 32.w,
+            height: 32.h,
+            child: const Icon(Icons.add, color: AppColors.primary)),
         ),
       ],
     );

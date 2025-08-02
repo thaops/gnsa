@@ -14,6 +14,7 @@ class FlightListNotifier extends _$FlightListNotifier {
   CancelToken? _cancelToken;
   late bool _isMyFlight;
   bool _isLoadingMore = false;
+  FlightsModel? _originalData;
 
   @override
   Future<FlightsModel> build(bool isMyFlight) async {
@@ -21,15 +22,29 @@ class FlightListNotifier extends _$FlightListNotifier {
     _page = 1;
     _cancelToken?.cancel();
     _cancelToken = CancelToken();
-    return await _fetchFlights(search: null, cancelToken: _cancelToken!);
+    final result =
+        await _fetchFlights(search: null, cancelToken: _cancelToken!);
+    _originalData = result;
+    return result;
   }
 
-  Future<FlightsModel> fetchInitialFlights({String? search, DateTime? fromDate, DateTime? toDate}) async {
+  void restoreOriginalData() {
+    if (_originalData != null) {
+      state = AsyncValue.data(_originalData!);
+    }
+  }
+
+  Future<FlightsModel> fetchInitialFlights(
+      {String? search, DateTime? fromDate, DateTime? toDate}) async {
     if (!ref.mounted) return FlightsModel();
     _cancelToken?.cancel();
     _cancelToken = CancelToken();
     _page = 1;
-    return await _fetchFlights(search: search, fromDate: fromDate, toDate: toDate, cancelToken: _cancelToken!);
+    return await _fetchFlights(
+        search: search,
+        fromDate: fromDate,
+        toDate: toDate,
+        cancelToken: _cancelToken!);
   }
 
   // Future<void> loadMore({String? search}) async {
@@ -44,25 +59,32 @@ class FlightListNotifier extends _$FlightListNotifier {
   // }
 
   Future<void> loadMore({String? search}) async {
-  if (!ref.mounted || _isLoadingMore) return;
+    if (!ref.mounted || _isLoadingMore || (_cancelToken?.isCancelled ?? false))
+      return;
 
-  _isLoadingMore = true;
-  _page++;
+    _isLoadingMore = true;
+    _page++;
 
-  print('Page: $_page');
+    print('Page: $_page');
 
-  try {
-    final moreFlights = await _fetchFlights(search: search, cancelToken: _cancelToken!);
-    if (!ref.mounted) return;
-
-    state = AsyncValue.data(state.value!.copyWith(
-      data: [...state.value?.data ?? [], ...moreFlights.data ?? []],
-    ));
-  } finally {
-    _isLoadingMore = false;
+    try {
+      final moreFlights =
+          await _fetchFlights(search: search, cancelToken: _cancelToken!);
+      if (!ref.mounted || (_cancelToken?.isCancelled ?? false)) return;
+      final data = <FlightData>[
+        ...state.value?.data ?? [],
+        ...moreFlights.data ?? [],
+      ];
+      // if (search?.isEmpty ?? true) {
+      //   _originalData = FlightsModel(data: data);
+      // }
+      state = AsyncValue.data(state.value!.copyWith(
+        data: data,
+      ));
+    } finally {
+      _isLoadingMore = false;
+    }
   }
-}
-
 
   Future<FlightsModel> _fetchFlights({
     String? search,
@@ -74,7 +96,7 @@ class FlightListNotifier extends _$FlightListNotifier {
       final params = FlightsParams(
         pageIndex: _page,
         pageSize: _pageSize,
-        isMySchedule: _isMyFlight, 
+        isMySchedule: _isMyFlight,
         keyword: search,
         fromDate: fromDate,
         toDate: toDate,
@@ -86,9 +108,11 @@ class FlightListNotifier extends _$FlightListNotifier {
     }
   }
 
-  Future<void> refreshFlights({String? search, DateTime? fromDate, DateTime? toDate}) async {
+  Future<void> refreshFlights(
+      {String? search, DateTime? fromDate, DateTime? toDate}) async {
     if (!ref.mounted) return;
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => fetchInitialFlights(search: search, fromDate: fromDate, toDate: toDate));
+    state = await AsyncValue.guard(() => fetchInitialFlights(
+        search: search, fromDate: fromDate, toDate: toDate));
   }
 }

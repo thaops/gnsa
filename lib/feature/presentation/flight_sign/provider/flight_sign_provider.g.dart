@@ -37,7 +37,7 @@ final class FlightSignNotifierProvider
 }
 
 String _$flightSignNotifierHash() =>
-    r'023ae45b6f4f75e4f5b0125b92cf92d76cdb811c';
+    r'b29b416db345e6ae176155fbbaf7cbc3f01aa2b4';
 
 abstract class _$FlightSignNotifier extends $AsyncNotifier<bool?> {
   FutureOr<bool?> build();

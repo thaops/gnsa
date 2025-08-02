@@ -72,6 +72,18 @@ class PopupCreateFood extends HookConsumerWidget {
           color: AppColors.primary,
           borderRadius: AppSizes.radiusMedium,
           onPressed: () {
+            if (selectItem.value == null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Vui lòng chọn loại xe đẩy')),
+              );
+              return;
+            }
+            if (controller.text.isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Vui lòng nhập số lượng')),
+              );
+              return;
+            }
             ref.read(flightDetailUserCaseProvider).addCardItem(CardAddReqModel(
               cartId: selectItem.value!,
               quantity: int.parse(controller.text),

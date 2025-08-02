@@ -30,30 +30,32 @@ class FlightSign extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.watch(flightSignNotifierProvider.notifier);
     final state = ref.watch(flightSignNotifierProvider);
-    final nameController = useTextEditingController();
+    final nameController = useTextEditingController(text: arguments.signedName);
 
-    return Scaffold(
-      appBar: AppBarWidget(
-        title: arguments.title,
-        isBack: false,
-        sizeTitle: 14.sp,
-        iconRightFirst: Icons.close,
-        onPressedFirst: () => Navigator.pop(context),
-      ),
-      body: SingleChildScrollView(
-        child: IntrinsicHeight(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
-            child: Column(
-              children: [
-                _buildSignatureArea(controller, nameController),
-                SizedBox(height: AppSizes.paddingLarge.h),
-                _buildSaveButton(context, controller, state, nameController),
-              ],
-            ),
+    return 
+        Scaffold(
+          appBar: AppBarWidget(
+            title: arguments.title,
+            isBack: false,
+            sizeTitle: 14.sp,
+            iconRightFirst: Icons.close,
+            onPressedFirst: () => Navigator.pop(context),
           ),
-        ),
-      ),
+          body: SingleChildScrollView(
+            child: IntrinsicHeight(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
+                child: Column(
+                  children: [
+                    _buildSignatureArea(controller, nameController),
+                    SizedBox(height: AppSizes.paddingLarge.h),
+                    _buildSaveButton(
+                        context, controller, state, nameController),
+                  ],
+                ),
+              ),
+            ),
+          ),       
     );
   }
 
@@ -131,17 +133,30 @@ class FlightSign extends HookConsumerWidget {
                     message: 'Vui lòng nhập họ tên');
                 return;
               }
-                await controller.saveSignature(
-                  supplyFormDetailIds: arguments.supplyFormIds,
-                  isCrew: arguments.isSupplierSign,
-                  signedName: nameController.text,
-                  isSupplement: arguments.isSupplierSign,
-                );
-              if (state.hasValue && !state.hasError) {
-                Navigator.pop(context, true);
-              }
+              // await controller.saveSignature(
+              //   supplyFormDetailIds: arguments.supplyFormIds,
+              //   isCrew: arguments.isSupplierSign,
+              //   signedName: nameController.text,
+              //   isSupplement: arguments.isSupplement,
+              // );
+              // if (state.hasValue && !state.hasError) {
+              //   Navigator.pop(context, true);
+              // }
+
+              final bytes = await controller.signatureController.toPngBytes();
+              Navigator.pop(context, {
+                'signatureBytes': bytes,
+                'signedName': nameController.text,
+                'isCrew': arguments.isSupplierSign,
+              });
+              _clearSignature(controller, nameController);
             },
       text: 'Lưu',
     );
   }
+}
+
+void _clearSignature(FlightSignNotifier controller, TextEditingController nameController) {
+  controller.clearSignature();
+  nameController.clear();
 }
