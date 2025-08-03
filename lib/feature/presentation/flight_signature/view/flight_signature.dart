@@ -305,7 +305,6 @@ Future<bool> saveSignatures(
 }) async {
   final flightSignUseCase = ref.read(flightSignUserCaseProvider);
   final notifier = ref.read(flightSignNotifierProvider.notifier);
-
   // notifier.state = const AsyncValue.loading();
   if (crewSignature != null && crewName != null) {
     await _saveSignature(
@@ -353,6 +352,7 @@ Future<void> _saveSignature(
       '${tempDir.path}/signature_${DateTime.now().millisecondsSinceEpoch}.png');
   await file.writeAsBytes(signatureBytes);
 
+  notifier.state = const AsyncValue.loading();
   await asyncRequestHandler.execute(
     apiCall: () async {
       return await flightSignUseCase.saveSignature(

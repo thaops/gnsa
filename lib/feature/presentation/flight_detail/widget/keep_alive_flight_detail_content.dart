@@ -129,8 +129,6 @@ class _KeepAliveFlightDetailContentState
                     Expanded(
                       child: SupplyFormListView(
                         supplyForms: data.supplyFormDetails,
-                        // isExpanded: isExpanded,
-                        ref: ref,
                         flightId: widget.flightId,
                         isAdditional: false,
                         kValueSign: _kValueSign,
@@ -154,7 +152,6 @@ class _KeepAliveFlightDetailContentState
                     Expanded(
                       child: SupplyFormListView(
                         supplyForms: data.additionalFormDetails,
-                        ref: ref,
                         flightId: widget.flightId,
                         isAdditional: true,
                         kValueSign: _kValueSign,

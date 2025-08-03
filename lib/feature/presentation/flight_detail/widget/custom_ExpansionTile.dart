@@ -103,6 +103,7 @@ class CustomExpansionTile extends HookConsumerWidget {
           children: [
             ListView.builder(
               shrinkWrap: true,
+              cacheExtent: 2000,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: detailItems?.length ?? 0,
               itemBuilder: (context, outerIndex) => ExpansionTile(

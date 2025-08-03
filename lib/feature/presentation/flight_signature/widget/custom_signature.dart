@@ -41,10 +41,10 @@ class CustomSignature extends StatelessWidget {
         SizedBox(height: 12.h),
         Expanded(
           child: Container(
-              width: double.infinity,
+              width: screenSize.width + 60.w,
               // height: screenSize.height * 0.35,
               padding: EdgeInsets.symmetric(
-                horizontal: (hasServerSignature || hasTempSignature) ? 40.w : 0,
+                horizontal: (hasServerSignature || hasTempSignature) ? 20.w : 0,
               ),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12.r),
@@ -86,33 +86,38 @@ class CustomSignature extends StatelessWidget {
                       ],
                     )
                   : Stack(
-                      children: [
-                        Center(
-                            child: hasTempSignature
-                                ? Image.memory(signatureBytes!,
-                                    fit: BoxFit.fill)
-                                : CachedNetworkImage(
-                                    imageUrl: crewInfo?.imageUrl ?? '',
-                                    fit: BoxFit.fill,
-                                    key: ValueKey(crewInfo?.imageUrl),
-                                    errorWidget: (context, url, error) =>
-                                        const Icon(Icons.error))),
-                        Positioned(
-                          top: 5,
-                          right: 5,
-                          child: Container(
-                            width: 44.w,
-                            height: 44.h,
-                            decoration: BoxDecoration(
-                                color: AppColors.borderSignature,
-                                borderRadius: BorderRadius.circular(50.r)),
-                            child: IconButton(
-                                onPressed: onPressed,
-                                icon: Icon(Icons.edit, size: 24.sp)),
+                        clipBehavior: Clip.none,
+                        children: [
+                          Center(
+                              child: hasTempSignature
+                                  ? Image.memory(signatureBytes!,
+                                      fit: BoxFit.fill)
+                                  : CachedNetworkImage(
+                                      imageUrl: crewInfo?.imageUrl ?? '',
+                                      fit: BoxFit.fill,
+                                      key: ValueKey(crewInfo?.imageUrl),
+                                      errorWidget: (context, url, error) =>
+                                          const Icon(Icons.error))),
+                          Align(
+                            alignment: Alignment.topRight,
+                            child: Transform.translate(
+                              offset: Offset(10.w, 5.h),
+                              child: InkWell(
+                                onTap: onPressed,
+                                child: Container(
+                                  width: 44.w,
+                                  height: 44.h,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.borderSignature,
+                                    borderRadius: BorderRadius.circular(50.r)),
+                                child: Icon(Icons.edit, size: 24.sp),
+                              ),
+                            ),
                           ),
-                        )
-                      ],
-                    )),
+                          )
+                        ],
+                      ),
+                    ),
         ),
       ],
     );

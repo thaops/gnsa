@@ -17,7 +17,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class SupplyFormListView extends HookConsumerWidget {
   final List<SupplyFormDetail>? supplyForms;
   final bool isAdditional;
-  final WidgetRef ref;
   final String? kValueSign;
   final String flightId;
   final bool isSupplement;
@@ -25,7 +24,6 @@ class SupplyFormListView extends HookConsumerWidget {
   const SupplyFormListView({
     required this.supplyForms,
     required this.isAdditional,
-    required this.ref,
     this.kValueSign,
     required this.flightId,
     required this.isSupplement,
