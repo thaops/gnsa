@@ -8,6 +8,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
   final double heightAppBar;
   final bool isBack;
+  final Function? onWillPop;
   final IconData? leadingIcon;
   final IconData? iconRightFirst;
   final IconData? iconRightSecond;
@@ -43,6 +44,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
     this.widgetRight,
     this.popupMenuItems,
     this.onPopupMenuSelected,
+    this.onWillPop,
   }) : super(key: key);
 
   @override
@@ -57,7 +59,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
             )
           : isBack
               ? IconButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => onWillPop != null ? onWillPop!() : Navigator.pop(context),
                   icon: Icon(
                     Icons.arrow_back_ios,
                     color: AppColors.primary,
