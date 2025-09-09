@@ -177,6 +177,7 @@ class MainActivity : FlutterActivity() {
         return nextY
     }
 
+
     /**
      * Prints a row with two columns of Unicode text
      */
@@ -369,29 +370,25 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun printLogo(startY: Int): Int {
-        var yPosition = startY
+        var y = startY
         try {
-            val bitmap = BitmapFactory.decodeResource(resources, R.drawable.logoprint)
-            if (bitmap != null) {
-                Log.d(TAG, "Ảnh logo được tải thành công.")
-                // Chuyển sang trắng–đen, threshold cao để logo không bị đen đặc
-                val bwBitmap = convertToThreshold(bitmap, 180)
-                // Scale logo gọn lại
-                val scaledBitmap = Bitmap.createScaledBitmap(bwBitmap, 150, 60, false)
-                val logoX = (PAGE_WIDTH - scaledBitmap.width) / 2
-                printerManager?.drawBitmap(scaledBitmap, logoX.coerceAtLeast(0), yPosition)
-                yPosition += scaledBitmap.height + 16
-                Log.d(TAG, "Logo được in tại yPosition: $yPosition")
+            val rawBitmap = BitmapFactory.decodeResource(resources, R.drawable.logoprint)
+            if (rawBitmap != null) {
+                val prepared = prepareBitmapForPrint(rawBitmap)
+                val scaled = Bitmap.createScaledBitmap(prepared, 280, 95, false)
+                val x = (PAGE_WIDTH - scaled.width) / 2
+                printerManager?.drawBitmap(scaled, x.coerceAtLeast(0), y)
+                y += scaled.height + 16
             } else {
-                Log.w(TAG, "Ảnh logo bị null. Bỏ qua việc in logo.")
-                yPosition += 20
+                y += 20
             }
         } catch (e: Exception) {
             Log.e(TAG, "Lỗi khi in logo: ${e.message}", e)
-            yPosition += 20
+            y += 20
         }
-        return yPosition
+        return y
     }
+
 
 
     private fun convertToGray(bitmap: Bitmap): Bitmap {
@@ -429,6 +426,16 @@ class MainActivity : FlutterActivity() {
         }
         return bwBitmap
     }
+
+    private fun prepareBitmapForPrint(src: Bitmap): Bitmap {
+        val newBitmap = Bitmap.createBitmap(src.width, src.height, Bitmap.Config.RGB_565)
+        val canvas = Canvas(newBitmap)
+        canvas.drawColor(0xFFFFFFFF.toInt()) // nền trắng
+        canvas.drawBitmap(src, 0f, 0f, null)
+        return newBitmap
+    }
+
+
 
 
 
@@ -488,13 +495,15 @@ class MainActivity : FlutterActivity() {
 
             // Additional flight info - Departure
             if (departureDate.isNotEmpty()) {
-                yPosition = printUnicodeTextRow("Departure:", "${formatDate(departureDate)}", yPosition, 18f)
+                yPosition = printUnicodeTextRow("Departure: ${formatDate(departureDate)}", "", yPosition, 18f)
             }
             
             // Additional flight info - Arrival
             if (arrivalDate.isNotEmpty()) {
-                yPosition = printUnicodeTextRow("Arrival:"," ${formatDate(arrivalDate)}", yPosition, 18f)
+                yPosition = printUnicodeTextRow("Arrival: ${formatDate(arrivalDate)}", "", yPosition, 18f)
             }
+            yPosition += 4
+
 
             // Divider
             yPosition = printDivider(yPosition)
@@ -503,8 +512,6 @@ class MainActivity : FlutterActivity() {
             yPosition = printUnicodeTextRow("Name", "Qty", yPosition, 18f, true)
             yPosition += 8
 
-            // Divider under table header
-            yPosition = printDivider(yPosition)
 
             Log.d(TAG, "Thông tin chuyến bay được in tại yPosition: $yPosition")
         } catch (e: Exception) {
@@ -535,17 +542,35 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun printDivider(startY: Int): Int {
-        val yPosition = startY
-        try {
-            val divider = "---------------------------------------------------".take(48)
-            printerManager?.drawText(divider, 0, yPosition, "simsun", 14, false, false, 0)
-            Log.d(TAG, "Dòng phân cách được in tại yPosition: ${yPosition + 24}")
-            return yPosition + 24
+        val lineHeight = 1  // độ dày đường kẻ
+        return try {
+            // tạo bitmap ngang bằng chiều rộng giấy
+            val bitmap = Bitmap.createBitmap(PAGE_WIDTH, lineHeight, Bitmap.Config.RGB_565)
+            val canvas = Canvas(bitmap)
+            canvas.drawColor(0xFFFFFFFF.toInt()) // nền trắng
+
+            val paint = Paint()
+            paint.color = 0xFF000000.toInt()
+            paint.strokeWidth = lineHeight.toFloat()
+
+            // vẽ một line đen chạy ngang giấy
+            canvas.drawLine(
+                0f,
+                lineHeight / 2f,
+                PAGE_WIDTH.toFloat(),
+                lineHeight / 2f,
+                paint
+            )
+
+            printerManager?.drawBitmap(bitmap, 0, startY)
+
+            startY + lineHeight + 8 // trả về vị trí tiếp theo (cộng thêm spacing)
         } catch (e: Exception) {
-            Log.e(TAG, "Lỗi khi in dòng phân cách: ${e.message}", e)
-            return yPosition
+            Log.e(TAG, "Lỗi khi in divider: ${e.message}", e)
+            startY + 8
         }
     }
+
     
     private fun printFlightInfo(data: Map<String, Any>, startY: Int): Int {
         // For now, we'll use the same implementation as printPreviewFlightInfo
@@ -604,7 +629,7 @@ class MainActivity : FlutterActivity() {
             val totalSupply = data["TotalSupply"] as? Int ?: 0
             Log.d(TAG, "Total supply: $totalSupply")
             yPosition = printUnicodeTextRow("Total:", totalSupply.toString(), yPosition, 20f, true)
-            yPosition += 12
+            yPosition += 14
 
             Log.d(TAG, "Biểu mẫu cung cấp được in tại yPosition: $yPosition")
         } catch (e: Exception) {
@@ -622,13 +647,15 @@ class MainActivity : FlutterActivity() {
         try {
             val qrTitleText = "Scan the QR code to view supply details"
             yPosition = printUnicodeTextLine(qrTitleText, yPosition, 20f, true, true)
+            yPosition += 4
 
             // Decode và chuyển QR sang nhị phân rõ nét
-            val bitmap = BitmapFactory.decodeByteArray(qrCode, 0, qrCode.size)
-            val bwBitmap = convertToThreshold(bitmap, 128) // giữ QR trắng–đen chuẩn
-            val qrX = (PAGE_WIDTH - bwBitmap.width) / 2
-            printerManager?.drawBitmap(bwBitmap, qrX.coerceAtLeast(0), yPosition)
-            yPosition += bwBitmap.height + 20
+            val qrBitmap = BitmapFactory.decodeByteArray(qrCode, 0, qrCode.size)
+            val prepared = prepareBitmapForPrint(qrBitmap)
+            val scaled = Bitmap.createScaledBitmap(prepared, 200, 200, false) // QR 200x200 px
+            val x = (PAGE_WIDTH - scaled.width) / 2
+            printerManager?.drawBitmap(scaled, x.coerceAtLeast(0), yPosition)
+            yPosition += scaled.height + 20
             Log.d(TAG, "QR code printed at yPosition: $yPosition")
 
             val signedText = "Signed/Confirmed before printing"
