@@ -57,7 +57,9 @@ class FlightListContent extends HookConsumerWidget {
           fontSize: 12,
           fontWeight: FontWeight.w300,
           color: AppColors.black,
-          text: isMyFlight ? 'Không có chuyến bay của bạn' : 'Không có chuyến bay',
+          text: isMyFlight
+              ? 'Không có chuyến bay của bạn'
+              : 'Không có chuyến bay',
         ),
       );
     }
@@ -83,7 +85,7 @@ class FlightListContent extends HookConsumerWidget {
               data: flightData,
               onTap: () => GoRouter.of(context).push(
                 AppRouter.flightDetail,
-                extra: flightData.id,
+                extra: "277fcac2-a15d-444b-bee4-0087be9086f5",
               ),
             ),
           );

@@ -3,6 +3,10 @@ package com.vacs.gnsa
 import android.device.PrinterManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Typeface
+import android.graphics.Rect
 import android.util.Log
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -96,6 +100,7 @@ class MainActivity : FlutterActivity() {
                             result.success("Không có máy in trên thiết bị này")
                         }
                         "checkPrinterStatus" -> result.success("Không có máy in")
+
                         else -> {
                             Log.w(TAG, "Phương thức chưa được triển khai hoặc bị bỏ qua: ${call.method}")
                             result.notImplemented()
@@ -103,6 +108,124 @@ class MainActivity : FlutterActivity() {
                     }
                 }
             }
+    }
+
+    /**
+     * Prints Unicode text by rendering it to a bitmap first
+     * This ensures proper Vietnamese character support
+     */
+    private fun printUnicodeText(text: String, x: Int, y: Int, textSize: Float, isBold: Boolean = false, isCentered: Boolean = false): Int {
+        try {
+            // Create a bitmap to draw the text on
+            val paint = Paint()
+            paint.isAntiAlias = true
+            paint.textSize = textSize
+            
+            // Try to load a Unicode font that supports Vietnamese
+            try {
+                val font = Typeface.createFromAsset(assets, "fonts/Roboto-Regular.ttf")
+                paint.typeface = if (isBold) Typeface.create(font, Typeface.BOLD) else font
+            } catch (e: Exception) {
+                // Fallback to default font if custom font fails
+                paint.typeface = if (isBold) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
+                Log.w(TAG, "Could not load custom font, using default: ${e.message}")
+            }
+            
+            // Measure text dimensions
+            val bounds = Rect()
+            paint.getTextBounds(text, 0, text.length, bounds)
+            
+            // Create bitmap with appropriate size
+            val bitmapWidth = if (isCentered) PAGE_WIDTH else bounds.width() + 20
+            val bitmapHeight = bounds.height() + 20
+            val bitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.RGB_565)
+            val canvas = Canvas(bitmap)
+            
+            // Fill background with white
+            canvas.drawColor(0xFFFFFFFF.toInt())
+            
+            // Calculate position
+            val textX = if (isCentered) (bitmapWidth - bounds.width()) / 2f else 10f
+            val textY = bitmapHeight - 10f
+            
+            // Draw text
+            paint.color = 0xFF000000.toInt() // Black text
+            canvas.drawText(text, textX, textY, paint)
+            
+            // Convert to black and white for thermal printing
+            val bwBitmap = convertToGray(bitmap)
+            
+            // Calculate final position
+            val finalX = if (isCentered) 0 else x
+            printerManager?.drawBitmap(bwBitmap, finalX, y)
+            
+            return y + bitmapHeight
+        } catch (e: Exception) {
+            Log.e(TAG, "Error printing Unicode text: ${e.message}", e)
+            // Fallback to regular text printing if bitmap method fails
+            printerManager?.drawText(text, x, y, "simsun", textSize.toInt(), isBold, false, 0)
+            return y + textSize.toInt() + 10
+        }
+    }
+
+    /**
+     * Prints a line of Unicode text with proper line height calculation
+     */
+    private fun printUnicodeTextLine(text: String, startY: Int, textSize: Float = 24f, isBold: Boolean = false, isCentered: Boolean = false): Int {
+        val lineHeight = (textSize * 1.5).toInt()
+        val nextY = printUnicodeText(text, 0, startY, textSize, isBold, isCentered)
+        return nextY
+    }
+
+    /**
+     * Prints a row with two columns of Unicode text
+     */
+    private fun printUnicodeTextRow(leftText: String, rightText: String, startY: Int, textSize: Float = 24f, isBold: Boolean = false): Int {
+        try {
+            val lineHeight = (textSize * 1.5).toInt()
+            
+            // Create bitmap for the entire row
+            val bitmap = Bitmap.createBitmap(PAGE_WIDTH, lineHeight, Bitmap.Config.RGB_565)
+            val canvas = Canvas(bitmap)
+            canvas.drawColor(0xFFFFFFFF.toInt())
+            
+            val paint = Paint()
+            paint.isAntiAlias = true
+            paint.textSize = textSize
+            paint.color = 0xFF000000.toInt()
+            
+            // Try to load a Unicode font that supports Vietnamese
+            try {
+                val font = Typeface.createFromAsset(assets, "fonts/Roboto-Regular.ttf")
+                paint.typeface = if (isBold) Typeface.create(font, Typeface.BOLD) else font
+            } catch (e: Exception) {
+                paint.typeface = if (isBold) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
+                Log.w(TAG, "Could not load custom font for row, using default: ${e.message}")
+            }
+            
+            // Draw left text
+            val leftBounds = Rect()
+            paint.getTextBounds(leftText, 0, leftText.length, leftBounds)
+            canvas.drawText(leftText, 0f, lineHeight - 5f, paint)
+            
+            // Draw right text
+            val rightBounds = Rect()
+            paint.getTextBounds(rightText, 0, rightText.length, rightBounds)
+            val rightX = (PAGE_WIDTH - rightBounds.width() - 10).toFloat()
+            canvas.drawText(rightText, rightX, lineHeight - 5f, paint)
+            
+            // Convert to black and white and print
+            val bwBitmap = convertToGray(bitmap)
+            printerManager?.drawBitmap(bwBitmap, 0, startY)
+            
+            return startY + lineHeight
+        } catch (e: Exception) {
+            Log.e(TAG, "Error printing Unicode text row: ${e.message}", e)
+            // Fallback to regular text printing
+            printerManager?.drawText(leftText, 0, startY, "simsun", textSize.toInt(), isBold, false, 0)
+            printerManager?.drawText(rightText, PAGE_WIDTH/2, startY, "simsun", textSize.toInt(), isBold, false, 0)
+            return startY + (textSize.toInt() + 10)
+        }
     }
 
     private fun printFlightDetail(data: Map<String, Any>) {
@@ -251,27 +374,45 @@ class MainActivity : FlutterActivity() {
             val bitmap = BitmapFactory.decodeResource(resources, R.drawable.logoprint)
             if (bitmap != null) {
                 Log.d(TAG, "Ảnh logo được tải thành công.")
-                val bwBitmap = convertToBlackAndWhite(bitmap)
-                // Scale the logo to be more proportional (smaller than before)
-                val scaledBitmap = Bitmap.createScaledBitmap(bwBitmap, 150, 60, true)
-                val logoX = (PAGE_WIDTH - scaledBitmap.width) / 2  // Center the logo
+                // Chuyển sang trắng–đen, threshold cao để logo không bị đen đặc
+                val bwBitmap = convertToThreshold(bitmap, 180)
+                // Scale logo gọn lại
+                val scaledBitmap = Bitmap.createScaledBitmap(bwBitmap, 150, 60, false)
+                val logoX = (PAGE_WIDTH - scaledBitmap.width) / 2
                 printerManager?.drawBitmap(scaledBitmap, logoX.coerceAtLeast(0), yPosition)
-                yPosition += scaledBitmap.height + 16  // Increased spacing after logo for better visual separation
+                yPosition += scaledBitmap.height + 16
                 Log.d(TAG, "Logo được in tại yPosition: $yPosition")
             } else {
                 Log.w(TAG, "Ảnh logo bị null. Bỏ qua việc in logo.")
-                // Even if no logo, add some spacing
                 yPosition += 20
             }
         } catch (e: Exception) {
             Log.e(TAG, "Lỗi khi in logo: ${e.message}", e)
-            // Add some spacing even if logo fails
             yPosition += 20
         }
         return yPosition
     }
 
-    private fun convertToBlackAndWhite(bitmap: Bitmap): Bitmap {
+
+    private fun convertToGray(bitmap: Bitmap): Bitmap {
+        val width = bitmap.width
+        val height = bitmap.height
+        val grayBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
+
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                val pixel = bitmap.getPixel(x, y)
+                val gray = ((pixel shr 16 and 0xff) * 0.3 +
+                        (pixel shr 8 and 0xff) * 0.59 +
+                        (pixel and 0xff) * 0.11).toInt()
+                val newPixel = 0xFF000000.toInt() or (gray shl 16) or (gray shl 8) or gray
+                grayBitmap.setPixel(x, y, newPixel)
+            }
+        }
+        return grayBitmap
+    }
+
+    private fun convertToThreshold(bitmap: Bitmap, threshold: Int = 160): Bitmap {
         val width = bitmap.width
         val height = bitmap.height
         val bwBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
@@ -282,12 +423,13 @@ class MainActivity : FlutterActivity() {
                 val gray = ((pixel shr 16 and 0xff) * 0.3 +
                         (pixel shr 8 and 0xff) * 0.59 +
                         (pixel and 0xff) * 0.11).toInt()
-                val newPixel = if (gray < 128) 0xFF000000.toInt() else 0xFFFFFFFF.toInt()
+                val newPixel = if (gray < threshold) 0xFF000000.toInt() else 0xFFFFFFFF.toInt()
                 bwBitmap.setPixel(x, y, newPixel)
             }
         }
         return bwBitmap
     }
+
 
 
     private fun printPreviewFlightInfo(data: Map<String, Any>, startY: Int): Int {
@@ -309,83 +451,60 @@ class MainActivity : FlutterActivity() {
 
             // Header text - "Vietnam Airlines Caterers"
             val headerText = "Vietnam Airlines Caterers"
-            val headerX = (PAGE_WIDTH - headerText.length * 8) / 2
-            printerManager?.drawText(headerText, headerX.coerceAtLeast(0), yPosition, "simsun", 16, true, false, 0)
-            yPosition += lineHeight
+            yPosition = printUnicodeTextLine(headerText, yPosition, 20f, true, true)
 
             // Address text
             val addressLine1 = "Tan Son Nhat International Airport, Tan Son Hoa Ward,"
             val addressLine2 = "Ho Chi Minh City, Vietnam."
-            val addressX1 = (PAGE_WIDTH - addressLine1.length * 6) / 2
-            val addressX2 = (PAGE_WIDTH - addressLine2.length * 6) / 2
-            printerManager?.drawText(addressLine1, addressX1.coerceAtLeast(0), yPosition, "simsun", 12, false, false, 0)
-            yPosition += lineHeight - 4
-            printerManager?.drawText(addressLine2, addressX2.coerceAtLeast(0), yPosition, "simsun", 12, false, false, 0)
-            yPosition += lineHeight - 4
+            yPosition = printUnicodeTextLine(addressLine1, yPosition, 16f, false, true)
+            yPosition = printUnicodeTextLine(addressLine2, yPosition, 16f, false, true)
 
             // Phone number
             val phone = "(84 - 28) 38.448.367"
-            val phoneX = (PAGE_WIDTH - phone.length * 6) / 2
-            printerManager?.drawText(phone, phoneX.coerceAtLeast(0), yPosition, "simsun", 12, false, false, 0)
-            yPosition += lineHeight + 4
+            yPosition = printUnicodeTextLine(phone, yPosition, 16f, false, true)
+            yPosition += 8
 
             // Divider
-            printerManager?.drawText("--------------------------------------------".take(48), 0, yPosition, "simsun", 12, false, false, 0)
-            yPosition += lineHeight + 4
+            yPosition = printDivider(yPosition)
 
             // Title
             val title = "Delivery and Receipt Note"
-            val titleX = (PAGE_WIDTH - title.length * 6) / 3
-            printerManager?.drawText(title, titleX.coerceAtLeast(0), yPosition, "simsun", 20, true, false, 0)
-            yPosition += lineHeight + 4
+            yPosition = printUnicodeTextLine(title, yPosition, 24f, true, true)
 
             // Code
             val acfNoText = acfNo ?: ""
             val codeText = "Code: $acfNoText"
-            val codeX = (PAGE_WIDTH - codeText.length * 6) / 3
-            printerManager?.drawText(codeText, codeX.coerceAtLeast(0), yPosition, "simsun", 16, true, false, 0)
-            yPosition += lineHeight + 8
+            yPosition = printUnicodeTextLine(codeText, yPosition, 20f, true, true)
+            yPosition += 8
 
             // Divider
-            printerManager?.drawText("--------------------------------------------".take(48), 0, yPosition, "simsun", 12, false, false, 0)
-            yPosition += lineHeight + 4
-
-
+            yPosition = printDivider(yPosition)
 
             // Flight details - Row 1: Flight and Flight No (side by side)
-            printerManager?.drawText("Flight: $routing".take(24), 0, yPosition, "simsun", 14, false, false, 0)
-            printerManager?.drawText("PK: $typeApl".take(24), PAGE_WIDTH/2, yPosition, "simsun", 14, false, false, 0)
-            yPosition += lineHeight
+            yPosition = printUnicodeTextRow("Flight: $routing", "PK: $typeApl", yPosition, 18f)
 
             // Flight details - Row 2: PK and A/C (side by side)
-            printerManager?.drawText("Flight No: $flightNo".take(24), 0, yPosition, "simsun", 14, false, false, 0)
-            printerManager?.drawText("A/C: $acfNo".take(24), PAGE_WIDTH/2, yPosition, "simsun", 14, false, false, 0)
-            yPosition += lineHeight
+            yPosition = printUnicodeTextRow("Flight No: $flightNo", "A/C: $acfNo", yPosition, 18f)
 
             // Additional flight info - Departure
             if (departureDate.isNotEmpty()) {
-                printerManager?.drawText("Departure: ${formatDate(departureDate)}".take(48), 0, yPosition, "simsun", 14, false, false, 0)
-                yPosition += lineHeight
+                yPosition = printUnicodeTextRow("Departure:", "${formatDate(departureDate)}", yPosition, 18f)
             }
             
             // Additional flight info - Arrival
             if (arrivalDate.isNotEmpty()) {
-                printerManager?.drawText("Arrival: ${formatDate(arrivalDate)}".take(48), 0, yPosition, "simsun", 14, false, false, 0)
-                yPosition += lineHeight
+                yPosition = printUnicodeTextRow("Arrival:"," ${formatDate(arrivalDate)}", yPosition, 18f)
             }
 
             // Divider
-            printerManager?.drawText("--------------------------------------------".take(48), 0, yPosition, "simsun", 12, false, false, 0)
-            yPosition += lineHeight + 4
+            yPosition = printDivider(yPosition)
 
             // Table header
-            printerManager?.drawText("Name".take(24), 0, yPosition, "simsun", 14, true, false, 0)
-            printerManager?.drawText("Qty".take(24), PAGE_WIDTH - 12*6, yPosition, "simsun", 14, true, false, 0)
-            yPosition += lineHeight
+            yPosition = printUnicodeTextRow("Name", "Qty", yPosition, 18f, true)
+            yPosition += 8
 
             // Divider under table header
-            printerManager?.drawText("--------------------------------------------".take(48), 0, yPosition, "simsun", 12, false, false, 0)
-            yPosition += lineHeight
+            yPosition = printDivider(yPosition)
 
             Log.d(TAG, "Thông tin chuyến bay được in tại yPosition: $yPosition")
         } catch (e: Exception) {
@@ -459,27 +578,23 @@ class MainActivity : FlutterActivity() {
                 Log.d(TAG, "Detail items for form $index: $detailItems")
 
                 // Supply form header
-                printerManager?.drawText("$supplyType".take(48), 0, yPosition, "simsun", 16, true, false, 0)
-                printerManager?.drawText(supplyCode.toString().take(48), PAGE_WIDTH - 12*6, yPosition, "simsun", 14, false, false, 0)
 
-                yPosition += lineHeight + 4
+                yPosition = printUnicodeTextRow("$supplyType:", supplyCode.toString(), yPosition, 20f, true)
+
+                yPosition += 4
 
                 // Detail items
                 detailItems?.forEach { item ->
                     val itemName = item["ItemName"] as? String ?: "N/A"
                     val quantity = item["Quantity"] as? Int ?: 0
-                    printerManager?.drawText(itemName.take(36), 0, yPosition, "simsun", 14, false, false, 0)
-                    printerManager?.drawText(quantity.toString().take(12), PAGE_WIDTH - 12*6, yPosition, "simsun", 14, false, false, 0)
-                    yPosition += smallLineHeight
+                    yPosition = printUnicodeTextRow(itemName, quantity.toString(), yPosition, 18f)
                 }
 
                 // Add spacing before dashed line
                 yPosition += 4
 
                 // Dashed line separator (simulated with dotted line)
-                val dashLine = "---------------------------------------------------"
-                printerManager?.drawText(dashLine.take(48), 0, yPosition, "simsun", 12, false, false, 0)
-                yPosition += lineHeight + 4
+                yPosition = printDivider(yPosition)
             }
 
             // Add some spacing before Total
@@ -488,9 +603,8 @@ class MainActivity : FlutterActivity() {
             // Total
             val totalSupply = data["TotalSupply"] as? Int ?: 0
             Log.d(TAG, "Total supply: $totalSupply")
-            printerManager?.drawText("Total:".take(24), 0, yPosition, "simsun", 16, true, false, 0)
-            printerManager?.drawText(totalSupply.toString().take(24), PAGE_WIDTH - 12*6, yPosition, "simsun", 16, true, false, 0)
-            yPosition += lineHeight + 8
+            yPosition = printUnicodeTextRow("Total:", totalSupply.toString(), yPosition, 20f, true)
+            yPosition += 12
 
             Log.d(TAG, "Biểu mẫu cung cấp được in tại yPosition: $yPosition")
         } catch (e: Exception) {
@@ -500,37 +614,29 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun printQR(qrCode: ByteArray?, startY: Int): Int {
-         if (qrCode == null) {
-        Log.w(TAG, "QR code is null, skip printing")
-        return startY
-    }
+        if (qrCode == null) {
+            Log.w(TAG, "QR code is null, skip printing")
+            return startY
+        }
         var yPosition = startY
         try {
-            // Tiêu đề QR
             val qrTitleText = "Scan the QR code to view supply details"
-            val qrTitleX = (PAGE_WIDTH - qrTitleText.length * 8) / 2
-            printerManager?.drawText(qrTitleText, qrTitleX.coerceAtLeast(0), yPosition, "simsun", 16, true, false, 0)
-            yPosition += 28
+            yPosition = printUnicodeTextLine(qrTitleText, yPosition, 20f, true, true)
 
-            // In QR code
+            // Decode và chuyển QR sang nhị phân rõ nét
             val bitmap = BitmapFactory.decodeByteArray(qrCode, 0, qrCode.size)
-            val bwBitmap = convertToBlackAndWhite(bitmap) 
+            val bwBitmap = convertToThreshold(bitmap, 128) // giữ QR trắng–đen chuẩn
             val qrX = (PAGE_WIDTH - bwBitmap.width) / 2
             printerManager?.drawBitmap(bwBitmap, qrX.coerceAtLeast(0), yPosition)
             yPosition += bwBitmap.height + 20
             Log.d(TAG, "QR code printed at yPosition: $yPosition")
 
-            // Text xác nhận
             val signedText = "Signed/Confirmed before printing"
-            val signedX = (PAGE_WIDTH - signedText.length * 8) / 2
-            printerManager?.drawText(signedText, signedX.coerceAtLeast(0), yPosition, "simsun", 16, true, false, 0)
-            yPosition += 28
+            yPosition = printUnicodeTextLine(signedText, yPosition, 20f, true, true)
 
-            // Thời gian in
             val currentTime = SimpleDateFormat("dd/MM/yyyy HH:mm").format(Date())
             val printedText = "     Printed: $currentTime"
-            val printedX = (PAGE_WIDTH - printedText.length * 6) / 2
-            printerManager?.drawText(printedText, printedX.coerceAtLeast(0), yPosition, "simsun", 12, false, false, 0)
+            yPosition = printUnicodeTextLine(printedText, yPosition, 16f, false, true)
             yPosition += 24
 
             Log.d(TAG, "QR + text printed at yPosition: $yPosition")
@@ -540,6 +646,7 @@ class MainActivity : FlutterActivity() {
             return yPosition
         }
     }
+
 
 
     override fun onDestroy() {
