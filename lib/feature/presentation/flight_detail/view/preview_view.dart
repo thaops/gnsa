@@ -1,10 +1,13 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gnsa/common/design_system/tokens/app_sizes.dart';
+import 'package:gnsa/common/img/img.dart';
+import 'package:gnsa/common/method_channel/printer_plugin.dart';
 import 'package:gnsa/common/utils/dash_line.dart';
 import 'package:gnsa/common/utils/date_utils.dart';
 import 'package:gnsa/common/widgets/app_bar_widget.dart';
-import 'package:gnsa/common/widgets/container_loading.dart';
 import 'package:gnsa/common/widgets/custom_button.dart';
 import 'package:gnsa/common/widgets/loading_shimmer.dart';
 import 'package:gnsa/common/widgets/text_widget.dart';
@@ -24,10 +27,75 @@ const double _dashSpace = 3;
 
 class PreviewView extends ConsumerWidget {
   final PreviewArgs args;
-  const PreviewView({super.key, required this.args});
+   PreviewView({super.key, required this.args});
 
-  void handlePrint() {
-    print('Printing supply form...');
+  final UrovoPrinter _printer = UrovoPrinter();
+
+
+Future<Uint8List?> generateQrBytes(String data, {double size = 200}) async {
+  try {
+    final qrPainter = QrPainter(
+      data: data,
+      version: QrVersions.auto,
+      gapless: false,
+    );
+    final picData = await qrPainter.toImageData(size);
+    return picData?.buffer.asUint8List();
+  } catch (e) {
+    return null;
+  }
+}
+
+
+  Future<void> handlePrint(
+      BuildContext context, FlightPreviewModel data ) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+
+    try {
+          final qrBytes = await generateQrBytes(data.linkUrl ?? data.flightInfo?.flightNo ?? "");
+
+      final Map<String, dynamic> printData = {
+        'FlightInfo': data.flightInfo?.toJson(),
+        'SupplyFormDetails':
+            data.supplyFormDetails?.map((detail) => detail.toJson()).toList() ??
+                [],
+        'TotalSupply': data.totalSupply,
+        'LinkUrl': data.linkUrl,
+        'QRCode':  qrBytes
+      };
+
+      final result = await _printer.printPreview(printData);
+
+      Navigator.of(context).pop();
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result),
+            backgroundColor: AppColors.primary,
+          ),
+        );
+      }
+    } catch (e) {
+      Navigator.of(context).pop();
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to print. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -61,51 +129,57 @@ class PreviewView extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              _buildHeaderPreview(data.flightInfo?.acfNo.toString() ?? ''),
               Container(
                 color: AppColors.white,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Column(
                   children: [
-                    Expanded(
-                      child: Column(
-                        children: [
-                          _buildFlightInfoRow(
-                              label: 'Flight',
-                              value: data.flightInfo?.routing ?? ''),
-                          _buildFlightInfoRow(
-                              label: 'Flight No',
-                              value: data.flightInfo?.flightNo ?? ''),
-                          _buildFlightInfoRow(
-                              label: 'Aircraft',
-                              value: data.flightInfo?.acfNo ?? ''),
-                          _buildFlightInfoRow(
-                              label: 'Departure',
-                              value: DateUtilsCustom.formatStringDate(
-                                  data.flightInfo?.departureDate ?? '')),
-                        ],
-                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                              _buildFlightInfoRow(
+                                  label: 'Flight',
+                                  value: data.flightInfo?.routing ?? ''),
+                              _buildFlightInfoRow(
+                                  label: 'Flight No',
+                                  value: data.flightInfo?.flightNo ?? ''),
+                            ])),
+                        Expanded(
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                              _buildFlightInfoRow(
+                                  label: 'PK',
+                                  value: data.flightInfo?.typeApl ?? ''),
+                              _buildFlightInfoRow(
+                                  label: 'A/C',
+                                  value: data.flightInfo?.acfNo ?? ''),
+                            ]))
+                      ],
                     ),
-                    SizedBox(width: AppSizes.paddingMedium),
-                    Expanded(
-                      child: Column(
-                        children: [
-                          _buildFlightInfoRow(
-                              label: 'Arrival',
-                              value: DateUtilsCustom.formatStringDate(
-                                  data.flightInfo?.arrivalDate ?? '')),
-                          _buildFlightInfoRow(
-                              label: 'Aircraft Type',
-                              value: data.flightInfo?.typeApl ?? ''),
-                        ],
-                      ),
-                    ),
+                    _buildFlightInfoRow(
+                        label: 'Flight', value: data.flightInfo?.routing ?? ''),
+                    _buildFlightInfoRow(
+                        label: 'Flight No',
+                        value: data.flightInfo?.flightNo ?? ''),
+                    _buildFlightInfoRow(
+                        label: 'Arrival',
+                        value: DateUtilsCustom.formatStringDateTime(
+                            data.flightInfo?.arrivalDate ?? '')),
+                    _buildFlightInfoRow(
+                        label: 'Departure',
+                        value: DateUtilsCustom.formatStringDateTime(
+                            data.flightInfo?.departureDate ?? '')),
                   ],
                 ),
               ),
               SizedBox(height: AppSizes.paddingXSmall),
               _buildFlightInfoRow(
-                  label: 'Tên',
-                  value: 'SL',
+                  label: 'Name',
+                  value: 'Qty',
                   mainAxisAlignment: MainAxisAlignment.spaceBetween),
               Divider(
                 height: _heightDivider,
@@ -165,7 +239,7 @@ class PreviewView extends ConsumerWidget {
                   }).toList() ??
                   [],
               _buildFlightInfoRow(
-                  label: 'Tổng',
+                  label: 'Total',
                   value: data.totalSupply.toString() ?? '',
                   mainAxisAlignment: MainAxisAlignment.spaceBetween),
               Padding(
@@ -173,9 +247,10 @@ class PreviewView extends ConsumerWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
+                  spacing: AppSizes.spacingXSmall,
                   children: [
                     TextWidget(
-                      text: 'Quét mã để xem chi tiết phiếu cung ứng',
+                      text: 'Scan the QR code to view supply details',
                       fontSize: 12.sp,
                       fontWeight: FontWeight.w300,
                       textAlign: TextAlign.center,
@@ -187,15 +262,24 @@ class PreviewView extends ConsumerWidget {
                       version: QrVersions.auto,
                       size: 160.w,
                     ),
+                    TextWidget(
+                      text: 'Signed/Confirmed before printing',
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w300,
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      color: AppColors.black,
+                    ),
                   ],
                 ),
               ),
+              SizedBox(height: AppSizes.paddingSmall),
               CustomButton(
                 horizontalPadding: AppSizes.paddingLarge,
                 width: MediaQuery.of(context).size.width * 0.4,
                 text: 'In phiếu',
                 color: AppColors.primary,
-                onPressed: handlePrint,
+                onPressed: () => handlePrint(context, data),
               ),
               SizedBox(height: AppSizes.paddingSmall),
             ],
@@ -203,6 +287,50 @@ class PreviewView extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildHeaderPreview(String code) {
+    return Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        spacing: AppSizes.paddingSmall,
+        children: [
+          Image.asset(
+            Img.logo,
+            fit: BoxFit.cover,
+          ),
+          TextWidget(
+            text: 'Vietnam Airlines Caterers',
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w500,
+          ),
+          TextWidget(
+            text:
+                'Tan Son Nhat International Airport, Tan Son Hoa Ward,\n Ho Chi Minh City, Vietnam.',
+            textAlign: TextAlign.center,
+            fontSize: 12.sp,
+            fontWeight: FontWeight.w400,
+            maxLines: 2,
+          ),
+          TextWidget(
+            text: "(84 - 28) 38.448.367",
+            fontSize: 12.sp,
+            fontWeight: FontWeight.w400,
+          ),
+          Divider(
+            height: _heightDivider,
+            color: AppColors.black,
+          ),
+          TextWidget(
+            text: "Delivery and Receipt Note",
+            fontSize: 20.sp,
+            fontWeight: FontWeight.w500,
+          ),
+          TextWidget(
+              text: "Code: ${code}",
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w500),
+          SizedBox(height: AppSizes.paddingSmall),
+        ]);
   }
 
   Widget _buildFlightInfoRow(

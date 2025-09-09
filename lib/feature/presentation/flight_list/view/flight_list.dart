@@ -71,7 +71,6 @@ class _KeepAliveFlightListContentState extends State<KeepAliveFlightListContent>
         final searchController = useTextEditingController();
         final currentSearch = useState('');
         final debounce = useState<Timer?>(null);
-        RefreshController _refreshController = RefreshController(initialRefresh: false);
 
         useEffect(() {
           WidgetsBinding.instance.addPostFrameCallback((_) {

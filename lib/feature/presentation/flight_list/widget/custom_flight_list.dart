@@ -18,8 +18,8 @@ class CustomFlightList extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          height: 104.h,
+          padding: EdgeInsets.symmetric(horizontal: 16.r, vertical: 12.r),
+          height: 112.h,
           decoration: BoxDecoration(
             color: AppColors.backgroundTab,
             borderRadius: BorderRadius.circular(10),
@@ -76,35 +76,31 @@ class FlightInfoColumn extends StatelessWidget {
   });
   @override
   Widget build(BuildContext context) {
-    return   Column(
-          crossAxisAlignment: crossAxisAlignment,
-          mainAxisAlignment: MainAxisAlignment.center,
-           children: [
-            TextWidget(
-              text: flightNo,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              textAlign: TextAlign.center,
-            ),
-            if (isDepart == true)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Image.asset(Img.iconFlight),
-              ),
-            if (isDepart != true) const SizedBox(height: 4),
-            TextWidget(
-              text: isDepart == true
-                  ? DateUtilsCustom.formatStringDate(flightDate.toIso8601String())
-                  : DateUtilsCustom.formatStringTime(
-                      flightDate.toIso8601String()),
-              fontSize: 12,
-              textAlign: TextAlign.center,
-              fontWeight: FontWeight.w300,
-              
-            ),
-          ],
-        
-      );
-    
+    return Column(
+      crossAxisAlignment: crossAxisAlignment,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        TextWidget(
+          text: flightNo,
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          textAlign: TextAlign.center,
+        ),
+        if (isDepart == true)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Image.asset(Img.iconFlight),
+          ),
+        if (isDepart != true) const SizedBox(height: 4),
+        TextWidget(
+          text: isDepart == true
+              ? DateUtilsCustom.formatStringDate(flightDate.toIso8601String())
+              : DateUtilsCustom.formatStringTime(flightDate.toIso8601String()),
+          fontSize: 12,
+          textAlign: TextAlign.center,
+          fontWeight: FontWeight.w300,
+        ),
+      ],
+    );
   }
 }

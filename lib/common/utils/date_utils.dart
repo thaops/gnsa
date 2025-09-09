@@ -15,6 +15,19 @@ class DateUtilsCustom {
     }
   }
 
+  static String formatDateTime(DateTime? date) {
+    if (date != null) {
+      try {
+        return DateFormat('dd/MM/yyyy HH:mm').format(date);
+      } catch (e) {
+        print("Error formatting date: $e");
+        return date.toString();
+      }
+    } else {
+      return 'N/A';
+    }
+  }
+
   // Hàm chuyển đổi chuỗi ISO 8601 thành DateTime rồi định dạng ngày
   static String formatStringDate(String? date) {
     if (date != null && date.isNotEmpty) {
@@ -29,6 +42,21 @@ class DateUtilsCustom {
       return 'N/A';
     }
   }
+
+    static String formatStringDateTime(String? date) {
+    if (date != null && date.isNotEmpty) {
+      try {
+        DateTime dateTime = DateTime.parse(date);
+        return formatDateTime(dateTime);
+      } catch (e) {
+        print("Error parsing date: $e");
+        return date;
+      }
+    } else {
+      return 'N/A';
+    }
+  }
+
 
   // Hàm định dạng giờ (ví dụ: HH:mm)
   static String formatTime(DateTime? time) {

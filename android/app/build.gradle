@@ -13,13 +13,13 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.vacs.gnsa"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35
     ndkVersion = flutter.ndkVersion
 
     defaultConfig {
         applicationId = "com.vacs.gnsa"
         minSdk = 23
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
     }

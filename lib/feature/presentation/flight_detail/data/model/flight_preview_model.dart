@@ -26,12 +26,11 @@ class FlightPreviewModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'SupplyFormId': supplyFormId,
-        'FlightInfo': flightInfo?.toJson(),
-        'SupplyFormDetails':
-            supplyFormDetails?.map((e) => e.toJson()).toList(),
-        'TotalSupply': totalSupply,
-        'LinkUrl': linkUrl,
+        'supplyFormId': supplyFormId,
+        'flightInfo': flightInfo?.toJson(),
+        'supplyFormDetails': supplyFormDetails?.map((e) => e.toJson()).toList(),
+        'totalSupply': totalSupply,
+        'linkUrl': linkUrl,
       };
 }
 

@@ -25,16 +25,18 @@ class AppRouter {
   static const preview = '/preview';
   static const qrcode = '/qrcode';
   static const profile = '/profile';
+  static GoRouter? _router;
 
   static GoRouter getRouter(String accessToken) {
-    return GoRouter(
+    if (_router != null) return _router!;
+
+    _router = GoRouter(
       initialLocation: accessToken.isNotEmpty ? main : login,
       routes: [
-
         GoRoute(
           name: login,
           path: login,
-          builder: (context, state) =>const  LoginScreen(),
+          builder: (context, state) => const LoginScreen(),
         ),
         GoRoute(
           name: main,
@@ -44,7 +46,8 @@ class AppRouter {
         GoRoute(
           name: flightList,
           path: flightList,
-          builder: (context, state) => const FlightListScreen(isMyFlight: false),
+          builder: (context, state) =>
+              const FlightListScreen(isMyFlight: false),
         ),
         GoRoute(
           name: preview,
@@ -59,7 +62,8 @@ class AppRouter {
         GoRoute(
           name: qrcode,
           path: qrcode,
-          builder: (context, state) => QrcodeView(flightId: state.extra as String),
+          builder: (context, state) =>
+              QrcodeView(flightId: state.extra as String),
         ),
         GoRoute(
           name: flightDetail,
@@ -75,11 +79,11 @@ class AppRouter {
           name: flightSignature,
           path: flightSignature,
           builder: (context, state) {
-         final args = state.extra as FlightSignatureAg;
-             return FlightSignature(
-              supplyfromdetailId: args.supplyformdetailId,
-              isSupplement: args.isSupplement,
-              isSignAll: args.isSignAll);
+            final args = state.extra as FlightSignatureAg;
+            return FlightSignature(
+                supplyfromdetailId: args.supplyformdetailId,
+                isSupplement: args.isSupplement,
+                isSignAll: args.isSignAll);
           },
         ),
         GoRoute(
@@ -97,7 +101,8 @@ class AppRouter {
           builder: (context, state) {
             final flightDetailModel = state.extra as SupplyFormModel;
             final flightId = state.extra as String;
-            return FlightPrinter(flightDetailModel: flightDetailModel, flightId: flightId);
+            return FlightPrinter(
+                flightDetailModel: flightDetailModel, flightId: flightId);
           },
         ),
         GoRoute(
@@ -107,5 +112,6 @@ class AppRouter {
         ),
       ],
     );
+    return _router!;
   }
 }
