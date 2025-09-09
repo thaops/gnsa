@@ -18,7 +18,6 @@ abstract class FlightDetailRemote {
   Future<bool> addCardItem(CardAddReqModel req);
 
   Future<String> getQr(String flightId);
-
 }
 
 class FlightDetailRemoteImpl implements FlightDetailRemote {
@@ -26,9 +25,10 @@ class FlightDetailRemoteImpl implements FlightDetailRemote {
   FlightDetailRemoteImpl(this._dioApi);
   @override
   Future<SupplyFormModel> getFlightDetail(String id) async {
-    final response = await _dioApi.get(ApiEndpoints.supplyFormAllDetail(id: id));
-    print("response.data['Data'] ${response.data['Data']}");
-    return SupplyFormModel.fromJson(response.data['Data'] as Map<String, dynamic>);
+    final response =
+        await _dioApi.get(ApiEndpoints.supplyFormAllDetail(id: id));
+    return SupplyFormModel.fromJson(
+        response.data['Data'] as Map<String, dynamic>);
   }
 
   @override
@@ -42,19 +42,26 @@ class FlightDetailRemoteImpl implements FlightDetailRemote {
 
   @override
   Future<FlightPreviewModel> getFlightPreview(PreviewArgs args) async {
-    final response = await _dioApi.post(ApiEndpoints.getFlightPreview, data: args.toJson());
-    return FlightPreviewModel.fromJson(response.data['Data'] as Map<String, dynamic>);
+    final response =
+        await _dioApi.post(ApiEndpoints.getFlightPreview, data: args.toJson());
+    print("response.data['Data'] ${response.data['Data']}");
+
+    return FlightPreviewModel.fromJson(
+        response.data['Data'] as Map<String, dynamic>);
   }
 
   @override
   Future<List<CardItemModel>> getListCart() async {
     final response = await _dioApi.get(ApiEndpoints.getListCart);
-    return (response.data['Data'] as List).map((e) => CardItemModel.fromJson(e)).toList();
+    return (response.data['Data'] as List)
+        .map((e) => CardItemModel.fromJson(e))
+        .toList();
   }
 
   @override
   Future<bool> addCardItem(CardAddReqModel req) async {
-    final response = await _dioApi.post(ApiEndpoints.addCart, data: req.toJson());
+    final response =
+        await _dioApi.post(ApiEndpoints.addCart, data: req.toJson());
     return response.data['Data'] as bool;
   }
 

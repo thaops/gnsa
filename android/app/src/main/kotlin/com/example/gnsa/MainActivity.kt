@@ -253,7 +253,7 @@ class MainActivity : FlutterActivity() {
 
                 yPosition = printLogo(yPosition)
                 yPosition = printFlightInfo(data, yPosition)
-                yPosition = printDivider(yPosition)
+                yPosition = printDivider(yPosition, 2)
                 yPosition = printSupplyForms(data, yPosition)
                 yPosition = printQR(qrBytes,yPosition)
                 printerManager?.printPage(0)
@@ -444,6 +444,7 @@ class MainActivity : FlutterActivity() {
         val lineHeight = 24
 
         try {
+
             val flightInfo = data["FlightInfo"] as? Map<String, Any>
             Log.d(TAG, "Extracted flightInfo: $flightInfo")
             val flightNo = flightInfo?.get("FlightNo") as? String ?: "N/A"
@@ -452,7 +453,12 @@ class MainActivity : FlutterActivity() {
             val typeApl = flightInfo?.get("TypeApl") as? String ?: "N/A"
             val departureDate = flightInfo?.get("DepartureDate") as? String ?: ""
             val arrivalDate = flightInfo?.get("ArrivalDate") as? String ?: ""
-            
+            val pk = flightInfo?.get("Pk") as? String ?: ""
+            val deliveryBy = flightInfo?.get("DeliveryBy") as? String ?: ""
+            val deliveryCode = flightInfo?.get("DeliveryCode") as? String ?: ""
+            val deliveryDate = flightInfo?.get("DeliveryDate") as? String ?: ""
+            val supplyFormCode = data["SupplyFormCode"] as? String ?: ""
+
             // Log extracted values
             Log.d(TAG, "Extracted flight data - FlightNo: $flightNo, Routing: $routing, AcfNo: $acfNo, TypeApl: $typeApl")
 
@@ -472,15 +478,14 @@ class MainActivity : FlutterActivity() {
             yPosition += 8
 
             // Divider
-            yPosition = printDivider(yPosition)
+            yPosition = printDivider(yPosition, 2)
 
             // Title
             val title = "Delivery and Receipt Note"
             yPosition = printUnicodeTextLine(title, yPosition, 24f, true, true)
 
             // Code
-            val acfNoText = acfNo ?: ""
-            val codeText = "Code: $acfNoText"
+            val codeText = "Code: $supplyFormCode"
             yPosition = printUnicodeTextLine(codeText, yPosition, 20f, true, true)
             yPosition += 8
 
@@ -488,7 +493,7 @@ class MainActivity : FlutterActivity() {
             yPosition = printDivider(yPosition)
 
             // Flight details - Row 1: Flight and Flight No (side by side)
-            yPosition = printUnicodeTextRow("Flight: $routing", "PK: $typeApl", yPosition, 18f)
+            yPosition = printUnicodeTextRow("Flight: $routing", "PK: $pk", yPosition, 18f)
 
             // Flight details - Row 2: PK and A/C (side by side)
             yPosition = printUnicodeTextRow("Flight No: $flightNo", "A/C: $acfNo", yPosition, 18f)
@@ -502,11 +507,13 @@ class MainActivity : FlutterActivity() {
             if (arrivalDate.isNotEmpty()) {
                 yPosition = printUnicodeTextRow("Arrival: ${formatDate(arrivalDate)}", "", yPosition, 18f)
             }
-            yPosition += 4
-
-
-            // Divider
-            yPosition = printDivider(yPosition)
+            if (arrivalDate.isNotEmpty()) {
+                yPosition = printUnicodeTextRow("Delivery By: ${deliveryCode} - ${deliveryBy}", "", yPosition, 18f)
+            }
+            if (arrivalDate.isNotEmpty()) {
+                yPosition = printUnicodeTextRow("Delivery Date: ${formatDate(deliveryDate)}", "", yPosition, 18f)
+            }
+            yPosition += 8
 
             // Table header
             yPosition = printUnicodeTextRow("Name", "Qty", yPosition, 18f, true)
@@ -541,8 +548,8 @@ class MainActivity : FlutterActivity() {
         }
     }
 
-    private fun printDivider(startY: Int): Int {
-        val lineHeight = 1  // độ dày đường kẻ
+    private fun printDivider(startY: Int ,  heightl: Int = 1): Int {
+        val lineHeight = heightl  // độ dày đường kẻ
         return try {
             // tạo bitmap ngang bằng chiều rộng giấy
             val bitmap = Bitmap.createBitmap(PAGE_WIDTH, lineHeight, Bitmap.Config.RGB_565)
@@ -604,7 +611,7 @@ class MainActivity : FlutterActivity() {
 
                 // Supply form header
 
-                yPosition = printUnicodeTextRow("$supplyType:", supplyCode.toString(), yPosition, 20f, true)
+                yPosition = printUnicodeTextRow("$supplyType ($supplyCode)", "", yPosition, 20f, true)
 
                 yPosition += 4
 
@@ -616,10 +623,11 @@ class MainActivity : FlutterActivity() {
                 }
 
                 // Add spacing before dashed line
-                yPosition += 4
-
+                yPosition += 6
                 // Dashed line separator (simulated with dotted line)
                 yPosition = printDivider(yPosition)
+                yPosition += 2
+
             }
 
             // Add some spacing before Total
@@ -649,7 +657,6 @@ class MainActivity : FlutterActivity() {
             yPosition = printUnicodeTextLine(qrTitleText, yPosition, 20f, true, true)
             yPosition += 4
 
-            // Decode và chuyển QR sang nhị phân rõ nét
             val qrBitmap = BitmapFactory.decodeByteArray(qrCode, 0, qrCode.size)
             val prepared = prepareBitmapForPrint(qrBitmap)
             val scaled = Bitmap.createScaledBitmap(prepared, 200, 200, false) // QR 200x200 px
@@ -661,9 +668,6 @@ class MainActivity : FlutterActivity() {
             val signedText = "Signed/Confirmed before printing"
             yPosition = printUnicodeTextLine(signedText, yPosition, 20f, true, true)
 
-            val currentTime = SimpleDateFormat("dd/MM/yyyy HH:mm").format(Date())
-            val printedText = "     Printed: $currentTime"
-            yPosition = printUnicodeTextLine(printedText, yPosition, 16f, false, true)
             yPosition += 24
 
             Log.d(TAG, "QR + text printed at yPosition: $yPosition")

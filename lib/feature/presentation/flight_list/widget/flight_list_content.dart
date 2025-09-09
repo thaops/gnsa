@@ -85,7 +85,7 @@ class FlightListContent extends HookConsumerWidget {
               data: flightData,
               onTap: () => GoRouter.of(context).push(
                 AppRouter.flightDetail,
-                extra: "277fcac2-a15d-444b-bee4-0087be9086f5",
+                extra: flightData.id,
               ),
             ),
           );

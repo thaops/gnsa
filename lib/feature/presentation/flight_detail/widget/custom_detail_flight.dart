@@ -45,8 +45,8 @@ class CustomDetailFlight extends StatelessWidget {
                           supplyFormModel.flightInfo?.routing.toString() ?? ''),
                   TextRowTitleValue(
                       title: "Flight No :",
-                      value:
-                          supplyFormModel.flightInfo?.flightNo.toString() ?? ''),
+                      value: supplyFormModel.flightInfo?.flightNo.toString() ??
+                          ''),
                   TextRowTitleValue(
                       title: "Time :",
                       value: DateUtilsCustom.formatStringDate(supplyFormModel
@@ -59,8 +59,11 @@ class CustomDetailFlight extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TextRowTitleValue(title: "Pk:", value: "${supplyFormModel.flightInfo?.typeApl}"),
-                  TextRowTitleValue(title: "A/C :", value: "${supplyFormModel.flightInfo?.groupNo}"),
+                  TextRowTitleValue(
+                      title: "Pk:", value: "${supplyFormModel.flightInfo?.pk}"),
+                  TextRowTitleValue(
+                      title: "A/C :",
+                      value: "${supplyFormModel.flightInfo?.acfNo}"),
                 ],
               ),
             ],

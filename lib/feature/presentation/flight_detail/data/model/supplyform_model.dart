@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:gnsa/feature/presentation/flight_detail/data/model/flight_preview_model.dart';
 
 class SupplyFormModel extends Equatable {
   final String? supplyFormId;
@@ -45,57 +46,8 @@ class SupplyFormModel extends Equatable {
       [supplyFormId, flightInfo, supplyFormDetails, additionalFormDetails];
 }
 
-class FlightInfo extends Equatable {
-  final String? flightNo;
-  final String? acfNo;
-  final String? routing;
-  final DateTime? departureDate;
-  final DateTime? arrivalDate;
-  final String? typeApl;
-  final String? groupNo;
 
-  const FlightInfo({
-    this.flightNo,
-    this.acfNo,
-    this.routing,
-    this.departureDate,
-    this.arrivalDate,
-    this.typeApl,
-    this.groupNo,
-  });
 
-  factory FlightInfo.fromJson(Map<String, dynamic> json) {
-    return FlightInfo(
-      flightNo: json['FlightNo'] ?? '',
-      acfNo: json['AcfNo'] ?? '',
-      routing: json['Routing'] ?? '',
-      departureDate: json['DepartureDate'] != null
-          ? DateTime.tryParse(json['DepartureDate'])
-          : null,
-      arrivalDate: json['ArrivalDate'] != null
-          ? DateTime.tryParse(json['ArrivalDate'])
-          : null,
-      typeApl: json['TypeApl'] ?? '',
-      groupNo: json['GroupNo'] ?? '',
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'FlightNo': flightNo,
-      'AcfNo': acfNo,
-      'Routing': routing,
-      'DepartureDate': departureDate?.toIso8601String(),
-      'ArrivalDate': arrivalDate?.toIso8601String(),
-      'TypeApl': typeApl,
-      'GroupNo': groupNo,
-    };
-  }
-
-  @override
-  List<Object?> get props =>
-      [flightNo, acfNo, routing, departureDate, arrivalDate, typeApl, groupNo];
-}
 
 class SupplyFormDetail extends Equatable {
   final String supplyFormDetailId;

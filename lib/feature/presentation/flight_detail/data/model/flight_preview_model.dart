@@ -2,6 +2,7 @@ class FlightPreviewModel {
   final String? supplyFormId;
   final FlightInfo? flightInfo;
   final List<SupplyFormDetail>? supplyFormDetails;
+  final String? supplyFormCode; // đổi thành String
   final int? totalSupply;
   final String? linkUrl;
 
@@ -9,6 +10,7 @@ class FlightPreviewModel {
     this.supplyFormId,
     this.flightInfo,
     this.supplyFormDetails,
+    this.supplyFormCode,
     this.totalSupply,
     this.linkUrl,
   });
@@ -21,16 +23,18 @@ class FlightPreviewModel {
           .map((e) => SupplyFormDetail.fromJson(e))
           .toList(),
       totalSupply: json['TotalSupply'] as int?,
+      supplyFormCode: json['SupplyFormCode']?.toString(), // ép string
       linkUrl: json['LinkUrl'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'supplyFormId': supplyFormId,
-        'flightInfo': flightInfo?.toJson(),
-        'supplyFormDetails': supplyFormDetails?.map((e) => e.toJson()).toList(),
-        'totalSupply': totalSupply,
-        'linkUrl': linkUrl,
+        'SupplyFormId': supplyFormId,
+        'FlightInfo': flightInfo?.toJson(),
+        'SupplyFormCode': supplyFormCode,
+        'SupplyFormDetails': supplyFormDetails?.map((e) => e.toJson()).toList(),
+        'TotalSupply': totalSupply,
+        'LinkUrl': linkUrl,
       };
 }
 
@@ -42,6 +46,10 @@ class FlightInfo {
   final String? arrivalDate;
   final String? typeApl;
   final String? groupNo;
+  final String? pk; // giữ String và ép sang String
+  final String? deliveryBy;
+  final String? deliveryCode;
+  final String? deliveryDate;
 
   FlightInfo({
     this.flightNo,
@@ -51,6 +59,10 @@ class FlightInfo {
     this.arrivalDate,
     this.typeApl,
     this.groupNo,
+    this.pk,
+    this.deliveryBy,
+    this.deliveryCode,
+    this.deliveryDate,
   });
 
   factory FlightInfo.fromJson(Map<String, dynamic> json) {
@@ -62,6 +74,10 @@ class FlightInfo {
       arrivalDate: json['ArrivalDate'] ?? '',
       typeApl: json['TypeApl'] ?? '',
       groupNo: json['GroupNo'] ?? '',
+      pk: json['Pk']?.toString(),
+      deliveryBy: json['DeliveryBy'] ?? '',
+      deliveryCode: json['DeliveryCode'] ?? '',
+      deliveryDate: json['DeliveryDate'] ?? '',
     );
   }
 
@@ -73,6 +89,10 @@ class FlightInfo {
         'ArrivalDate': arrivalDate,
         'TypeApl': typeApl,
         'GroupNo': groupNo,
+        'Pk': pk,
+        'DeliveryBy': deliveryBy,
+        'DeliveryCode': deliveryCode,
+        'DeliveryDate': deliveryDate,
       };
 }
 

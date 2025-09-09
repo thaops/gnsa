@@ -27,28 +27,26 @@ const double _dashSpace = 3;
 
 class PreviewView extends ConsumerWidget {
   final PreviewArgs args;
-   PreviewView({super.key, required this.args});
+  PreviewView({super.key, required this.args});
 
   final UrovoPrinter _printer = UrovoPrinter();
 
-
-Future<Uint8List?> generateQrBytes(String data, {double size = 200}) async {
-  try {
-    final qrPainter = QrPainter(
-      data: data,
-      version: QrVersions.auto,
-      gapless: false,
-    );
-    final picData = await qrPainter.toImageData(size);
-    return picData?.buffer.asUint8List();
-  } catch (e) {
-    return null;
+  Future<Uint8List?> generateQrBytes(String data, {double size = 200}) async {
+    try {
+      final qrPainter = QrPainter(
+        data: data,
+        version: QrVersions.auto,
+        gapless: false,
+      );
+      final picData = await qrPainter.toImageData(size);
+      return picData?.buffer.asUint8List();
+    } catch (e) {
+      return null;
+    }
   }
-}
-
 
   Future<void> handlePrint(
-      BuildContext context, FlightPreviewModel data ) async {
+      BuildContext context, FlightPreviewModel data) async {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -60,7 +58,8 @@ Future<Uint8List?> generateQrBytes(String data, {double size = 200}) async {
     );
 
     try {
-          final qrBytes = await generateQrBytes(data.linkUrl ?? data.flightInfo?.flightNo ?? "");
+      final qrBytes = await generateQrBytes(
+          data.linkUrl ?? data.flightInfo?.flightNo ?? "");
 
       final Map<String, dynamic> printData = {
         'FlightInfo': data.flightInfo?.toJson(),
@@ -69,7 +68,9 @@ Future<Uint8List?> generateQrBytes(String data, {double size = 200}) async {
                 [],
         'TotalSupply': data.totalSupply,
         'LinkUrl': data.linkUrl,
-        'QRCode':  qrBytes
+        'QRCode': qrBytes,
+        'SupplyFormCode': data.supplyFormCode,
+
       };
 
       final result = await _printer.printPreview(printData);
@@ -129,7 +130,7 @@ Future<Uint8List?> generateQrBytes(String data, {double size = 200}) async {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildHeaderPreview(data.flightInfo?.acfNo.toString() ?? ''),
+              _buildHeaderPreview(data.supplyFormCode.toString() ?? ''),
               Container(
                 color: AppColors.white,
                 child: Column(
@@ -153,7 +154,7 @@ Future<Uint8List?> generateQrBytes(String data, {double size = 200}) async {
                                 children: [
                               _buildFlightInfoRow(
                                   label: 'PK',
-                                  value: data.flightInfo?.typeApl ?? ''),
+                                  value: data.flightInfo?.pk ?? ''),
                               _buildFlightInfoRow(
                                   label: 'A/C',
                                   value: data.flightInfo?.acfNo ?? ''),
@@ -173,6 +174,14 @@ Future<Uint8List?> generateQrBytes(String data, {double size = 200}) async {
                         label: 'Departure',
                         value: DateUtilsCustom.formatStringDateTime(
                             data.flightInfo?.departureDate ?? '')),
+                    _buildFlightInfoRow(
+                        label: 'Departure By',
+                        value:
+                            "${data.flightInfo?.deliveryCode} ${data.flightInfo?.deliveryBy}"),
+                    _buildFlightInfoRow(
+                        label: 'Departure Date',
+                        value: DateUtilsCustom.formatStringDateTime(
+                            data.flightInfo?.deliveryDate ?? '')),
                   ],
                 ),
               ),
@@ -196,10 +205,11 @@ Future<Uint8List?> generateQrBytes(String data, {double size = 200}) async {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildFlightInfoRow(
-                                label: supply.supplyType ?? '',
-                                value: supply.supplyCode ?? '',
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween),
+                              label: supply.supplyType ?? '',
+                              value: supply.supplyCode ?? '',
+                              isSupply: true,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                            ),
                             SizedBox(height: AppSizes.paddingSmall),
                             ...supply.detailItems?.asMap().entries.map((entry) {
                                   final index = entry.key;
@@ -333,10 +343,12 @@ Future<Uint8List?> generateQrBytes(String data, {double size = 200}) async {
         ]);
   }
 
-  Widget _buildFlightInfoRow(
-      {required String label,
-      required String value,
-      MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start}) {
+  Widget _buildFlightInfoRow({
+    required String label,
+    required String value,
+    MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start,
+    bool? isSupply = false,
+  }) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: AppSizes.paddingXSmall),
       child: Row(
@@ -347,11 +359,17 @@ Future<Uint8List?> generateQrBytes(String data, {double size = 200}) async {
             fontSize: 14,
             fontWeight: FontWeight.w300,
           ),
-          TextWidget(
-            text: value,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
+          isSupply == true
+              ? TextWidget(
+                  text: " (${value})",
+                  fontSize: 14,
+                  fontWeight: FontWeight.w300,
+                )
+              : TextWidget(
+                  text: value,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
         ],
       ),
     );
