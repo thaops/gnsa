@@ -163,7 +163,6 @@ class FlightDetailScreen extends HookConsumerWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('Đang tải URL...')),
               );
-
               final qrAsyncValue =
                   ref.read(getQrProviderProvider(flightId).future);
 

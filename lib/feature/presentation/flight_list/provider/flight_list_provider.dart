@@ -15,6 +15,12 @@ class FlightListNotifier extends _$FlightListNotifier {
   late bool _isMyFlight;
   bool _isLoadingMore = false;
   FlightsModel? _originalData;
+  DateTime? _fromDate;
+  DateTime? _toDate;
+
+  // Getter methods for accessing date values
+  DateTime? get fromDate => _fromDate;
+  DateTime? get toDate => _toDate;
 
   @override
   Future<FlightsModel> build(bool isMyFlight) async {
@@ -40,10 +46,15 @@ class FlightListNotifier extends _$FlightListNotifier {
     _cancelToken?.cancel();
     _cancelToken = CancelToken();
     _page = 1;
+
+    // Store the date range for future searches
+    _fromDate = fromDate ?? _fromDate;
+    _toDate = toDate ?? _toDate;
+
     return await _fetchFlights(
         search: search,
-        fromDate: fromDate,
-        toDate: toDate,
+        fromDate: _fromDate,
+        toDate: _toDate,
         cancelToken: _cancelToken!);
   }
 

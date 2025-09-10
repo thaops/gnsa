@@ -14,7 +14,6 @@ import 'package:gnsa/feature/presentation/flight_list/widget/flight_list_content
 import 'package:gnsa/router/app_router.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 const _searchDebounceDuration = Duration(seconds: 1);
 const _listItemVerticalPadding = 16.0;
@@ -34,14 +33,23 @@ void _goToProfile(BuildContext context) {
 }
 
 Future<DateTimeRange?> _showDatePicker(
-    BuildContext context, WidgetRef ref) async {
+    BuildContext context, WidgetRef ref, bool isMyFlight) async {
+  // Get current date values from the provider
+  final provider = ref.read(flightListNotifierProvider(isMyFlight).notifier);
+  final fromDate = provider.fromDate;
+  final toDate = provider.toDate;
+  
+  // Use previously selected dates as initial values, or default to last 7 days if none selected
+  final startDate = fromDate ?? DateTime.now().subtract(const Duration(days: 7));
+  final endDate = toDate ?? DateTime.now();
+  
   final picked = await showDateRangePicker(
     context: context,
     firstDate: DateTime(2020),
     lastDate: DateTime(2100),
     initialDateRange: DateTimeRange(
-      start: DateTime.now().subtract(const Duration(days: 7)),
-      end: DateTime.now(),
+      start: startDate,
+      end: endDate,
     ),
   );
 
@@ -92,8 +100,14 @@ class _KeepAliveFlightListContentState extends State<KeepAliveFlightListContent>
             if (value.isEmpty) {
               flightsAsync.restoreOriginalData();
             } else {
+              // Get current date values from the provider
+              final fromDate = flightsAsync.fromDate;
+              final toDate = flightsAsync.toDate;
+              
               flightsAsync.refreshFlights(
                 search: value,
+                fromDate: fromDate,
+                toDate: toDate,
               );
             }
           });
@@ -102,74 +116,73 @@ class _KeepAliveFlightListContentState extends State<KeepAliveFlightListContent>
         return GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
           child: Scaffold(
-              appBar: AppBarWidget(
-                title:
-                    widget.isMyFlight ? 'Lịch bay của tôi' : 'Toàn bộ lịch bay',
-                isBack: false,
-                iconRightFirst: Icons.person,
-                onPressedFirst: () {
-                  _goToProfile(context);
-                },
-                leadingIcon: Icons.calendar_month_sharp,
-                onLeadingIconPressed: () async {
-                  final picked = await _showDatePicker(context, ref);
-                  if (picked != null) {
-                    ref
-                        .read(flightListNotifierProvider(widget.isMyFlight)
-                            .notifier)
-                        .refreshFlights(
-                          search: currentSearch.value.isEmpty
-                              ? null
-                              : currentSearch.value,
-                          fromDate: picked.start,
-                          toDate: picked.end,
+            appBar: AppBarWidget(
+              title:
+                  widget.isMyFlight ? 'Lịch bay của tôi' : 'Toàn bộ lịch bay',
+              isBack: false,
+              iconRightFirst: Icons.person,
+              onPressedFirst: () {
+                _goToProfile(context);
+              },
+              leadingIcon: Icons.calendar_month_sharp,
+              onLeadingIconPressed: () async {
+                final picked = await _showDatePicker(context, ref, widget.isMyFlight);
+                if (picked != null) {
+                  ref
+                      .read(flightListNotifierProvider(widget.isMyFlight)
+                          .notifier)
+                      .refreshFlights(
+                        search: currentSearch.value.isEmpty
+                            ? null
+                            : currentSearch.value,
+                        fromDate: picked.start,
+                        toDate: picked.end,
+                      );
+                }
+              },
+            ),
+            body: Padding(
+              padding:
+                  EdgeInsets.symmetric(horizontal: _listItemVerticalPadding.h),
+              child: Column(
+                children: [
+                  _buildSearchField(
+                    controller: searchController,
+                    onChanged: onSearchChanged,
+                    onClear: () {
+                      searchController.clear();
+                      currentSearch.value = '';
+                      ref
+                          .read(flightListNotifierProvider(widget.isMyFlight)
+                              .notifier)
+                          .restoreOriginalData();
+                    },
+                  ),
+                  SizedBox(height: 16.h),
+                  Expanded(
+                    child: Consumer(
+                      builder: (context, ref, child) {
+                        final flightsAsync = ref.watch(
+                            flightListNotifierProvider(widget.isMyFlight));
+                        return flightsAsync.when(
+                          loading: () => LoadingShimmer(
+                            type: LoadingShimmerType.list,
+                            child: ContainerLoading(),
+                          ),
+                          error: (error, stack) =>
+                              StateErr(error: error.toString()),
+                          data: (flights) => FlightListContent(
+                            flights: flights,
+                            searchText: currentSearch.value,
+                            isMyFlight: widget.isMyFlight,
+                          ),
                         );
-                  }
-                },
-              ),
-              body: Padding(
-                padding:
-                    EdgeInsets.symmetric(horizontal: _listItemVerticalPadding.h),
-                child: Column(
-                  children: [
-                    _buildSearchField(
-                      controller: searchController,
-                      onChanged: onSearchChanged,
-                      onClear: () {
-                        searchController.clear();
-                        currentSearch.value = '';
-                        ref
-                            .read(flightListNotifierProvider(widget.isMyFlight)
-                                .notifier)
-                            .restoreOriginalData();
                       },
                     ),
-                    SizedBox(height: 16.h),
-                    Expanded(
-                      child: Consumer(
-                        builder: (context, ref, child) {
-                          final flightsAsync = ref.watch(
-                              flightListNotifierProvider(widget.isMyFlight));
-                          return flightsAsync.when(
-                            loading: () => LoadingShimmer(
-                              type: LoadingShimmerType.list,
-                              child: ContainerLoading(),
-                            ),
-                            error: (error, stack) =>
-                                StateErr(error: error.toString()),
-                            data: (flights) => FlightListContent(
-                              flights: flights,
-                              searchText: currentSearch.value,
-                              isMyFlight: widget.isMyFlight,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            
+            ),
           ),
         );
       },

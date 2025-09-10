@@ -52,7 +52,7 @@ final class GetQrProviderProvider
   }
 }
 
-String _$getQrProviderHash() => r'5abe930dd42fc6e4bf1d47d8d3f553a6fcc62afb';
+String _$getQrProviderHash() => r'a39481d36c6dd3857c3f5b91b0c7a7d078a1c73a';
 
 final class GetQrProviderFamily extends $Family
     with
