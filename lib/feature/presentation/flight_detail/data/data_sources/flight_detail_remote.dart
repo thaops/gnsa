@@ -67,7 +67,47 @@ class FlightDetailRemoteImpl implements FlightDetailRemote {
 
   @override
   Future<String> getQr(String flightId) async {
-    final response = await _dioApi.get(ApiEndpoints.qr(flightId));
-    return response.data['Data'] as String;
+    print("Calling QR API with flightId: $flightId");
+
+    try {
+      final response = await _dioApi.get(ApiEndpoints.qr(flightId));
+      print("QR API response: ${response.data}");
+
+      // Check if response has data and Data field
+      if (response.data == null) {
+        print("QR API response data is null");
+        return '';
+      }
+
+      if (!response.data.containsKey('Data')) {
+        print(
+            "QR API response does not contain 'Data' field. Available keys: ${response.data.keys}");
+        return '';
+      }
+
+      final data = response.data['Data'];
+      print("QR API Data field: $data");
+      print("QR API Data field type: ${data.runtimeType}");
+
+      // Handle different possible data types
+      if (data == null) {
+        print("QR API Data field is null");
+        return '';
+      }
+
+      if (data is String) {
+        print("QR API Data is already a string: '$data'");
+        return data;
+      }
+
+      // If it's not a string, try to convert it
+      final result = data.toString();
+      print("QR API Data converted to string: '$result'");
+      return result;
+    } catch (e, stack) {
+      print("Exception in getQr: $e");
+      print("Stack trace: $stack");
+      return '';
+    }
   }
 }

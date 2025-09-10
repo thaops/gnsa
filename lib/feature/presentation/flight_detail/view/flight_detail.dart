@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gnsa/common/utils/responsive_helper.dart';
 import 'package:gnsa/common/widgets/app_bar_widget.dart';
@@ -11,6 +10,7 @@ import 'package:gnsa/core/configs/theme/app_colors.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/preview_args.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/supplyform_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/provider/flight_detail_provider.dart';
+import 'package:gnsa/feature/presentation/flight_detail/provider/get_qr_provider.dart';
 import 'package:gnsa/feature/presentation/flight_detail/provider/ids_not_sign_provider.dart';
 import 'package:gnsa/feature/presentation/flight_detail/provider/providers.dart';
 import 'package:gnsa/feature/presentation/flight_detail/widget/custom_loading_case.dart';
@@ -18,7 +18,9 @@ import 'package:gnsa/feature/presentation/flight_detail/widget/keep_alive_flight
 import 'package:gnsa/feature/presentation/flight_printer/view/flight_printer.dart';
 import 'package:gnsa/router/app_router.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'dart:async';
 
 const _kValueSign = 'NotSigned';
 const _paddingHorizontalMobile = 16.0;
@@ -60,7 +62,9 @@ class FlightDetailScreen extends HookConsumerWidget {
         });
 
         ref.read(idsNotSignProvider.notifier).setIds(idsNotSign);
-        ref.read(idsNotSignAdditionalProvider.notifier).setIds(idsNotSignAdditional);
+        ref
+            .read(idsNotSignAdditionalProvider.notifier)
+            .setIds(idsNotSignAdditional);
       });
     });
 
@@ -144,7 +148,7 @@ class FlightDetailScreen extends HookConsumerWidget {
           ),
         ),
       ],
-      onPopupMenuSelected: (value) {
+      onPopupMenuSelected: (value) async {
         switch (value) {
           case 'printer':
             _showPrinterDialog(context, ref, state);
@@ -153,12 +157,89 @@ class FlightDetailScreen extends HookConsumerWidget {
             context.push(AppRouter.qrcode, extra: flightId);
             break;
           case 'preview':
-            context.push(AppRouter.preview,
-                extra: PreviewArgs(flightId: flightId));
+            if (!context.mounted) return;
+
+            try {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Đang tải URL...')),
+              );
+
+              final qrAsyncValue =
+                  ref.read(getQrProviderProvider(flightId).future);
+
+              final url = await qrAsyncValue.timeout(Duration(seconds: 15));
+
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              }
+
+              if (url.isEmpty) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content: Text(
+                            'Không nhận được URL từ máy chủ. Vui lòng thử lại sau.')),
+                  );
+                }
+                return;
+              }
+
+              if (context.mounted) {
+                openUrlSafe(url, context);
+              }
+            } on TimeoutException catch (e) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                      content: Text(
+                          'Hết thời gian chờ. Vui lòng kiểm tra kết nối mạng.')),
+                );
+              }
+            } catch (err, stack) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Không mở được web: $err')),
+                );
+              }
+            }
             break;
         }
       },
     );
+  }
+
+  Future<void> openUrlSafe(String link, BuildContext context) async {
+    if (link.isEmpty) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(
+                  'Không nhận được URL từ máy chủ. Vui lòng thử lại sau.')),
+        );
+      }
+      return;
+    }
+
+    final uri = Uri.parse(link);
+    try {
+      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+        if (!await launchUrl(uri, mode: LaunchMode.inAppWebView)) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Không mở được: $link')),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Lỗi mở link: $e')),
+        );
+      }
+    }
   }
 
   Widget _buildBody(
