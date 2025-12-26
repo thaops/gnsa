@@ -105,17 +105,48 @@ class DioApi {
             headers: {...?options.headers, ...headers},
           ) ??
           Options(headers: headers);
+      
+      // Log request details
+      print('═══════════════════════════════════════════════════════════');
+      print('📤 API REQUEST - POST');
+      print('URL: ${dio.options.baseUrl}$url');
+      print('Headers: ${headers.toString().replaceAll(headers['Authorization'] ?? '', '[HIDDEN]')}');
+      print('Request Data: $data');
+      print('═══════════════════════════════════════════════════════════');
+      
       final response = await dio.post(
         url,
         data: data,
         options: mergedOptions,
       );
+      
+      // Log response details
+      print('═══════════════════════════════════════════════════════════');
+      print('📥 API RESPONSE - POST');
+      print('URL: ${dio.options.baseUrl}$url');
+      print('Status Code: ${response.statusCode}');
+      print('Status Message: ${response.statusMessage}');
+      print('Response Data: ${response.data}');
+      print('═══════════════════════════════════════════════════════════');
+      
       return _handleResponse(response);
     } on DioException catch (e) {
-      print("errors: $e");
+      // Log error details
+      print('═══════════════════════════════════════════════════════════');
+      print('❌ API ERROR - POST');
+      print('URL: ${dio.options.baseUrl}$url');
+      print('Error Type: ${e.type}');
+      print('Error Message: ${e.message}');
+      print('Response: ${e.response?.data}');
+      print('Status Code: ${e.response?.statusCode}');
+      print('═══════════════════════════════════════════════════════════');
       throw Exception('Failed to post data: ${e.message}');
     } catch (e) {
-      print("errorsc: $e");
+      print('═══════════════════════════════════════════════════════════');
+      print('❌ UNEXPECTED ERROR - POST');
+      print('URL: ${dio.options.baseUrl}$url');
+      print('Error: $e');
+      print('═══════════════════════════════════════════════════════════');
       throw Exception('Unexpected error: $e');
     }
   }

@@ -3,8 +3,10 @@ buildscript {
         google()
         jcenter()
     }
+    // Note: AGP version is now managed in settings.gradle plugins block
+    // This classpath is kept for backward compatibility but may not be used
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.0.2'
+        // classpath 'com.android.tools.build:gradle:8.0.2'
     }
 }
 

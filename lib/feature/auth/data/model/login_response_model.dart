@@ -10,9 +10,15 @@ class LoginResponseModel {
   });
 
   factory LoginResponseModel.fromJson(Map<String, dynamic> json) {
+    // Xử lý trường hợp Data có thể là null
+    String accessToken = '';
+    if (json['Data'] != null && json['Data'] is Map) {
+      accessToken = json['Data']['AccessToken'] ?? '';
+    }
+    
     return LoginResponseModel(
-      accessToken: json['Data']['AccessToken'],
-      statusCode: json['StatusCode'],
+      accessToken: accessToken,
+      statusCode: json['StatusCode'] ?? 400,
       message: json['Message'],
     );
   }

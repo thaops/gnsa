@@ -38,17 +38,88 @@ class LoginController extends _$LoginController {
       }
       return;
     }
+
+    final username = currentState.nameController.text;
+    final password = currentState.passwordController.text;
+    
+    print('═══════════════════════════════════════════════════════════');
+    print('🔐 LOGIN ATTEMPT');
+    print('Username: $username');
+    print('Password: ${'*' * password.length}');
+    print('═══════════════════════════════════════════════════════════');
+
     state = AsyncValue.loading();
 
-    await handler.execute(
-      state: state,
-      apiCall: () async {
-        return await _performLogin(currentState);
-      },
-      onSuccess: (response) async {
-        await _handleLoginSuccess(response as LoginResponseModel, context);
-      },
-    );
+    try {
+      await handler.execute(
+        state: state,
+        apiCall: () async {
+          print('🔄 Starting login API call...');
+          return await _performLogin(currentState);
+        },
+        onSuccess: (response) async {
+          print('✅ Login API call successful');
+          final loginResponse = response as LoginResponseModel;
+          
+          // Kiểm tra statusCode từ API
+          if (loginResponse.statusCode != HttpStatusCodes.STATUS_CODE_OK) {
+            // Hiển thị message từ API khi statusCode != 200
+            state = AsyncValue.data(currentState);
+            if (context.mounted) {
+              final errorMessage = loginResponse.message ?? 'Đăng nhập thất bại. Vui lòng thử lại.';
+              print('❌ Login failed with statusCode: ${loginResponse.statusCode}');
+              print('❌ Error message from API: $errorMessage');
+              CustomFlushbar.showError(
+                context,
+                message: errorMessage,
+              );
+            }
+            return;
+          }
+          
+          await _handleLoginSuccess(loginResponse, context);
+          // Reset state to data after success
+          state = AsyncValue.data(currentState);
+        },
+        onError: (error, stackTrace) async {
+          print('❌ Login API call failed: $error');
+          print('Stack trace: $stackTrace');
+          
+          // Lấy message từ exception nếu có
+          String errorMessage = 'Đăng nhập thất bại. Vui lòng thử lại.';
+          if (error is Exception) {
+            final errorStr = error.toString();
+            // Lấy message từ exception (bỏ prefix "Exception: ")
+            errorMessage = errorStr.replaceAll('Exception: ', '');
+            // Nếu message rỗng hoặc quá ngắn, dùng message mặc định
+            if (errorMessage.isEmpty || errorMessage.length < 3) {
+              errorMessage = 'Đăng nhập thất bại. Vui lòng thử lại.';
+            }
+          }
+          
+          // Reset state to data on error to prevent UI freeze
+          state = AsyncValue.data(currentState);
+          if (context.mounted) {
+            CustomFlushbar.showError(
+              context,
+              message: errorMessage,
+            );
+          }
+        },
+        rethrowError: false, // Không rethrow để tránh crash
+      );
+    } catch (e, st) {
+      print('❌ Login exception caught: $e');
+      print('Stack trace: $st');
+      // Đảm bảo state được reset ngay cả khi có exception
+      state = AsyncValue.data(currentState);
+      if (context.mounted) {
+        CustomFlushbar.showError(
+          context,
+          message: 'Đăng nhập thất bại. Vui lòng thử lại.',
+        );
+      }
+    }
   }
 
   Future<LoginResponseModel> _performLogin(LoginState state) async {
@@ -61,14 +132,15 @@ class LoginController extends _$LoginController {
 
   Future<void> _handleLoginSuccess(
       LoginResponseModel response, BuildContext context) async {
-    if (response.statusCode != HttpStatusCodes.STATUS_CODE_OK) {
-      throw Exception(response.message ?? 'Đăng nhập thất bại');
-    }
-
+    // Không cần check statusCode ở đây nữa vì đã check ở onSuccess
+    // Chỉ xử lý khi statusCode == 200
+    
+    print('💾 Saving access token...');
     final sharedPreferences = await ref.read(sharedPreferencesProvider.future);
     await Services(sharedPreferences).saveAccessToken(response.accessToken);
     _clearForm();
 
+    print('✅ Login successful, navigating to main screen...');
     if (context.mounted) {
       GoRouter.of(context).push(AppRouter.main);
     }
