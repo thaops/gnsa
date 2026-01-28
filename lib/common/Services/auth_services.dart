@@ -2,7 +2,7 @@
 
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:gnsa/common/Services/services.dart';
+import 'package:gnsa/core/services/services.dart';
 
 class AuthServices extends GetxController {
   var accessToken = ''.obs; // Sử dụng Rx để theo dõi sự thay đổi của accessToken

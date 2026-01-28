@@ -1,12 +1,11 @@
-// lib/common/config/api_endpoints.dart
-import 'package:gnsa/common/Services/config.dart';
+import 'package:gnsa/core/config/config.dart';
 
 class ApiEndpoints {
   static const String login = "${Config.baseUrl}/user/login";
-  static String flightList = "${Config.baseUrl}/flight/mobile/flights";
+  static String flightList =
+      "${Config.baseUrl}/flightinfo/get-list-flight-4mobile";
   static String flightDetail(String id) =>
-      "${Config.baseUrl}/flight/mobile/flight-detail/$id";
-  // static String supplyFormAllDetail({String? id, int? pageIndex, int? pageSize}) => "${Config.baseUrl}/supplyform/mobile/get-all-by-flight?flightId=$id&pageIndex=${pageIndex ?? 1}&pageSize=${pageSize ?? 100}";
+      "${Config.baseUrl}/flightinfo/get-list-flight-4mobile/$id";
   static String supplyFormDetail(
           {String? supplyFormId, String? supplyFormType}) =>
       "${Config.baseUrl}/supplyform/mobile/get-detail-by-flight?supplyFormId=$supplyFormId&supplyFormType=$supplyFormType";
@@ -17,28 +16,34 @@ class ApiEndpoints {
   static const String updateSupplyFormNote =
       "${Config.baseUrl}/supplyform/mobile/update-note";
 
-//new
-//supplyfromdetail
   static String supplyFormAllDetail({String? id}) =>
-      "${Config.baseUrl}/supplyform/get-supply-form-detail-by-flight-id-mobile?flightId=$id";
+      "${Config.baseUrl}/supplyform/mobile/get-supply-form-detail/$id";
   static String updateSupplyfromItemDetail =
-      "${Config.baseUrl}/supplyform/update-item-in-supply-form-mobile";
+      "${Config.baseUrl}/supplyform/mobile/update-item-in-supply-form";
   static String getSupplyfromItemDetail =
-      "${Config.baseUrl}/supplyform/get-item-in-supply-form-mobile";
+      "${Config.baseUrl}/supplyform/mobile/get-item-in-supply-form";
 
-  //cart
   static String addCart = "${Config.baseUrl}/cart/add-cart-to-supply-form";
   static String getListCart = "${Config.baseUrl}/cart/get-list-cart";
 
-  static String getFlightPreview =
-      "${Config.baseUrl}/supplyform/preview-supply-form-in-mobile";
-  //signed
-  static String getListSignedSupplyForm(String supplyFormDetailId) =>
-      "${Config.baseUrl}/supplyform/get-list-signed-supply-form-mobile?supplyFormDetailId=$supplyFormDetailId";
-  static String signedSupplyForm =
-      "${Config.baseUrl}/supplyform/signed-supply-form-mobile";
+  static String getFlightPreview(String flightId, {List<String>? types}) {
+    final baseUrl =
+        "${Config.baseUrl}/supplyform/mobile/preview-supply-form/$flightId";
+    if (types == null || types.isEmpty) {
+      return baseUrl;
+    }
+    final typesParam = types.map((t) => 'types=$t').join('&');
+    return "$baseUrl?$typesParam";
+  }
 
-  //qr
+  static String getListSignedSupplyForm(String supplyFormDetailId) =>
+      "${Config.baseUrl}/supplyform/mobile/get-signed-supply-form?supplyFormDetailId=$supplyFormDetailId";
+  static String signedSupplyForm =
+      "${Config.baseUrl}/supplyform/mobile/signed-in-supply-form";
+
   static String qr(String flightId) =>
-      "${Config.baseUrl}/supplyform/get-qr-code-by-flight-id-mobile?flightId=$flightId";
+      "${Config.baseUrl}/supplyform/mobile/get-qr-code-by-flight/$flightId";
+
+  static String getSupplyType =
+      "${Config.baseUrl}/supplyform/mobile/get-supply-type";
 }

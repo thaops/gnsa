@@ -4,6 +4,7 @@ import 'package:gnsa/feature/presentation/flight_detail/data/model/card_item_mod
 import 'package:gnsa/feature/presentation/flight_detail/data/model/flight_preview_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/preview_args.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/supplyform_model.dart';
+import 'package:gnsa/feature/presentation/flight_detail/data/model/supply_type_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/update_supplyfrom_item_req.dart';
 import 'package:gnsa/feature/presentation/flight_detail/domain/repository/flight_detail_repository.dart';
 
@@ -34,9 +35,14 @@ class FlightDetailRepositoryImpl implements FlightDetailRepository {
   Future<bool> addCardItem(CardAddReqModel req) {
     return _flightDetailRemote.addCardItem(req);
   }
-  
+
   @override
   Future<String> getQr(String flightId) {
     return _flightDetailRemote.getQr(flightId);
+  }
+
+  @override
+  Future<List<SupplyTypeModel>> getSupplyTypes() {
+    return _flightDetailRemote.getSupplyTypes();
   }
 }

@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 import 'package:dio/dio.dart' as dio;
 import 'package:gnsa/common/constants/http_status_codes.dart';
-import 'package:gnsa/common/repositoty/dio_api.dart';
+import 'package:gnsa/dio_api/dio_api.dart';
 
 class UploadImage {
   DioApi dioApi = DioApi();

@@ -46,9 +46,6 @@ class SupplyFormModel extends Equatable {
       [supplyFormId, flightInfo, supplyFormDetails, additionalFormDetails];
 }
 
-
-
-
 class SupplyFormDetail extends Equatable {
   final String supplyFormDetailId;
   final String supplyType;
@@ -92,13 +89,19 @@ class SupplyFormDetail extends Equatable {
   }
 
   @override
-  List<Object?> get props =>
-      [supplyFormDetailId, supplyType, supplyName, status, supplyCode, detailItems];
+  List<Object?> get props => [
+        supplyFormDetailId,
+        supplyType,
+        supplyName,
+        status,
+        supplyCode,
+        detailItems
+      ];
 }
 
 class DetailItemGroup extends Equatable {
   final String className;
-  final List<SupplyItemGroup> items;
+  final List<SupplyItem> items;
 
   const DetailItemGroup({
     required this.className,
@@ -109,7 +112,7 @@ class DetailItemGroup extends Equatable {
     return DetailItemGroup(
       className: json['ClassName'] ?? '',
       items: (json['Items'] as List<dynamic>?)
-              ?.map((e) => SupplyItemGroup.fromJson(e))
+              ?.map((e) => SupplyItem.fromJson(e))
               .toList() ??
           [],
     );
@@ -126,60 +129,29 @@ class DetailItemGroup extends Equatable {
   List<Object?> get props => [className, items];
 }
 
-class SupplyItemGroup extends Equatable {
+class SupplyItem extends Equatable {
   final String detailItemId;
   final String itemId;
-  final List<SupplyItem> supplyItems;
-
-  const SupplyItemGroup({
-    required this.detailItemId,
-    required this.itemId,
-    required this.supplyItems,
-  });
-
-  factory SupplyItemGroup.fromJson(Map<String, dynamic> json) {
-    return SupplyItemGroup(
-      detailItemId: json['DetailItemId'] ?? '',
-      itemId: json['ItemId'] ?? '',
-      supplyItems: (json['SupplyItems'] as List<dynamic>?)
-              ?.map((e) => SupplyItem.fromJson(e))
-              .toList() ??
-          [],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'DetailItemId': detailItemId,
-      'ItemId': itemId,
-      'SupplyItems': supplyItems.map((e) => e.toJson()).toList(),
-    };
-  }
-
-  @override
-  List<Object?> get props => [detailItemId, itemId, supplyItems];
-}
-
-class SupplyItem extends Equatable {
-  final String id;
   final String name;
   final int supplyQuantity;
-  final int? additionalQuantity;
-  final int? confirmedQuantity;
-  final String? note;
+  final int additionalQuantity;
+  final int confirmedQuantity;
+  final String note;
 
   const SupplyItem({
-    required this.id,
+    required this.detailItemId,
+    required this.itemId,
     required this.name,
     required this.supplyQuantity,
-    this.additionalQuantity,
-    this.confirmedQuantity,
-    this.note,
+    required this.additionalQuantity,
+    required this.confirmedQuantity,
+    required this.note,
   });
 
   factory SupplyItem.fromJson(Map<String, dynamic> json) {
     return SupplyItem(
-      id: json['Id'] ?? '',
+      detailItemId: json['DetailItemId'] ?? '',
+      itemId: json['ItemId'] ?? '',
       name: json['Name'] ?? '',
       supplyQuantity: json['SupplyQuantity'] ?? 0,
       additionalQuantity: json['AdditionalQuantity'] ?? 0,
@@ -190,7 +162,8 @@ class SupplyItem extends Equatable {
 
   Map<String, dynamic> toJson() {
     return {
-      'Id': id,
+      'DetailItemId': detailItemId,
+      'ItemId': itemId,
       'Name': name,
       'SupplyQuantity': supplyQuantity,
       'AdditionalQuantity': additionalQuantity,
@@ -201,7 +174,8 @@ class SupplyItem extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
+        detailItemId,
+        itemId,
         name,
         supplyQuantity,
         additionalQuantity,

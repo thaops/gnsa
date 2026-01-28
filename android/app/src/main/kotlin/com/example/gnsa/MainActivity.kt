@@ -585,10 +585,68 @@ class MainActivity : FlutterActivity() {
         return printPreviewFlightInfo(data, startY)
     }
     
+    
     private fun printSupplyForms(data: Map<String, Any>, startY: Int): Int {
-        // For now, we'll use the same implementation as printPreviewSupplyForms
-        // In a more complete implementation, this might have different formatting
-        return printPreviewSupplyForms(data, startY)
+        var yPosition = startY
+        val lineHeight = 26
+
+        try {
+            val supplyFormDetails = data["SupplyFormDetails"] as? List<Map<String, Any>>
+            Log.d(TAG, "Extracted supplyFormDetails for detail: $supplyFormDetails")
+            
+            var totalQuantity = 0
+            
+            supplyFormDetails?.forEachIndexed { index, form ->
+                val supplyType = form["SupplyType"] as? String ?: "N/A"
+                val supplyCode = form["SupplyCode"] as? String ?: "N/A"
+                val detailItems = form["DetailItems"] as? List<Map<String, Any>>
+                
+                Log.d(TAG, "Supply form $index - Type: $supplyType, Code: $supplyCode")
+                Log.d(TAG, "Detail items for form $index: $detailItems")
+
+                // Supply form header
+                yPosition = printUnicodeTextRow("$supplyType ($supplyCode)", "", yPosition, 20f, true)
+                yPosition += 4
+
+                // Detail items - nested structure
+                detailItems?.forEach { itemGroup ->
+                    val className = itemGroup["ClassName"] as? String ?: "N/A"
+                    val items = itemGroup["Items"] as? List<Map<String, Any>>
+                    
+                    // Print class name as sub-header
+                    yPosition = printUnicodeTextLine(className, yPosition, 18f, true, false)
+                    yPosition += 2
+                    
+                    // Print each item in this class
+                    items?.forEach { item ->
+                        val itemName = item["Name"] as? String ?: "N/A"
+                        val supplyQuantity = item["SupplyQuantity"] as? Int ?: 0
+                        val additionalQuantity = item["AdditionalQuantity"] as? Int ?: 0
+                        val confirmedQuantity = item["ConfirmedQuantity"] as? Int ?: 0
+                        
+                        totalQuantity += confirmedQuantity
+                        
+                        yPosition = printUnicodeTextRow(itemName, confirmedQuantity.toString(), yPosition, 18f)
+                    }
+                    yPosition += 4
+                }
+
+                // Divider after each supply form
+                yPosition += 6
+                yPosition = printDivider(yPosition)
+                yPosition += 2
+            }
+
+            // Total
+            yPosition += 8
+            yPosition = printUnicodeTextRow("Total:", totalQuantity.toString(), yPosition, 20f, true)
+            yPosition += 14
+
+            Log.d(TAG, "Supply forms detail printed at yPosition: $yPosition")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error printing supply forms detail: ${e.message}", e)
+        }
+        return yPosition
     }
     
     private fun printPreviewSupplyForms(data: Map<String, Any>, startY: Int): Int {

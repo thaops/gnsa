@@ -59,7 +59,8 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
             )
           : isBack
               ? IconButton(
-                  onPressed: () => onWillPop != null ? onWillPop!() : Navigator.pop(context),
+                  onPressed: () =>
+                      onWillPop != null ? onWillPop!() : Navigator.pop(context),
                   icon: Icon(
                     Icons.arrow_back_ios,
                     color: AppColors.primary,

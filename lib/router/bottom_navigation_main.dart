@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gnsa/feature/presentation/flight_list/view/flight_list.dart';
+import 'package:gnsa/feature/presentation/flight_list/presentation/view/flight_list.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
 class MainScreen extends StatefulWidget {
@@ -68,31 +68,13 @@ class _MainScreenState extends State<MainScreen> {
         physics: const BouncingScrollPhysics(),
         children: _screens,
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.only(bottom: 16.0),
-        child: Container(
-          margin: EdgeInsets.only(left: 24.w, right: 24.w),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.rectangle,
-            borderRadius: BorderRadius.circular(30),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.5),
-                spreadRadius: 2,
-                blurRadius: 7,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: SalomonBottomBar(
-            currentIndex: _selectedIndex,
-            onTap: _onTabTapped,
-            unselectedItemColor: Colors.grey,
-            itemPadding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 32.w),
-            items: selectedItem,
-          ),
-        ),
+      bottomNavigationBar: SalomonBottomBar(
+        currentIndex: _selectedIndex,
+        onTap: _onTabTapped,
+        unselectedItemColor: Colors.grey,
+        itemPadding:
+            EdgeInsets.only(top: 12.h, bottom: 12.h, left: 32.w, right: 32.w),
+        items: selectedItem,
       ),
     );
   }

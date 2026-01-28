@@ -1,10 +1,11 @@
 import 'package:gnsa/common/Services/api_endpoints.dart';
-import 'package:gnsa/common/repositoty/dio_api.dart';
+import 'package:gnsa/dio_api/dio_api.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/card_add_req_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/card_item_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/flight_preview_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/preview_args.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/supplyform_model.dart';
+import 'package:gnsa/feature/presentation/flight_detail/data/model/supply_type_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/update_supplyfrom_item_req.dart';
 
 abstract class FlightDetailRemote {
@@ -18,6 +19,8 @@ abstract class FlightDetailRemote {
   Future<bool> addCardItem(CardAddReqModel req);
 
   Future<String> getQr(String flightId);
+
+  Future<List<SupplyTypeModel>> getSupplyTypes();
 }
 
 class FlightDetailRemoteImpl implements FlightDetailRemote {
@@ -42,8 +45,9 @@ class FlightDetailRemoteImpl implements FlightDetailRemote {
 
   @override
   Future<FlightPreviewModel> getFlightPreview(PreviewArgs args) async {
-    final response =
-        await _dioApi.post(ApiEndpoints.getFlightPreview, data: args.toJson());
+    final response = await _dioApi.get(
+      ApiEndpoints.getFlightPreview(args.flightId, types: args.type),
+    );
     print("response.data['Data'] ${response.data['Data']}");
 
     return FlightPreviewModel.fromJson(
@@ -109,5 +113,13 @@ class FlightDetailRemoteImpl implements FlightDetailRemote {
       print("Stack trace: $stack");
       return '';
     }
+  }
+
+  @override
+  Future<List<SupplyTypeModel>> getSupplyTypes() async {
+    final response = await _dioApi.get(ApiEndpoints.getSupplyType);
+    return (response.data['Data'] as List)
+        .map((e) => SupplyTypeModel.fromJson(e))
+        .toList();
   }
 }

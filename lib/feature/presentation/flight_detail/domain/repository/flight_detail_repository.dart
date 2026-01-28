@@ -3,6 +3,7 @@ import 'package:gnsa/feature/presentation/flight_detail/data/model/card_item_mod
 import 'package:gnsa/feature/presentation/flight_detail/data/model/flight_preview_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/preview_args.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/supplyform_model.dart';
+import 'package:gnsa/feature/presentation/flight_detail/data/model/supply_type_model.dart';
 import 'package:gnsa/feature/presentation/flight_detail/data/model/update_supplyfrom_item_req.dart';
 
 abstract class FlightDetailRepository {
@@ -12,6 +13,7 @@ abstract class FlightDetailRepository {
   Future<List<CardItemModel>> getListCart();
   Future<bool> addCardItem(CardAddReqModel req);
   Future<String> getQr(String flightId);
+  Future<List<SupplyTypeModel>> getSupplyTypes();
 }
 
 class FlightDetailUserCase {
@@ -41,5 +43,9 @@ class FlightDetailUserCase {
 
   Future<String> getQr(String flightId) async {
     return await repository.getQr(flightId);
+  }
+
+  Future<List<SupplyTypeModel>> getSupplyTypes() async {
+    return await repository.getSupplyTypes();
   }
 }

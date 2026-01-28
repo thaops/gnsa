@@ -1,5 +1,5 @@
 import 'package:gnsa/common/Services/api_endpoints.dart';
-import 'package:gnsa/common/repositoty/dio_api.dart';
+import 'package:gnsa/dio_api/dio_api.dart';
 import 'package:gnsa/feature/presentation/flight_signature/data/model/flight_signature_model.dart';
 
 abstract class FlightSignatureRemote {

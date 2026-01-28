@@ -1,5 +1,5 @@
 import 'package:gnsa/common/Services/api_endpoints.dart';
-import 'package:gnsa/common/repositoty/dio_api.dart';
+import 'package:gnsa/dio_api/dio_api.dart';
 import 'package:gnsa/feature/presentation/flight_list/data/model/flights_model.dart';
 import 'package:gnsa/feature/presentation/flight_list/data/model/flights_params.dart';
 

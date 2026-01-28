@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:gnsa/common/Services/api_endpoints.dart';
-import 'package:gnsa/common/repositoty/dio_api.dart';
+import 'package:gnsa/dio_api/dio_api.dart';
 import 'package:gnsa/feature/auth/data/model/login_request_model.dart';
 import 'package:gnsa/feature/auth/data/model/login_response_model.dart';
 

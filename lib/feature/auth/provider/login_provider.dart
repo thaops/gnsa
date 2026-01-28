@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gnsa/common/Services/services.dart';
-import 'package:gnsa/common/Services/services_base/api_service_ref.dart';
-import 'package:gnsa/common/Services/services_base/async_request_handler.dart';
+import 'package:gnsa/core/services/services.dart';
+import 'package:gnsa/dio_api/providers/dio_provider.dart';
 import 'package:gnsa/common/constants/http_status_codes.dart';
 import 'package:gnsa/common/utils/custom_flushbar.dart';
 import 'package:gnsa/feature/auth/data/model/login_response_model.dart';
@@ -41,7 +40,7 @@ class LoginController extends _$LoginController {
 
     final username = currentState.nameController.text;
     final password = currentState.passwordController.text;
-    
+
     print('═══════════════════════════════════════════════════════════');
     print('🔐 LOGIN ATTEMPT');
     print('Username: $username');
@@ -60,23 +59,23 @@ class LoginController extends _$LoginController {
         onSuccess: (response) async {
           print('✅ Login API call successful');
           final loginResponse = response as LoginResponseModel;
-          
+
           // Kiểm tra statusCode từ API
           if (loginResponse.statusCode != HttpStatusCodes.STATUS_CODE_OK) {
-            // Hiển thị message từ API khi statusCode != 200
+            // Hiển thị message lỗi đăng nhập
             state = AsyncValue.data(currentState);
             if (context.mounted) {
-              final errorMessage = loginResponse.message ?? 'Đăng nhập thất bại. Vui lòng thử lại.';
-              print('❌ Login failed with statusCode: ${loginResponse.statusCode}');
-              print('❌ Error message from API: $errorMessage');
+              print(
+                  '❌ Login failed with statusCode: ${loginResponse.statusCode}');
+              print('❌ Error message from API: ${loginResponse.message}');
               CustomFlushbar.showError(
                 context,
-                message: errorMessage,
+                message: 'Sai tên đăng nhập hoặc mật khẩu. Vui lòng thử lại!',
               );
             }
             return;
           }
-          
+
           await _handleLoginSuccess(loginResponse, context);
           // Reset state to data after success
           state = AsyncValue.data(currentState);
@@ -84,25 +83,13 @@ class LoginController extends _$LoginController {
         onError: (error, stackTrace) async {
           print('❌ Login API call failed: $error');
           print('Stack trace: $stackTrace');
-          
-          // Lấy message từ exception nếu có
-          String errorMessage = 'Đăng nhập thất bại. Vui lòng thử lại.';
-          if (error is Exception) {
-            final errorStr = error.toString();
-            // Lấy message từ exception (bỏ prefix "Exception: ")
-            errorMessage = errorStr.replaceAll('Exception: ', '');
-            // Nếu message rỗng hoặc quá ngắn, dùng message mặc định
-            if (errorMessage.isEmpty || errorMessage.length < 3) {
-              errorMessage = 'Đăng nhập thất bại. Vui lòng thử lại.';
-            }
-          }
-          
+
           // Reset state to data on error to prevent UI freeze
           state = AsyncValue.data(currentState);
           if (context.mounted) {
             CustomFlushbar.showError(
               context,
-              message: errorMessage,
+              message: 'Sai tên đăng nhập hoặc mật khẩu. Vui lòng thử lại!',
             );
           }
         },
@@ -116,7 +103,7 @@ class LoginController extends _$LoginController {
       if (context.mounted) {
         CustomFlushbar.showError(
           context,
-          message: 'Đăng nhập thất bại. Vui lòng thử lại.',
+          message: 'Sai tên đăng nhập hoặc mật khẩu. Vui lòng thử lại!',
         );
       }
     }
@@ -134,7 +121,7 @@ class LoginController extends _$LoginController {
       LoginResponseModel response, BuildContext context) async {
     // Không cần check statusCode ở đây nữa vì đã check ở onSuccess
     // Chỉ xử lý khi statusCode == 200
-    
+
     print('💾 Saving access token...');
     final sharedPreferences = await ref.read(sharedPreferencesProvider.future);
     await Services(sharedPreferences).saveAccessToken(response.accessToken);

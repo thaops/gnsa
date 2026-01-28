@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:gnsa/common/Services/services.dart';
+import 'package:gnsa/core/services/services.dart';
 import 'package:gnsa/common/widgets/app_bar_widget.dart';
 import 'package:gnsa/router/app_router.dart';
 import 'package:go_router/go_router.dart';
