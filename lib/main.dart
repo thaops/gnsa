@@ -44,21 +44,17 @@ class _MyAppState extends ConsumerState<MyApp> {
   Future<void> _initializeDesignSize() async {
     Size designSize;
 
-    // Kiểm tra iPad bằng DeviceInfoPlugin cho iOS
     if (Platform.isIOS) {
       try {
         final deviceInfo = DeviceInfoPlugin();
         final iosInfo = await deviceInfo.iosInfo;
-        // Kiểm tra nếu là iPad (model name hoặc name chứa "iPad")
         final isIpad = iosInfo.model.toLowerCase().contains('ipad') ||
             iosInfo.name.toLowerCase().contains('ipad') ||
             iosInfo.utsname.machine.toLowerCase().contains('ipad');
 
         if (isIpad) {
           designSize = Size(ScreenSize.widthIpad, ScreenSize.heightIpad);
-          print("iPad detected: ${iosInfo.model} - ${iosInfo.name}");
         } else {
-          // Kiểm tra bằng kích thước màn hình nếu không phát hiện được qua model
           final view = WidgetsBinding.instance.platformDispatcher.views.first;
           final screenSize = view.physicalSize / view.devicePixelRatio;
           designSize = screenSize.width >= 768
@@ -66,8 +62,6 @@ class _MyAppState extends ConsumerState<MyApp> {
               : Size(ScreenSize.width, ScreenSize.height);
         }
       } catch (e) {
-        print("Error detecting iPad: $e");
-        // Fallback: kiểm tra bằng kích thước màn hình
         final view = WidgetsBinding.instance.platformDispatcher.views.first;
         final screenSize = view.physicalSize / view.devicePixelRatio;
         designSize = screenSize.width >= 768
@@ -75,15 +69,12 @@ class _MyAppState extends ConsumerState<MyApp> {
             : Size(ScreenSize.width, ScreenSize.height);
       }
     } else {
-      // Cho Android và các platform khác, kiểm tra bằng kích thước màn hình
       final view = WidgetsBinding.instance.platformDispatcher.views.first;
       final screenSize = view.physicalSize / view.devicePixelRatio;
       designSize = screenSize.width >= 768
           ? Size(ScreenSize.widthIpad, ScreenSize.heightIpad)
           : Size(ScreenSize.width, ScreenSize.height);
     }
-
-    print("designSize: $designSize");
 
     if (mounted) {
       setState(() {

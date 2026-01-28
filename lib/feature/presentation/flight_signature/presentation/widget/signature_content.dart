@@ -38,7 +38,7 @@ class SignatureContent extends HookConsumerWidget {
     required this.onRefresh,
     required this.isSupplement,
     required this.isSignAll,
-    required this.updateTempSignatureStatus, // Thêm callback mới
+    required this.updateTempSignatureStatus, 
   });
 
   @override
@@ -48,23 +48,18 @@ class SignatureContent extends HookConsumerWidget {
     final tempEmployeeSignature = useState<Uint8List?>(null);
     final tempEmployeeName = useState<String?>(null);
 
-    // Sử dụng effect để cập nhật trạng thái sau khi build
     useEffect(() {
-      // Hàm kiểm tra trạng thái chữ ký tạm
       void checkTempSignature() {
         final hasTempSig = tempCrewSignature.value != null ||
             tempEmployeeSignature.value != null;
         updateTempSignatureStatus(hasTempSig);
       }
 
-      // Kiểm tra lần đầu
       checkTempSignature();
 
-      // Trả về hàm cleanup
       return () {};
     }, []);
 
-    // Hàm cập nhật chữ ký và trạng thái
     void updateSignature(
       ValueNotifier<Uint8List?> signatureNotifier,
       ValueNotifier<String?> nameNotifier,
@@ -73,7 +68,6 @@ class SignatureContent extends HookConsumerWidget {
       signatureNotifier.value = result['signatureBytes'] as Uint8List;
       nameNotifier.value = result['signedName'] as String;
 
-      // Cập nhật trạng thái sau khi thay đổi
       final hasTempSig = tempCrewSignature.value != null ||
           tempEmployeeSignature.value != null;
       WidgetsBinding.instance.addPostFrameCallback((_) {
