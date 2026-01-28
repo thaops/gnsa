@@ -18,7 +18,7 @@ class UpdateSupplyfromItemReq {
   Map<String, dynamic> toJson() {
     return {
       'SupplyFormDetailId': supplyFormDetailId,
-      'SupplyFormDetailItemId': supplyFormDetailItemId,
+      'DetailItemId': supplyFormDetailItemId,
       'ItemId': itemId,
       'Supplement': supplement,
       'Type': type,
